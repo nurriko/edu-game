@@ -431,6 +431,14 @@
                                 <p id="p-stat-coins" class="font-game font-bold text-sm text-amber-500">150</p>
                             </div>
                         </div>
+                        <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                            <p class="text-[10px] font-extrabold uppercase text-slate-400 mb-2">Reset Data Game Anak</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="resetChildStats('coins')" class="py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-extrabold text-[11px]"><i class="fa-solid fa-coins"></i> Reset Koin</button>
+                                <button onclick="resetChildStats('xp')" class="py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-extrabold text-[11px]"><i class="fa-solid fa-bolt"></i> Reset XP</button>
+                                <button onclick="resetChildStats('both')" class="py-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-extrabold text-[11px]"><i class="fa-solid fa-rotate-left"></i> Reset Semua</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Status Target Harian Saat Ini -->
@@ -1101,7 +1109,7 @@
                             Topik Soal
                         </span>
                         <span class="text-xs font-extrabold text-amber-500 flex items-center gap-1">
-                            <i class="fa-solid fa-bolt"></i> +15 XP & +10 Koin
+                            <i class="fa-solid fa-bolt"></i> +15 XP & +5 Koin | Salah -10 Koin
                         </span>
                     </div>
                     <p id="quiz-question-text" class="whitespace-pre-line font-bold text-base leading-relaxed text-slate-800 dark:text-slate-100">
@@ -1267,7 +1275,7 @@
                 <div>
                     <h3 class="font-game font-bold text-lg">Roda Keberuntungan Juara</h3>
                     <p id="spin-desc-text" class="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-                        Putar gratis setiap hari untuk mendapatkan tambahan Koin Emas & XP!
+                        Putar gratis setiap hari. Bisa dapat Koin Emas & XP, tapi hati-hati ada hadiah ZONK yang mengurangi koin!
                     </p>
                 </div>
 
@@ -2168,6 +2176,184 @@
                 ]
             }
         };
+
+        /* =========================================================================
+           3B. BANK SOAL TAMBAHAN (VARIASI JENIS SOAL BARU AGAR TIDAK MENGULANG)
+           Format: [pertanyaan, jawabanBenar, [pengecoh1, pengecoh2, pengecoh3], pembahasan]
+           ========================================================================= */
+        (function addExtraQuestions() {
+            const EXTRA = {
+                5: {
+                    'Matematika': [
+                        ['Hasil dari 3/4 + 1/8 adalah...', '7/8', ['4/12', '5/8', '3/4'], 'Samakan penyebut: 3/4 = 6/8, maka 6/8 + 1/8 = 7/8.'],
+                        ['Manakah di bawah ini yang merupakan bilangan prima?', '17', ['15', '21', '27'], 'Bilangan prima hanya habis dibagi 1 dan dirinya sendiri. 15, 21, dan 27 habis dibagi 3.'],
+                        ['Sebuah persegi panjang berukuran panjang 12 cm dan lebar 5 cm. Luasnya adalah...', '60 cm²', ['34 cm²', '17 cm²', '120 cm²'], 'Luas = panjang × lebar = 12 × 5 = 60 cm².'],
+                        ['KPK (Kelipatan Persekutuan Terkecil) dari 4 dan 6 adalah...', '12', ['24', '2', '10'], 'Kelipatan 4: 4, 8, 12. Kelipatan 6: 6, 12. Kelipatan sama terkecil adalah 12.']
+                    ],
+                    'IPA Terpadu': [
+                        ['Alat pernapasan pada ikan adalah...', 'Insang', ['Paru-paru', 'Trakea', 'Stomata'], 'Ikan mengambil oksigen yang terlarut di dalam air menggunakan insang.'],
+                        ['Perubahan uap air menjadi titik-titik air di awan disebut...', 'Kondensasi', ['Evaporasi', 'Presipitasi', 'Infiltrasi'], 'Kondensasi adalah pengembunan uap air akibat suhu yang dingin di udara.'],
+                        ['Zat hijau daun yang berfungsi menangkap cahaya matahari saat fotosintesis disebut...', 'Klorofil', ['Stomata', 'Xilem', 'Floem'], 'Klorofil menangkap energi cahaya untuk mengubah air dan CO₂ menjadi makanan.'],
+                        ['Hewan yang hanya memakan tumbuhan disebut...', 'Herbivora', ['Karnivora', 'Omnivora', 'Dekomposer'], 'Herbivora adalah pemakan tumbuhan, contohnya sapi dan kambing.']
+                    ],
+                    'IPS Terpadu': [
+                        ['Selat yang memisahkan Pulau Jawa dan Pulau Sumatra adalah...', 'Selat Sunda', ['Selat Malaka', 'Selat Bali', 'Selat Makassar'], 'Selat Sunda berada di antara ujung barat Jawa dan ujung selatan Sumatra.'],
+                        ['Naskah Proklamasi kemerdekaan Indonesia diketik oleh...', 'Sayuti Melik', ['Fatmawati', 'Moh. Yamin', 'Ki Hajar Dewantara'], 'Sayuti Melik mengetik naskah proklamasi dari tulisan tangan Soekarno.'],
+                        ['Kegiatan menggunakan barang dan jasa untuk memenuhi kebutuhan disebut...', 'Konsumsi', ['Produksi', 'Distribusi', 'Investasi'], 'Konsumsi adalah kegiatan memakai atau menghabiskan nilai guna barang dan jasa.'],
+                        ['Gunung tertinggi di Indonesia adalah...', 'Puncak Jaya', ['Gunung Semeru', 'Gunung Kerinci', 'Gunung Rinjani'], 'Puncak Jaya di Papua memiliki ketinggian sekitar 4.884 mdpl.']
+                    ],
+                    'Bahasa Indonesia': [
+                        ['Lawan kata (antonim) dari "rajin" adalah...', 'Malas', ['Giat', 'Tekun', 'Ulet'], 'Rajin berarti sungguh-sungguh bekerja, lawannya adalah malas.'],
+                        ['Penulisan kata baku yang benar adalah...', 'Apotek', ['Apotik', 'Opotek', 'Apoteek'], 'Kata baku dalam KBBI adalah "apotek".'],
+                        ['Kata tanya yang digunakan untuk menanyakan TEMPAT adalah...', 'Di mana', ['Kapan', 'Siapa', 'Mengapa'], 'Di mana menanyakan tempat, kapan menanyakan waktu, siapa menanyakan orang.'],
+                        ['Dalam satu bait pantun biasanya terdiri atas ... baris.', '4', ['2', '6', '8'], 'Pantun terdiri atas 4 baris: 2 baris sampiran dan 2 baris isi.']
+                    ],
+                    'Bahasa Inggris': [
+                        ['"It is half past seven." artinya jam...', '07.30', ['08.30', '06.45', '07.00'], 'Half past seven berarti setengah delapan, yaitu pukul 07.30.'],
+                        ['The plural form of "child" is...', 'children', ['childs', 'childrens', 'childes'], 'Child adalah plural tidak beraturan menjadi children.'],
+                        ['I ___ breakfast every morning.', 'eat', ['eats', 'eating', 'ate'], 'Subjek "I" pada Simple Present memakai kata kerja bentuk dasar (eat).'],
+                        ['The opposite of "big" is...', 'small', ['large', 'tall', 'huge'], 'Lawan kata big (besar) adalah small (kecil).']
+                    ]
+                },
+                6: {
+                    'Matematika': [
+                        ['Hasil dari (-5) + 8 adalah...', '3', ['-3', '13', '-13'], 'Mulai dari -5 lalu naik 8 langkah menjadi 3.'],
+                        ['Keliling lingkaran berjari-jari 7 cm (π = 22/7) adalah...', '44 cm', ['22 cm', '154 cm', '49 cm'], 'Keliling = 2 × π × r = 2 × 22/7 × 7 = 44 cm.'],
+                        ['Modus dari data 3, 4, 4, 5, 6, 4, 7 adalah...', '4', ['5', '3', '7'], 'Modus adalah nilai yang paling sering muncul, yaitu angka 4 (3 kali).'],
+                        ['Jumlah rusuk pada sebuah kubus adalah...', '12', ['6', '8', '4'], 'Kubus memiliki 12 rusuk, 6 sisi, dan 8 titik sudut.']
+                    ],
+                    'IPA Terpadu': [
+                        ['Tumbuhan yang berkembang biak secara vegetatif dengan tunas adalah...', 'Pisang', ['Kacang tanah', 'Jagung', 'Padi'], 'Pisang berkembang biak dengan tunas (anakan) di sekitar batang.'],
+                        ['Planet yang paling dekat dengan Matahari adalah...', 'Merkurius', ['Venus', 'Bumi', 'Mars'], 'Merkurius adalah planet pertama dari Matahari.'],
+                        ['Pada rangkaian listrik SERI, jika salah satu lampu putus maka lampu lainnya akan...', 'Ikut padam', ['Tetap menyala', 'Semakin terang', 'Berkedip'], 'Rangkaian seri hanya punya satu jalur, jika terputus arus berhenti mengalir.'],
+                        ['Urutan metamorfosis sempurna katak yang benar adalah...', 'Telur → berudu → katak muda → katak dewasa', ['Berudu → telur → katak muda → katak dewasa', 'Telur → katak muda → berudu → katak dewasa', 'Katak dewasa → telur → berudu → katak muda'], 'Katak berawal dari telur, menetas menjadi berudu, lalu tumbuh kaki.']
+                    ],
+                    'IPS Terpadu': [
+                        ['ASEAN didirikan pada tahun 1967 di kota...', 'Bangkok', ['Jakarta', 'Manila', 'Kuala Lumpur'], 'Deklarasi Bangkok pada 8 Agustus 1967 menandai berdirinya ASEAN.'],
+                        ['Ibu kota negara Malaysia adalah...', 'Kuala Lumpur', ['Bangkok', 'Manila', 'Hanoi'], 'Kuala Lumpur adalah ibu kota Malaysia.'],
+                        ['Pertempuran 10 November 1945 yang diperingati sebagai Hari Pahlawan terjadi di kota...', 'Surabaya', ['Bandung', 'Semarang', 'Medan'], 'Pertempuran besar melawan sekutu terjadi di Surabaya.'],
+                        ['Bendera Pusaka Merah Putih dijahit oleh...', 'Fatmawati', ['Cut Nyak Dien', 'R.A. Kartini', 'Dewi Sartika'], 'Ibu Fatmawati, istri Soekarno, menjahit bendera pusaka.']
+                    ],
+                    'Bahasa Indonesia': [
+                        ['Teks yang menjelaskan proses terjadinya suatu peristiwa alam, misalnya gerhana, disebut teks...', 'Eksplanasi', ['Narasi', 'Prosedur', 'Pidato'], 'Teks eksplanasi menjelaskan proses sebab-akibat suatu fenomena.'],
+                        ['Kata dasar "tulis" diberi awalan me- menjadi...', 'Menulis', ['Mentulis', 'Menulisi', 'Memtulis'], 'Awalan me- bertemu huruf t luluh menjadi "menulis".'],
+                        ['Kalimat yang penulisan huruf kapitalnya benar adalah...', 'Kami berlibur ke Bali.', ['kami berlibur ke bali.', 'Kami berlibur ke bali.', 'kami Berlibur Ke Bali.'], 'Awal kalimat dan nama tempat (Bali) ditulis dengan huruf kapital.'],
+                        ['Arti ungkapan "panjang tangan" adalah...', 'Suka mencuri', ['Suka menolong', 'Suka bekerja', 'Tangannya panjang'], '"Panjang tangan" adalah kiasan untuk orang yang suka mencuri.']
+                    ],
+                    'Bahasa Inggris': [
+                        ['Yesterday, I ___ football with my friends.', 'played', ['play', 'plays', 'playing'], '"Yesterday" menunjukkan Simple Past, sehingga memakai played.'],
+                        ['"Turn left at the corner." artinya...', 'Belok kiri di pojok jalan', ['Belok kanan di pojok jalan', 'Jalan lurus saja', 'Putar balik'], 'Turn left = belok kiri, corner = sudut/pojok jalan.'],
+                        ['I am going to ___ my grandmother tomorrow.', 'visit', ['visited', 'visits', 'visiting'], 'Setelah "going to" digunakan kata kerja bentuk dasar (visit).'],
+                        ['She is crying because she lost her cat. She feels ___.', 'sad', ['happy', 'proud', 'excited'], 'Menangis karena kehilangan kucing berarti merasa sedih (sad).']
+                    ]
+                },
+                7: {
+                    'Matematika': [
+                        ['Hasil dari -12 + 5 - (-3) adalah...', '-4', ['-14', '4', '-10'], '-12 + 5 = -7, lalu -7 - (-3) = -7 + 3 = -4.'],
+                        ['Penyelesaian dari 3x + 5 = 20 adalah x = ...', '5', ['15', '25/3', '8'], '3x = 20 - 5 = 15, maka x = 15 ÷ 3 = 5.'],
+                        ['Sebuah baju seharga Rp150.000 mendapat diskon 20%. Harga yang dibayar adalah...', 'Rp120.000', ['Rp30.000', 'Rp130.000', 'Rp170.000'], 'Diskon = 20% × 150.000 = 30.000. Bayar = 150.000 - 30.000 = 120.000.'],
+                        ['Bentuk sederhana dari 3a + 5b - a + 2b adalah...', '2a + 7b', ['4a + 7b', '2a + 3b', '3a + 7b'], 'Suku sejenis digabung: (3a - a) + (5b + 2b) = 2a + 7b.']
+                    ],
+                    'IPA Terpadu': [
+                        ['Satuan suhu dalam Sistem Internasional (SI) adalah...', 'Kelvin', ['Celsius', 'Fahrenheit', 'Reamur'], 'Satuan SI untuk suhu adalah Kelvin (K).'],
+                        ['Rumus massa jenis (ρ) adalah...', 'm / V', ['V / m', 'm × V', 'm + V'], 'Massa jenis = massa dibagi volume.'],
+                        ['Kumpulan sel sejenis yang memiliki fungsi yang sama disebut...', 'Jaringan', ['Organ', 'Sistem organ', 'Organel'], 'Urutan: sel → jaringan → organ → sistem organ → organisme.'],
+                        ['Perpindahan kalor tanpa memerlukan zat perantara disebut...', 'Radiasi', ['Konduksi', 'Konveksi', 'Adhesi'], 'Panas Matahari sampai ke Bumi lewat radiasi melalui ruang hampa.']
+                    ],
+                    'IPS Terpadu': [
+                        ['Pada peta berskala 1 : 500.000, jarak 4 cm di peta sama dengan jarak sebenarnya...', '20 km', ['2 km', '200 km', '12,5 km'], '4 × 500.000 = 2.000.000 cm = 20 km.'],
+                        ['Fosil manusia purba Pithecanthropus erectus ditemukan oleh Eugene Dubois di daerah...', 'Trinil', ['Sangiran', 'Ngandong', 'Wajak'], 'Dubois menemukannya di Trinil, Ngawi, Jawa Timur pada 1891.'],
+                        ['Berikut ini yang termasuk kebutuhan primer adalah...', 'Makanan', ['Mobil', 'Laptop', 'Liburan'], 'Kebutuhan primer adalah kebutuhan pokok seperti pangan, sandang, dan papan.'],
+                        ['Lembaga sosial pertama yang dikenal seorang anak adalah...', 'Keluarga', ['Sekolah', 'Masyarakat', 'Negara'], 'Anak pertama kali belajar nilai dan norma dari keluarganya.']
+                    ],
+                    'Bahasa Indonesia': [
+                        ['Cerita dengan tokoh hewan yang berperilaku seperti manusia dan mengandung pesan moral disebut...', 'Fabel', ['Legenda', 'Biografi', 'Berita'], 'Fabel adalah cerita binatang yang berisi ajaran moral.'],
+                        ['Dua baris pertama pada pantun disebut...', 'Sampiran', ['Isi', 'Tema', 'Amanat'], 'Sampiran di baris 1-2, isi (maksud) di baris 3-4.'],
+                        ['Ciri kebahasaan yang paling menonjol pada teks prosedur adalah menggunakan kalimat...', 'Perintah', ['Tanya', 'Seru', 'Berita opini'], 'Teks prosedur berisi langkah-langkah, sehingga memakai kalimat perintah.'],
+                        ['Tujuan utama teks deskripsi adalah...', 'Menggambarkan objek sehingga pembaca seolah melihatnya', ['Memerintahkan pembaca', 'Menceritakan kejadian berurutan', 'Menjual barang'], 'Teks deskripsi melukiskan ciri objek dengan detail.']
+                    ],
+                    'Bahasa Inggris': [
+                        ['She ___ to school every day.', 'goes', ['go', 'going', 'gone'], 'Subjek orang ketiga tunggal (she) pada Simple Present memakai V-s/es: goes.'],
+                        ['Tono is my brother. ___ is a student.', 'He', ['She', 'It', 'They'], 'Tono laki-laki sehingga kata gantinya "He".'],
+                        ['Which greeting is suitable at 3 pm?', 'Good afternoon', ['Good morning', 'Good evening', 'Good night'], 'Pukul 3 sore adalah afternoon.'],
+                        ['They ___ not like spicy food.', 'do', ['does', 'is', 'are'], 'Subjek jamak (they) pada negatif Simple Present memakai "do not".']
+                    ]
+                },
+                8: {
+                    'Matematika': [
+                        ['Segitiga siku-siku memiliki sisi tegak 6 cm dan 8 cm. Panjang sisi miringnya adalah...', '10 cm', ['14 cm', '12 cm', '100 cm'], 'c = √(6² + 8²) = √(36 + 64) = √100 = 10 cm.'],
+                        ['Gradien garis y = 3x - 2 adalah...', '3', ['-2', '2', '1/3'], 'Pada y = mx + c, gradien m adalah koefisien x, yaitu 3.'],
+                        ['Dari sistem x + y = 7 dan x - y = 1, nilai x adalah...', '4', ['3', '6', '5'], 'Jumlahkan kedua persamaan: 2x = 8 sehingga x = 4 (y = 3).'],
+                        ['Besar sudut keliling yang menghadap diameter lingkaran adalah...', '90°', ['180°', '45°', '60°'], 'Sudut keliling yang menghadap diameter selalu siku-siku (90°).']
+                    ],
+                    'IPA Terpadu': [
+                        ['Rumus usaha (W) yang benar adalah...', 'W = F × s', ['W = F / s', 'W = F + s', 'W = s / F'], 'Usaha = gaya × perpindahan.'],
+                        ['Satuan tekanan dalam Sistem Internasional adalah...', 'Pascal (Pa)', ['Newton', 'Joule', 'Watt'], 'Tekanan = gaya / luas, satuannya N/m² yang disebut Pascal.'],
+                        ['Enzim yang terdapat di dalam mulut dan mengubah amilum menjadi gula sederhana adalah...', 'Ptialin (amilase)', ['Pepsin', 'Tripsin', 'Lipase'], 'Ptialin dalam air liur memulai pencernaan karbohidrat.'],
+                        ['Contoh gelombang longitudinal adalah...', 'Gelombang bunyi', ['Cahaya', 'Gelombang radio', 'Gelombang pada tali'], 'Bunyi merambat sebagai rapatan dan renggangan searah rambatannya.']
+                    ],
+                    'IPS Terpadu': [
+                        ['Sekretariat ASEAN berkedudukan di kota...', 'Jakarta', ['Bangkok', 'Singapura', 'Manila'], 'Sekretariat ASEAN berpusat di Jakarta, Indonesia.'],
+                        ['Organisasi pergerakan nasional pertama di Indonesia adalah...', 'Budi Utomo', ['Sarekat Islam', 'Indische Partij', 'PNI'], 'Budi Utomo berdiri 20 Mei 1908 dan menjadi tonggak Kebangkitan Nasional.'],
+                        ['Ikrar Sumpah Pemuda diucapkan pada tanggal...', '28 Oktober 1928', ['20 Mei 1908', '17 Agustus 1945', '10 November 1945'], 'Kongres Pemuda II menghasilkan Sumpah Pemuda pada 28 Oktober 1928.'],
+                        ['Buruh pabrik yang dipromosikan menjadi manajer mengalami mobilitas sosial...', 'Vertikal naik', ['Vertikal turun', 'Horizontal', 'Antargenerasi turun'], 'Perpindahan ke lapisan sosial yang lebih tinggi disebut mobilitas vertikal naik.']
+                    ],
+                    'Bahasa Indonesia': [
+                        ['Unsur berita "mengapa" (why) menanyakan...', 'Sebab atau alasan kejadian', ['Waktu kejadian', 'Tempat kejadian', 'Pelaku kejadian'], 'Mengapa menanyakan sebab; kapan = waktu; di mana = tempat; siapa = pelaku.'],
+                        ['Informasi dalam teks berita harus...', 'Aktual dan faktual', ['Fiktif', 'Berdasarkan opini penulis', 'Dilebih-lebihkan'], 'Berita harus terbaru (aktual) dan sesuai kenyataan (faktual).'],
+                        ['Kalimat persuasif dalam iklan bertujuan untuk...', 'Membujuk pembaca membeli', ['Menghibur pembaca', 'Melaporkan kejadian', 'Menceritakan dongeng'], 'Iklan memakai kalimat persuasif untuk mempengaruhi calon pembeli.'],
+                        ['Teks ulasan berisi...', 'Penilaian kelebihan dan kekurangan suatu karya', ['Langkah-langkah membuat sesuatu', 'Cerita khayalan', 'Proses terjadinya hujan'], 'Teks ulasan menilai karya seperti film atau buku.']
+                    ],
+                    'Bahasa Inggris': [
+                        ['I ___ a movie last night.', 'watched', ['watch', 'watches', 'watching'], '"Last night" menunjukkan Simple Past, jadi watched.'],
+                        ['This bag is ___ than that one.', 'more expensive', ['expensiver', 'most expensive', 'expensive'], 'Kata sifat panjang memakai "more" untuk comparative.'],
+                        ['Rina ___ a letter at the moment.', 'is writing', ['writes', 'wrote', 'write'], '"At the moment" menunjukkan Present Continuous: is + V-ing.'],
+                        ['Superlative form of "good" is...', 'best', ['better', 'goodest', 'most good'], 'Good → better → best (bentuk tidak beraturan).']
+                    ]
+                },
+                9: {
+                    'Matematika': [
+                        ['Hasil dari 2³ × 2⁴ adalah...', '128', ['4.096', '64', '256'], 'Pangkat dijumlahkan: 2⁷ = 128.'],
+                        ['Akar-akar dari x² - 5x + 6 = 0 adalah...', 'x = 2 dan x = 3', ['x = 1 dan x = 6', 'x = -2 dan x = -3', 'x = 2 dan x = -3'], 'Faktorkan: (x - 2)(x - 3) = 0 sehingga x = 2 atau x = 3.'],
+                        ['Rumus volume kerucut adalah...', '1/3 × π × r² × t', ['π × r² × t', '4/3 × π × r³', '2 × π × r × t'], 'Volume kerucut = sepertiga volume tabung seukuran.'],
+                        ['Hasil dari √144 + √81 adalah...', '21', ['225', '15', '18'], '√144 = 12 dan √81 = 9, jumlahnya 21.']
+                    ],
+                    'IPA Terpadu': [
+                        ['Rumus Hukum Ohm yang benar adalah...', 'V = I × R', ['V = I / R', 'V = R / I', 'V = I + R'], 'Tegangan = kuat arus × hambatan.'],
+                        ['Dua kutub magnet yang berbeda (utara dan selatan) jika didekatkan akan...', 'Tarik-menarik', ['Tolak-menolak', 'Saling menetralkan', 'Tidak terjadi apa-apa'], 'Kutub tidak senama tarik-menarik, senama tolak-menolak.'],
+                        ['Molekul pembawa informasi genetik pada makhluk hidup adalah...', 'DNA', ['Glukosa', 'Lemak', 'Selulosa'], 'DNA menyimpan sifat-sifat yang diturunkan.'],
+                        ['Lampu 220 V dialiri arus 0,5 A. Daya lampu tersebut adalah...', '110 W', ['440 W', '11 W', '220 W'], 'P = V × I = 220 × 0,5 = 110 W.']
+                    ],
+                    'IPS Terpadu': [
+                        ['PPKI mengesahkan UUD 1945 pada tanggal...', '18 Agustus 1945', ['17 Agustus 1945', '1 Juni 1945', '22 Juni 1945'], 'Sehari setelah proklamasi, PPKI mengesahkan UUD 1945.'],
+                        ['Penyebab utama terjadinya perdagangan internasional adalah...', 'Perbedaan sumber daya dan kebutuhan antarnegara', ['Kesamaan hasil produksi', 'Larangan impor', 'Perbedaan bahasa'], 'Tidak ada negara yang bisa memenuhi semua kebutuhan sendiri.'],
+                        ['Pemasukan negara dari ekspor berupa mata uang asing disebut...', 'Devisa', ['Pajak', 'Kuota', 'Subsidi'], 'Devisa diperoleh dari ekspor, pariwisata, dan lainnya.'],
+                        ['Berikut ini yang termasuk subsektor ekonomi kreatif adalah...', 'Pembuatan animasi dan aplikasi game', ['Pertambangan batu bara', 'Penangkapan ikan laut', 'Peternakan sapi'], 'Ekonomi kreatif bertumpu pada ide dan kreativitas.']
+                    ],
+                    'Bahasa Indonesia': [
+                        ['Tujuan utama pidato persuasif adalah...', 'Mengajak dan mempengaruhi pendengar', ['Menghibur pendengar', 'Melaporkan kejadian', 'Menceritakan dongeng'], 'Pidato persuasif bersifat membujuk agar pendengar bertindak.'],
+                        ['Berikut ini yang termasuk unsur INTRINSIK cerpen adalah...', 'Latar', ['Biografi pengarang', 'Latar belakang masyarakat', 'Nilai budaya masyarakat'], 'Unsur intrinsik: tema, tokoh, alur, latar, sudut pandang, amanat.'],
+                        ['Bagian teks diskusi yang berisi kesimpulan akhir disebut...', 'Simpulan', ['Isu', 'Argumen pendukung', 'Argumen penentang'], 'Struktur diskusi: isu, argumen pro, argumen kontra, simpulan.'],
+                        ['"Tangisnya membanjiri seluruh kota." Majas pada kalimat tersebut adalah...', 'Hiperbola', ['Litotes', 'Ironi', 'Metafora'], 'Hiperbola adalah pernyataan yang dilebih-lebihkan.']
+                    ],
+                    'Bahasa Inggris': [
+                        ['The window ___ by the thief last night.', 'was broken', ['broke', 'is broken', 'broken'], 'Passive Past: was/were + Verb 3.'],
+                        ['I have ___ this movie three times.', 'seen', ['saw', 'see', 'seeing'], 'Present Perfect: have + Verb 3 (see - saw - seen).'],
+                        ['"Once upon a time, there lived a poor farmer..." belongs to which part of a narrative text?', 'Orientation', ['Complication', 'Resolution', 'Re-orientation'], 'Orientation memperkenalkan tokoh, waktu, dan tempat.'],
+                        ['Report text generally uses which tense?', 'Simple present tense', ['Past continuous tense', 'Future perfect tense', 'Present perfect continuous'], 'Report text menyampaikan fakta umum sehingga memakai simple present.']
+                    ]
+                }
+            };
+            Object.keys(EXTRA).forEach((g) => {
+                STATIC_QUESTION_POOL[g] = STATIC_QUESTION_POOL[g] || {};
+                Object.keys(EXTRA[g]).forEach((subj) => {
+                    STATIC_QUESTION_POOL[g][subj] = STATIC_QUESTION_POOL[g][subj] || [];
+                    EXTRA[g][subj].forEach(([q, right, wrongs, explanation]) => {
+                        STATIC_QUESTION_POOL[g][subj].push({ q, options: [right, ...wrongs], answer: 0, explanation });
+                    });
+                });
+            });
+        })();
 
         /* =========================================================================
            4. BUILDER KUIS 10 SOAL (KOMBINASI GENERATOR DINAMIS + BANK SOAL ACAK)
@@ -3332,6 +3518,22 @@
             }
         }
 
+        // Reset koin / XP anak (hanya tersedia di Dashboard Orang Tua)
+        function resetChildStats(mode) {
+            const fam = getActiveFamily();
+            const child = getActiveChild();
+            if (!fam || !child) return;
+            const label = mode === 'coins' ? 'KOIN' : mode === 'xp' ? 'XP (level)' : 'KOIN dan XP';
+            if (!confirm(`Reset ${label} milik ${child.name} menjadi 0? Tindakan ini tidak bisa dibatalkan.`)) return;
+            if (mode === 'coins' || mode === 'both') child.coins = 0;
+            if (mode === 'xp' || mode === 'both') child.xp = 0;
+            logActivity(fam, `mereset ${label} milik ${child.name} menjadi 0`);
+            saveDatabase(fam.parentUsername);
+            playSound('click');
+            renderParentDashboard();
+            showToast(`♻️ ${label} ${child.name} berhasil direset menjadi 0.`);
+        }
+
         function rejectChildVoucher(voucherId, childUsername) {
             const fam = getActiveFamily();
             if (!fam) return;
@@ -4043,7 +4245,7 @@
             if (child) {
                 child.recentQuestionHashes = child.recentQuestionHashes || [];
                 child.recentQuestionHashes.push(qObj.q.slice(0, 30));
-                if (child.recentQuestionHashes.length > 40) {
+                if (child.recentQuestionHashes.length > 150) {
                     child.recentQuestionHashes.shift();
                 }
             }
@@ -4077,18 +4279,19 @@
 
                 const multiplier = activeQuiz.currentCombo >= 3 ? 2 : 1;
                 const xpGain = 15 * multiplier;
-                const coinGain = 10 * multiplier;
+                const coinGain = 5 * multiplier;
                 activeQuiz.earnedXp += xpGain;
                 activeQuiz.earnedCoins += coinGain;
 
                 expBox.className = 'rounded-3xl p-4 border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-100 animate-pop';
                 expIcon.className = 'w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-xl shrink-0';
                 expIcon.textContent = '🎉';
-                expTitle.textContent = multiplier > 1 ? `Benar! Combo ${activeQuiz.currentCombo}x (+${xpGain} XP)` : `Mantap! Jawaban Benar (+${xpGain} XP)`;
+                expTitle.textContent = multiplier > 1 ? `Benar! Combo ${activeQuiz.currentCombo}x (+${xpGain} XP, +${coinGain} Koin)` : `Mantap! Jawaban Benar (+${xpGain} XP, +${coinGain} Koin)`;
                 expText.textContent = qObj.explanation;
             } else {
                 playSound('wrong');
                 activeQuiz.currentCombo = 0;
+                activeQuiz.earnedCoins -= 10; // Jawaban salah: koin dikurangi 10
                 quizCard.classList.remove('animate-shake');
                 void quizCard.offsetWidth;
                 quizCard.classList.add('animate-shake');
@@ -4096,7 +4299,7 @@
                 expBox.className = 'rounded-3xl p-4 border-2 border-rose-400 bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-100';
                 expIcon.className = 'w-10 h-10 rounded-2xl bg-rose-500 text-white flex items-center justify-center text-xl shrink-0';
                 expIcon.textContent = '💡';
-                expTitle.textContent = 'Kurang Tepat, Yuk Simak Pembahasannya!';
+                expTitle.textContent = 'Kurang Tepat (-10 Koin), Yuk Simak Pembahasannya!';
                 expText.textContent = qObj.explanation;
             }
 
@@ -4138,7 +4341,7 @@
             const scorePct = Math.round((activeQuiz.correctCount / total) * 100);
 
             child.xp += activeQuiz.earnedXp;
-            child.coins += activeQuiz.earnedCoins;
+            child.coins = Math.max(0, child.coins + activeQuiz.earnedCoins); // koin tidak bisa negatif
             child.quizzesCompleted += 1;
             if (scorePct === 100) child.perfectScores += 1;
 
@@ -4186,7 +4389,7 @@
 
             document.getElementById('result-score').textContent = `${scorePct}%`;
             document.getElementById('result-xp').textContent = `+${activeQuiz.earnedXp}`;
-            document.getElementById('result-coins').textContent = `+${activeQuiz.earnedCoins}`;
+            document.getElementById('result-coins').textContent = activeQuiz.earnedCoins >= 0 ? `+${activeQuiz.earnedCoins}` : `${activeQuiz.earnedCoins}`;
 
             if (scorePct === 100) {
                 document.getElementById('result-emoji').textContent = '👑';
@@ -4274,27 +4477,30 @@
                 { emoji: '🪙', label: '+50 Koin Emas!', coins: 50, xp: 20 },
                 { emoji: '💎', label: '+100 Koin Emas!', coins: 100, xp: 30 },
                 { emoji: '⚡', label: '+80 XP & +40 Koin!', coins: 40, xp: 80 },
-                { emoji: '👑', label: 'JACKPOT +150 Koin!', coins: 150, xp: 50 }
+                { emoji: '👑', label: 'JACKPOT +150 Koin!', coins: 150, xp: 50 },
+                { emoji: '🕸️', label: 'ZONK! -10 Koin', coins: -10, xp: 0 },
+                { emoji: '💣', label: 'ZONK! -25 Koin', coins: -25, xp: 0 },
+                { emoji: '👻', label: 'ZONK! -50 Koin', coins: -50, xp: 0 }
             ];
             const won = prizes[Math.floor(Math.random() * prizes.length)];
 
             setTimeout(() => {
-                playSound('fanfare');
-                fireConfetti(70);
+                const isZonk = won.coins < 0;
+                if (isZonk) { playSound('wrong'); } else { playSound('fanfare'); fireConfetti(70); }
                 child.lastSpinDate = todayStr;
-                child.coins += won.coins;
+                child.coins = Math.max(0, child.coins + won.coins);
                 child.xp += won.xp;
                 saveDatabase();
 
                 document.getElementById('spin-result-emoji').textContent = won.emoji;
                 document.getElementById('spin-result-label').textContent = won.label;
-                btn.textContent = '🎉 Hadiah Berhasil Diklaim!';
+                btn.textContent = isZonk ? '😅 Zonk! Coba lagi besok ya!' : '🎉 Hadiah Berhasil Diklaim!';
                 btn.classList.add('opacity-50');
                 wheel.style.transform = 'rotate(0deg)';
 
                 updateChildHeaderUI();
                 renderChildHomeView();
-                showToast(`🎰 Selamat! Kamu mendapat ${won.label}`);
+                showToast(isZonk ? `😬 Yah, kena ${won.label}` : `🎰 Selamat! Kamu mendapat ${won.label}`);
             }, 1000);
         }
 
