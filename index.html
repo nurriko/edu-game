@@ -35,6 +35,11 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
+        /* FIX: user-select:none pada * membuat input tidak bisa diketik di iOS Safari */
+        input, textarea, select {
+            -webkit-user-select: text;
+            user-select: text;
+        }
         body {
             font-family: 'Nunito', sans-serif;
             overflow-x: hidden;
@@ -242,9 +247,24 @@
                         </button>
                     </div>
 
+                    <div id="parent-join-code-wrap" class="hidden">
+                        <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Kode Undangan dari Pasangan</label>
+                        <input id="parent-auth-invite" type="text" maxlength="8" placeholder="Contoh: K7M2QX" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm uppercase tracking-widest focus:outline-none focus:border-purple-500">
+                        <p class="text-[10px] font-bold text-slate-400 mt-1">Minta kode di menu Portal Orang Tua → Keluarga pada HP pasangan Anda.</p>
+                    </div>
+
                     <div id="parent-reg-name-wrap" class="hidden">
                         <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama Ayah / Bunda</label>
                         <input id="parent-auth-fullname" type="text" placeholder="Contoh: Ayah Budi / Bunda Sari" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
+                    </div>
+
+                    <div id="parent-reg-relation-wrap" class="hidden">
+                        <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Peran di Keluarga</label>
+                        <select id="parent-auth-relation" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
+                            <option value="Ayah">👨 Ayah</option>
+                            <option value="Ibu">👩 Ibu</option>
+                            <option value="Wali">🧑 Wali</option>
+                        </select>
                     </div>
 
                     <div>
@@ -266,6 +286,11 @@
                     <button id="btn-parent-submit" onclick="handleParentAuth()" class="w-full py-3.5 rounded-2xl font-game font-bold text-white text-sm btn-3d-purple flex items-center justify-center gap-2">
                         <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Orang Tua
                     </button>
+                    <div class="text-center">
+                        <button id="btn-toggle-parent-join" type="button" onclick="toggleParentJoinMode()" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline">
+                            Pasangan saya sudah mendaftar — Gabung dengan Kode Undangan →
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Quick Demo Login Box -->
@@ -294,7 +319,8 @@
              ===================================================================== -->
         <div id="parent-screen" class="hidden flex-1 flex-col min-h-screen bg-slate-50 dark:bg-slate-900">
             <!-- Header Orang Tua -->
-            <header class="sticky top-0 z-30 bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-800 text-white px-4 py-3 shadow-md space-y-2">
+            <div class="sticky top-0 z-30">
+            <header class="bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-800 text-white px-4 py-3 shadow-md space-y-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
                         <div class="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-xl border border-white/20">
@@ -327,7 +353,7 @@
             </header>
 
             <!-- Sub-Navigasi Orang Tua (4 Menu: Pantau, Target, Hadiah Nyata, Akun Anak) -->
-            <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-2.5 py-2 grid grid-cols-4 gap-1 sticky top-[96px] z-20">
+            <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-2 py-2 grid grid-cols-5 gap-1">
                 <button id="ptab-monitor" onclick="switchParentTab('monitor')" class="py-2 px-1.5 rounded-xl font-game font-bold text-[11px] bg-purple-600 text-white shadow flex items-center justify-center gap-1">
                     <i class="fa-solid fa-chart-line"></i> Pantau
                 </button>
@@ -341,8 +367,12 @@
                 <button id="ptab-account" onclick="switchParentTab('account')" class="py-2 px-1.5 rounded-xl font-game font-bold text-[11px] text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1">
                     <i class="fa-solid fa-user-gear"></i> Anak
                 </button>
+                <button id="ptab-family" onclick="switchParentTab('family')" class="py-2 px-1.5 rounded-xl font-game font-bold text-[11px] text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1 relative">
+                    <i class="fa-solid fa-users"></i> Keluarga
+                </button>
             </div>
 
+            </div>
             <!-- Isi Konten Dashboard Orang Tua -->
             <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-20 no-scrollbar">
 
@@ -439,7 +469,7 @@
                     <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="font-game font-bold text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-Clipboard-check text-emerald-500"></i> Riwayat Hasil & Koreksi Jawaban Anak
+                                <i class="fa-solid fa-clipboard-check text-emerald-500"></i> Riwayat Hasil & Koreksi Jawaban Anak
                             </h3>
                             <span class="text-[10px] font-extrabold text-slate-400">Klik untuk detail</span>
                         </div>
@@ -664,6 +694,86 @@
                     </div>
                 </div>
 
+
+                <!-- TAB ORANG TUA 5: KELUARGA (AYAH + IBU, MULTI-AKUN ORANG TUA) -->
+                <div id="pview-family" class="hidden space-y-4">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-indigo-200 dark:border-indigo-900 space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center text-2xl">👨‍👩‍👧</div>
+                            <div>
+                                <h3 class="font-game font-bold text-sm">Akun Orang Tua dalam Keluarga</h3>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Ayah & Ibu memantau anak yang sama dengan login masing-masing.</p>
+                            </div>
+                        </div>
+                        <div id="family-members-list" class="space-y-2"></div>
+                    </div>
+
+                    <div id="family-demo-note" class="hidden p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 text-[11px] font-bold text-amber-800 dark:text-amber-200">
+                        ⚠️ Ini akun demo yang dipakai bersama, jadi fitur undang/tambah pasangan dimatikan. Daftar akun Orang Tua sendiri untuk memakai fitur ini.
+                    </div>
+
+                    <div id="family-admin-section" class="space-y-4">
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-purple-200 dark:border-purple-900 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">💌</span>
+                                <div>
+                                    <h3 class="font-game font-bold text-sm">Undang Pasangan dengan Kode</h3>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Pasangan membuat akunnya sendiri (username & password pilihannya).</p>
+                                </div>
+                            </div>
+                            <div id="family-invite-code" class="select-text font-game font-bold text-2xl tracking-[0.3em] text-center py-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">------</div>
+                            <p id="family-invite-expiry" class="text-[11px] text-center font-bold text-slate-400"></p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="generateFamilyInviteCode()" class="py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-purple"><i class="fa-solid fa-rotate mr-1"></i> Buat Kode Baru</button>
+                                <button onclick="copyFamilyInviteCode()" class="py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-indigo"><i class="fa-solid fa-copy mr-1"></i> Salin Kode</button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">
+                                Cara pakai: pasangan buka aplikasi → <strong>Portal Orang Tua</strong> → <strong>"Gabung dengan Kode Undangan"</strong> → isi kode ini. Kode berlaku 48 jam dan hanya bisa dipakai sekali.
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                            <h3 class="font-game font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-user-plus text-emerald-500"></i> Atau Buatkan Akun Pasangan Langsung</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <label class="block text-[11px] font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama</label>
+                                    <input id="family-add-name" type="text" placeholder="Contoh: Ibu Sari" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-extrabold text-slate-600 dark:text-slate-300 mb-1">Peran</label>
+                                    <select id="family-add-relation" class="w-full px-2 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                                        <option value="Ibu">Ibu</option>
+                                        <option value="Ayah">Ayah</option>
+                                        <option value="Wali">Wali</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input id="family-add-user" type="text" placeholder="Username (a-z, 0-9, _)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                                <input id="family-add-pass" type="text" placeholder="Password (min. 4)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                            </div>
+                            <button onclick="addCoParentDirect()" class="w-full py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-emerald flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-user-plus"></i> Tambahkan Akun Pasangan
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <h3 class="font-game font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Aktivitas Terbaru Keluarga</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Supaya Ayah & Ibu tahu siapa yang sudah mengubah target, menyetujui hadiah, dan kapan anak selesai belajar.</p>
+                        <div id="family-activity-log" class="space-y-1.5"></div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                        <h3 class="font-game font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-key text-amber-500"></i> Akun Saya</h3>
+                        <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400">Masuk sebagai: <span id="family-me-label" class="text-indigo-600 dark:text-indigo-400"></span></p>
+                        <div class="flex gap-2">
+                            <input id="family-new-pass" type="text" placeholder="Password baru (min. 4)" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                            <button onclick="changeMyParentPassword()" class="px-3 py-2 rounded-xl font-game font-bold text-xs text-white btn-3d-amber shrink-0">Ganti</button>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
 
@@ -756,6 +866,24 @@
                             <p id="child-mission-note" class="text-xs bg-black/20 rounded-xl px-3 py-2 font-semibold italic text-indigo-100">
                                 "Semangat belajar hari ini ya nak!"
                             </p>
+
+                            <div class="flex items-center justify-between text-[11px] font-extrabold text-indigo-100">
+                                <span>🎁 Hadiah: <span id="child-mission-reward">+200 Koin</span></span>
+                                <span id="child-mission-setby" class="italic opacity-90"></span>
+                            </div>
+                            <div class="w-full h-2.5 bg-black/25 rounded-full overflow-hidden p-0.5">
+                                <div id="child-mission-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+
+                            <button id="btn-play-mission" onclick="playTargetMissionNow()" class="w-full py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-emerald flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-play"></i> Kerjakan Misi Sekarang
+                            </button>
+                            <button id="btn-claim-mission" onclick="claimParentMissionReward()" class="hidden w-full py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-amber flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-gift"></i> Buka Peti Hadiah Orang Tua!
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Info Kurikulum Kelas Anak & Roda Keberuntungan Harian -->
                     <div class="grid grid-cols-2 gap-2.5">
                         <div class="bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 p-3 rounded-2xl flex items-center gap-2.5">
@@ -922,7 +1050,7 @@
             </main>
 
             <!-- BOTTOM NAVIGATION BAR ANAK -->
-            <nav id="bottom-nav" class="fixed bottom-0 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex justify-around items-center z-30">
+            <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex justify-around items-center z-30">
                 <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition">
                     <i class="fa-solid fa-gamepad text-lg"></i>
                     <span>Arena</span>
@@ -976,7 +1104,7 @@
                             <i class="fa-solid fa-bolt"></i> +15 XP & +10 Koin
                         </span>
                     </div>
-                    <p id="quiz-question-text" class="font-bold text-base leading-relaxed text-slate-800 dark:text-slate-100">
+                    <p id="quiz-question-text" class="whitespace-pre-line font-bold text-base leading-relaxed text-slate-800 dark:text-slate-100">
                         Pertanyaan akan muncul di sini...
                     </p>
 
@@ -1164,7 +1292,7 @@
            ========================================================================= */
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Konfigurasi Cloud Firebase Permanen (Terkunci di latar belakang, tidak bisa diutak-atik)
         const CUSTOM_FIREBASE_CONFIG = {
@@ -1247,6 +1375,11 @@
             }
         ];
 
+        // Escape HTML agar nama/judul buatan pengguna tidak bisa menyisipkan script (data dibagikan lewat cloud)
+        function esc(str) {
+            return String(str ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+
         function formatGradeLabel(grade) {
             return grade <= 6 ? `Kelas ${grade} SD` : `Kelas ${grade} SMP`;
         }
@@ -1275,6 +1408,16 @@
             const arr = Array.from(set).map(v => `${v}${unit}`);
             const correctStr = `${correctVal}${unit}`;
             return shuffleOptionsObject(arr, correctStr);
+        }
+
+        // Ambil 4 opsi unik (jawaban benar + 3 pengecoh berbeda) agar tidak ada dua pilihan yang sama
+        function pickUniqueOptions(correctStr, candidates) {
+            const picked = [correctStr];
+            for (const c of candidates) {
+                if (picked.length >= 4) break;
+                if (!picked.includes(c)) picked.push(c);
+            }
+            return shuffleOptionsObject(picked, correctStr);
         }
 
         function shuffleOptionsObject(optionsArr, correctStr) {
@@ -1575,12 +1718,14 @@
                             const nx = x + tx, ny = y + ty;
                             const correctStr = `A'(${nx}, ${ny})`;
                             const rawOpts = [
-                                correctStr,
                                 `A'(${x - tx}, ${y - ty})`,
                                 `A'(${ny}, ${nx})`,
-                                `A'(${-nx}, ${ny})`
+                                `A'(${-nx}, ${ny})`,
+                                `A'(${nx}, ${-ny})`,
+                                `A'(${nx + 1}, ${ny})`,
+                                `A'(${nx}, ${ny + 1})`
                             ];
-                            const opt = shuffleOptionsObject(rawOpts, correctStr);
+                            const opt = pickUniqueOptions(correctStr, rawOpts);
                             generated.push({
                                 q: `Bayangan titik A(${x}, ${y}) jika ditranslasikan (digeser) oleh T(${tx}, ${ty}) adalah...`,
                                 ...opt,
@@ -1591,8 +1736,8 @@
                             const n1 = k1 * k1 * 3, n2 = k2 * k2 * 3;
                             const sumK = k1 + k2;
                             const correctStr = `${sumK}√3`;
-                            const rawOpts = [`${sumK}√3`, `${sumK - 1}√3`, `${sumK + 2}√3`, `${k1 * k2}√3`];
-                            const opt = shuffleOptionsObject(rawOpts, correctStr);
+                            const rawOpts = [`${sumK - 1}√3`, `${sumK + 2}√3`, `${k1 * k2}√3`, `${sumK + 1}√3`, `${sumK + 3}√3`, `${sumK - 2}√3`];
+                            const opt = pickUniqueOptions(correctStr, rawOpts);
                             generated.push({
                                 q: `Hasil penyederhanaan bentuk akar √${n1} + √${n2} adalah...`,
                                 ...opt,
@@ -1769,7 +1914,9 @@
                     { q: 'Peristiwa Sumpah Pemuda diperingati setiap tanggal...', options: ['28 Oktober', '17 Agustus', '20 Mei', '10 November'], answer: 0, explanation: 'Kongres Pemuda II melahirkan ikrar Sumpah Pemuda pada tanggal 28 Oktober 1928.' },
                     { q: 'Badan usaha yang seluruh atau sebagian besar modalnya dimiliki oleh negara disebut...', options: ['BUMN (Badan Usaha Milik Negara)', 'Koperasi Sekolah', 'Perusahaan Perorangan', 'Firma'], answer: 0, explanation: 'BUMN dikelola oleh pemerintah untuk melayani kepentingan umum.' },
                     { q: 'Laut sempit yang berada di antara dua pulau disebut...', options: ['Selat', 'Samudra', 'Danau', 'Rawa'], answer: 0, explanation: 'Contoh selat adalah Selat Sunda yang memisahkan Pulau Jawa dan Pulau Sumatera.' },
-                    { q: 'Pahlawan nasional asal Maluku yang memimpin perlawanan rakyat terhadap Belanda di Benteng Duurstede adalah...', options: ['Kapitan Pattimura', 'Pangeran Diponegoro', 'Tuanku Imam Bonjol', 'Sultan Hasanuddin'], answer: 0, explanation: 'Kapitan Pattimura (Thomas Matulessy) memimpin perjuangan rakyat Maluku pada tahun 1817.' }
+                    { q: 'Pahlawan nasional asal Maluku yang memimpin perlawanan rakyat terhadap Belanda di Benteng Duurstede adalah...', options: ['Kapitan Pattimura', 'Pangeran Diponegoro', 'Tuanku Imam Bonjol', 'Sultan Hasanuddin'], answer: 0, explanation: 'Kapitan Pattimura (Thomas Matulessy) memimpin perjuangan rakyat Maluku pada tahun 1817.' },
+                    { q: 'Lambang negara Indonesia adalah...', options: ['Garuda Pancasila', 'Bendera Merah Putih', 'Bhinneka Tunggal Ika', 'Indonesia Raya'], answer: 0, explanation: 'Lambang negara Indonesia adalah Garuda Pancasila.' },
+                    { q: 'Sila pertama Pancasila berbunyi...', options: ['Ketuhanan Yang Maha Esa', 'Kemanusiaan yang adil dan beradab', 'Persatuan Indonesia', 'Keadilan sosial bagi seluruh rakyat Indonesia'], answer: 0, explanation: 'Sila ke-1 Pancasila: Ketuhanan Yang Maha Esa.' }
                 ],
                 'Bahasa Indonesia': [
                     { q: 'Gagasan utama yang menjadi dasar pengembangan sebuah paragraf disebut...', options: ['Ide Pokok / Gagasan Pokok', 'Kalimat Tambahan', 'Judul Buku', 'Daftar Isi'], answer: 0, explanation: 'Ide pokok merupakan inti pembahasan dalam sebuah paragraf.' },
@@ -1779,7 +1926,9 @@
                     { q: 'Surat undangan ulang tahun yang dikirimkan kepada teman sebaya termasuk jenis surat...', options: ['Surat Tidak Resmi (Pribadi)', 'Surat Dinas', 'Surat Keputusan', 'Surat Edaran Pemerintah'], answer: 0, explanation: 'Undangan ulang tahun bersifat pribadi dan tidak menggunakan nomor surat/kop instansi.' },
                     { q: 'Lawan kata (antonim) dari kata "Hemat" adalah...', options: ['Boros', 'Rajin', 'Cermat', 'Kaya'], answer: 0, explanation: 'Antonim dari hemat adalah boros.' },
                     { q: 'Persamaan makna kata (sinonim) dari kata "Pintar" adalah...', options: ['Cerdas / Pandai', 'Malas', 'Lambat', 'Tinggi'], answer: 0, explanation: 'Pintar bersinonim dengan pandai atau cerdas.' },
-                    { q: 'Pesan kebaikan yang ingin disampaikan pengarang melalui sebuah cerita atau dongeng disebut...', options: ['Amanat', 'Latar Tempat', 'Alur', 'Tokoh'], answer: 0, explanation: 'Amanat adalah pesan moral di dalam sebuah cerita.' }
+                    { q: 'Pesan kebaikan yang ingin disampaikan pengarang melalui sebuah cerita atau dongeng disebut...', options: ['Amanat', 'Latar Tempat', 'Alur', 'Tokoh'], answer: 0, explanation: 'Amanat adalah pesan moral di dalam sebuah cerita.' },
+                    { q: 'Kata "membaca" termasuk kelas kata...', options: ['Kata kerja (verba)', 'Kata benda', 'Kata sifat', 'Kata depan'], answer: 0, explanation: 'Membaca menyatakan perbuatan sehingga termasuk kata kerja.' },
+                    { q: 'Tanda baca yang digunakan di akhir kalimat tanya adalah...', options: ['Tanda tanya (?)', 'Tanda titik (.)', 'Tanda seru (!)', 'Tanda koma (,)'], answer: 0, explanation: 'Kalimat tanya diakhiri dengan tanda tanya (?).' }
                 ],
                 'Bahasa Inggris': [
                     { q: 'What is the English word for "Perpustakaan"?', options: ['Library', 'Hospital', 'Canteen', 'Mosque'], answer: 0, explanation: '"Library" artinya perpustakaan.' },
@@ -1789,7 +1938,9 @@
                     { q: 'My father works at school. He teaches students. He is a...', options: ['Teacher', 'Farmer', 'Policeman', 'Dentist'], answer: 0, explanation: 'Orang yang mengajar murid di sekolah adalah guru (Teacher).' },
                     { q: 'The giraffe has a ___ neck.', options: ['long', 'short', 'small', 'round'], answer: 0, explanation: 'Jerapah memiliki leher yang panjang (long neck).' },
                     { q: 'Sunday, Monday, Tuesday, ___, Thursday. What day is missing?', options: ['Wednesday', 'Friday', 'Saturday', 'January'], answer: 0, explanation: 'Hari di antara Selasa (Tuesday) dan Kamis (Thursday) adalah Rabu (Wednesday).' },
-                    { q: 'How many legs does a cat have?', options: ['Four', 'Two', 'Six', 'Eight'], answer: 0, explanation: 'Kucing memiliki empat (four) kaki.' }
+                    { q: 'How many legs does a cat have?', options: ['Four', 'Two', 'Six', 'Eight'], answer: 0, explanation: 'Kucing memiliki empat (four) kaki.' },
+                    { q: 'What color is a ripe banana?', options: ['Yellow', 'Blue', 'Black', 'Purple'], answer: 0, explanation: 'Pisang yang matang berwarna kuning (yellow).' },
+                    { q: 'I brush my teeth ___ the morning.', options: ['in', 'on', 'under', 'between'], answer: 0, explanation: 'Untuk bagian hari digunakan "in the morning".' }
                 ]
             },
             6: {
@@ -1819,7 +1970,9 @@
                     { q: 'Sikap positif pelajar SD menghadapi kemajuan teknologi di era globalisasi adalah...', options: ['Memanfaatkan internet untuk mencari ilmu pengetahuan dan belajar', 'Bermain game sepanjang malam', 'Melupakan budaya daerah sendiri', 'Menyebarkan berita bohong'], answer: 0, explanation: 'Teknologi informasi sebaiknya dimanfaatkan untuk mendukung pendidikan dan wawasan.' },
                     { q: 'Penjahit bendera Pusaka Merah Putih yang dikibarkan saat Proklamasi 17 Agustus 1945 adalah...', options: ['Ibu Fatmawati', 'R.A. Kartini', 'Cut Nyak Dien', 'Dewi Sartika'], answer: 0, explanation: 'Ibu Fatmawati menjahit bendera Merah Putih dari bahan katun.' },
                     { q: 'Ibukota dari negara tetangga Malaysia adalah...', options: ['Kuala Lumpur', 'Bangkok', 'Hanoi', 'Manila'], answer: 0, explanation: 'Kuala Lumpur adalah ibukota negara Malaysia.' },
-                    { q: 'Pertempuran 10 November 1945 yang diperingati sebagai Hari Pahlawan terjadi di kota...', options: ['Surabaya', 'Bandung', 'Semarang', 'Medan'], answer: 0, explanation: 'Pertempuran heroik 10 November 1945 terjadi di Surabaya dipimpin oleh Bung Tomo.' }
+                    { q: 'Pertempuran 10 November 1945 yang diperingati sebagai Hari Pahlawan terjadi di kota...', options: ['Surabaya', 'Bandung', 'Semarang', 'Medan'], answer: 0, explanation: 'Pertempuran heroik 10 November 1945 terjadi di Surabaya dipimpin oleh Bung Tomo.' },
+                    { q: 'Mata uang resmi negara Malaysia adalah...', options: ['Ringgit', 'Baht', 'Peso', 'Dong'], answer: 0, explanation: 'Mata uang Malaysia adalah Ringgit.' },
+                    { q: 'Teks Proklamasi dibacakan di Jalan...', options: ['Pegangsaan Timur 56, Jakarta', 'Malioboro, Yogyakarta', 'Braga, Bandung', 'Tunjungan, Surabaya'], answer: 0, explanation: 'Proklamasi dibacakan di Jl. Pegangsaan Timur No. 56, Jakarta.' }
                 ],
                 'Bahasa Indonesia': [
                     { q: 'Teks yang dibuat berdasarkan hasil pengamatan langsung terhadap suatu objek atau tempat disebut...', options: ['Teks Laporan Hasil Pengamatan', 'Teks Dongeng', 'Teks Fiksi', 'Teks Pantun'], answer: 0, explanation: 'Laporan pengamatan menyajikan fakta objektif sesuai hal yang diamati.' },
@@ -1829,7 +1982,9 @@
                     { q: 'Tokoh utama dalam cerita yang memiliki watak baik hati dan jujur disebut tokoh...', options: ['Protagonis', 'Antagonis', 'Tritagonis', 'Figuran'], answer: 0, explanation: 'Protagonis adalah tokoh berwatak baik, sedangkan Antagonis adalah tokoh penentang/jahat.' },
                     { q: 'Bagian dalam teks eksplanasi yang berisi kesimpulan atau intisari di akhir teks disebut...', options: ['Interpretasi / Penutup', 'Pernyataan Umum', 'Deretan Penjelas', 'Abstrak'], answer: 0, explanation: 'Struktur teks eksplanasi meliputi Pernyataan Umum, Deretan Penjelas, dan Interpretasi (Penutup).' },
                     { q: 'Kalimat utama yang terletak di akhir paragraf dan diawali kata "Jadi," atau "Oleh karena itu," disebut paragraf...', options: ['Induktif', 'Deduktif', 'Narasi', 'Dialog'], answer: 0, explanation: 'Paragraf induktif meletakkan simpulan/kalimat utama di bagian akhir paragraf.' },
-                    { q: 'Saat mengisi formulir pengiriman barang (wesel/paket), penulisan kode pos bertujuan untuk...', options: ['Memudahkan kurir menemukan lokasi daerah tujuan secara tepat', 'Menghitung berat barang', 'Mengetahui harga barang', 'Menambah hiasan amplop'], answer: 0, explanation: 'Kode pos mempercepat penyortiran alamat wilayah pengiriman.' }
+                    { q: 'Saat mengisi formulir pengiriman barang (wesel/paket), penulisan kode pos bertujuan untuk...', options: ['Memudahkan kurir menemukan lokasi daerah tujuan secara tepat', 'Menghitung berat barang', 'Mengetahui harga barang', 'Menambah hiasan amplop'], answer: 0, explanation: 'Kode pos mempercepat penyortiran alamat wilayah pengiriman.' },
+                    { q: 'Pada kalimat "Adik membeli buku di toko", predikatnya adalah...', options: ['membeli', 'Adik', 'buku', 'di toko'], answer: 0, explanation: 'Predikat adalah kata kerja inti kalimat, yaitu "membeli".' },
+                    { q: 'Persamaan makna (sinonim) kata "rapi" adalah...', options: ['Teratur', 'Kotor', 'Berantakan', 'Malas'], answer: 0, explanation: 'Rapi bersinonim dengan teratur.' }
                 ],
                 'Bahasa Inggris': [
                     { q: 'We ___ go to Bali next month for our school graduation trip.', options: ['will', 'went', 'did', 'was'], answer: 0, explanation: '"Next month" menunjukkan rencana masa depan (Future Tense), sehingga menggunakan "will".' },
@@ -1839,7 +1994,9 @@
                     { q: 'What does the traffic sign "Turn Left" mean in Indonesian?', options: ['Belok Kiri', 'Belok Kanan', 'Jalan Lurus', 'Dilarang Parkir'], answer: 0, explanation: '"Turn Left" artinya belok kiri, sedangkan "Turn Right" artinya belok kanan.' },
                     { q: 'An elephant is big, but an ant is...', options: ['small', 'tall', 'heavy', 'wide'], answer: 0, explanation: 'Lawan kata "big" (besar) pada semut adalah "small" (kecil).' },
                     { q: 'Doni: "Excuse me, could you tell me where the library is?"\nRaka: "Go straight and ___ right."', options: ['turn', 'walked', 'sleeping', 'eat'], answer: 0, explanation: 'Untuk menunjukkan arah belok kanan menggunakan "turn right".' },
-                    { q: 'My sister likes singing. She wants to be a famous ___ in the future.', options: ['singer', 'pilot', 'driver', 'nurse'], answer: 0, explanation: 'Orang yang suka bernyanyi (singing) bercita-cita menjadi penyanyi (singer).' }
+                    { q: 'My sister likes singing. She wants to be a famous ___ in the future.', options: ['singer', 'pilot', 'driver', 'nurse'], answer: 0, explanation: 'Orang yang suka bernyanyi (singing) bercita-cita menjadi penyanyi (singer).' },
+                    { q: 'She is ___ because she lost her favorite toy.', options: ['sad', 'happy', 'excited', 'proud'], answer: 0, explanation: 'Kehilangan mainan favorit membuat seseorang merasa sedih (sad).' },
+                    { q: 'What is the opposite of "hot"?', options: ['cold', 'warm', 'wet', 'dry'], answer: 0, explanation: 'Lawan kata hot (panas) adalah cold (dingin).' }
                 ]
             },
             7: {
@@ -2047,10 +2204,25 @@
             let combined = [...shuffleArray(dynamicList), ...shuffleArray(unseenStatic), ...shuffleArray(seenStatic)];
 
             // Jika masih kurang dari 10, tambahkan soal dinamis ekstra
-            while (combined.length < 10) {
-                const extra = generateDynamicQuestions(grade, 'Matematika', 2);
-                combined.push(...extra);
+            // Jika kurang dari 10, tambah dari mapel YANG SAMA (bukan mapel lain) tanpa soal ganda
+            const seenQ = new Set(combined.map((x) => x.q));
+            let guard = 0;
+            while (combined.length < 10 && guard < 40) {
+                guard++;
+                const reshuffledStatic = staticRaw.map((item) => {
+                    const sh = shuffleOptionsObject(item.options, item.options[item.answer]);
+                    return { q: item.q, options: sh.options, answer: sh.answer, explanation: item.explanation };
+                });
+                const candidates = shuffleArray([...generateDynamicQuestions(grade, subjectName, 2), ...reshuffledStatic]);
+                for (const c of candidates) {
+                    if (combined.length >= 10) break;
+                    if (!seenQ.has(c.q)) { seenQ.add(c.q); combined.push(c); }
+                }
             }
+            // Pengaman terakhir: ulangi soal yang ada (hanya bila bank soal sangat sedikit)
+            const baseLen = combined.length;
+            let k = 0;
+            while (baseLen > 0 && combined.length < 10) combined.push(combined[k++ % baseLen]);
 
             // Ambil tepat 10 soal dan acak urutannya
             return shuffleArray(combined.slice(0, 10));
@@ -2197,6 +2369,11 @@
             if (!Array.isArray(fam.customRewards) || fam.customRewards.length === 0) {
                 fam.customRewards = createDefaultParentRewards();
             }
+            if (!Array.isArray(fam.coParents)) fam.coParents = [];
+            if (!Array.isArray(fam.activityLog)) fam.activityLog = [];
+            if (typeof fam.inviteCode !== 'string') fam.inviteCode = '';
+            if (typeof fam.inviteCreatedAt !== 'number') fam.inviteCreatedAt = 0;
+            if (!fam.parentRelation) fam.parentRelation = 'Orang Tua';
             fam.children.forEach(c => {
                 if (!Array.isArray(c.redeemedVouchers)) c.redeemedVouchers = [];
             });
@@ -2208,6 +2385,7 @@
         }
 
         let db = loadDatabase();
+        let cloudInitPromise = null;
         let isParentRegisterMode = false;
         let tempConfigGrade = 6;
         let isAddingNewChild = false;
@@ -2227,23 +2405,30 @@
         }
 
         // Simpan lokal + Push Real-time ke Cloud Firestore
-        async function saveDatabase(specificParentUsername = null) {
+        // Field "child" hanya duplikat dari children[] (dipakai di memori) -> jangan dikirim ke cloud
+        function stripChild(fam) {
+            const copy = { ...fam };
+            delete copy.child;
+            return copy;
+        }
+
+        async function saveDatabase(specificParentUsername = null, skipCloud = false) {
             try {
                 localStorage.setItem(DB_KEY, JSON.stringify(db));
             } catch (e) {
                 console.warn('Cache penyimpanan lokal penuh:', e);
             }
 
-            if (isCloudActive && firestoreDb && currentAuthUser) {
+            if (!skipCloud && isCloudActive && firestoreDb && currentAuthUser) {
                 const targetKey = specificParentUsername || (db.currentSession && db.currentSession.parentUsername);
                 if (targetKey && db.families[targetKey]) {
                     try {
                         const famData = normalizeFamilyRecord(db.families[targetKey]);
                         const famDocRef = doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families', targetKey);
                         await setDoc(famDocRef, {
-                            ...famData,
+                            ...stripChild(famData),
                             updatedAt: Date.now()
-                        }, { merge: true });
+                        });
                     } catch (err) {
                         console.warn('Gagal sinkronisasi ke Cloud Firestore:', err);
                     }
@@ -2318,7 +2503,7 @@
                 const demoRef = doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families', 'ortu_demo');
                 const demoSnap = await getDoc(demoRef);
                 if (!demoSnap.exists() && db.families['ortu_demo']) {
-                    await setDoc(demoRef, normalizeFamilyRecord(db.families['ortu_demo']), { merge: true });
+                    await setDoc(demoRef, stripChild(normalizeFamilyRecord(db.families['ortu_demo'])));
                 }
 
                 if (familiesUnsubscribe) familiesUnsubscribe();
@@ -2336,10 +2521,21 @@
                             localStorage.setItem(DB_KEY, JSON.stringify(db));
                         } catch (e) {}
 
+                        if (db.currentSession && !isSessionValid()) {
+                            db.currentSession = null;
+                            try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) {}
+                            routeAppView();
+                            showToast('⚠️ Akun ini sudah tidak aktif atau diubah. Silakan login kembali.');
+                            return;
+                        }
+
                         const quizModalOpen = !document.getElementById('quiz-modal').classList.contains('hidden');
                         if (!quizModalOpen && db.currentSession) {
                             if (db.currentSession.role === 'parent') {
-                                renderParentDashboard();
+                                // Jangan menimpa isian form yang sedang diketik orang tua
+                                const ae = document.activeElement;
+                                const typing = ae && ['INPUT', 'SELECT', 'TEXTAREA'].includes(ae.tagName) && document.getElementById('parent-screen').contains(ae);
+                                if (!typing) renderParentDashboard();
                             } else if (db.currentSession.role === 'child') {
                                 updateChildHeaderUI();
                                 renderChildHomeView();
@@ -2357,6 +2553,281 @@
             }
         }
 
+        /* =========================================================================
+           6C. MULTI AKUN ORANG TUA (AYAH + IBU), KODE UNDANGAN & LOG AKTIVITAS
+           ========================================================================= */
+        const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
+        const MAX_CO_PARENTS = 3;
+        const USERNAME_RE = /^[a-z0-9_.-]{3,30}$/;
+
+        function makeInviteCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            do {
+                const arr = new Uint32Array(6);
+                crypto.getRandomValues(arr);
+                code = Array.from(arr, (n) => chars[n % chars.length]).join('');
+            } while (Object.values(db.families).some((f) => f && f.inviteCode === code));
+            return code;
+        }
+
+        function getCurrentParentAccount() {
+            const fam = getActiveFamily();
+            if (!fam || !db.currentSession) return null;
+            const accUser = db.currentSession.accountUsername || fam.parentUsername;
+            if (accUser === fam.parentUsername) {
+                return { username: fam.parentUsername, name: fam.parentName, relation: fam.parentRelation || 'Orang Tua', isPrimary: true };
+            }
+            const co = (fam.coParents || []).find((c) => c.username === accUser);
+            return co ? { username: co.username, name: co.name, relation: co.relation || 'Wali', isPrimary: false } : null;
+        }
+
+        function currentActorLabel() {
+            const a = getCurrentParentAccount();
+            if (!a) return 'Orang Tua';
+            return a.name.toLowerCase().includes(String(a.relation).toLowerCase()) ? a.name : `${a.name} (${a.relation})`;
+        }
+
+        function logActivity(fam, text, actor = null, kind = 'parent') {
+            if (!fam) return;
+            if (!Array.isArray(fam.activityLog)) fam.activityLog = [];
+            fam.activityLog.unshift({ t: Date.now(), by: actor || currentActorLabel(), text: text, kind: kind });
+            if (fam.activityLog.length > 40) fam.activityLog.length = 40;
+        }
+
+        function isParentUsernameTaken(username) {
+            const u = username.toLowerCase();
+            return Object.keys(db.families).some((k) => {
+                const f = normalizeFamilyRecord(db.families[k]);
+                return k.toLowerCase() === u || (f.coParents || []).some((c) => c.username.toLowerCase() === u);
+            });
+        }
+
+        function findParentAccount(username, password) {
+            for (const k of Object.keys(db.families)) {
+                const f = normalizeFamilyRecord(db.families[k]);
+                if (k.toLowerCase() === username && f.parentPassword === password) {
+                    return { famKey: k, accountUsername: f.parentUsername, accountName: f.parentName };
+                }
+                const co = (f.coParents || []).find((c) => c.username.toLowerCase() === username && c.password === password);
+                if (co) return { famKey: k, accountUsername: co.username, accountName: co.name };
+            }
+            return null;
+        }
+
+        function isSessionValid() {
+            const s = db.currentSession;
+            if (!s) return true;
+            const fam = db.families[s.parentUsername];
+            if (!fam) return false;
+            normalizeFamilyRecord(fam);
+            if (s.role === 'parent') return !!getCurrentParentAccount();
+            if (s.role === 'child') return !!getActiveChild();
+            return false;
+        }
+
+        // Ambil data keluarga terbaru dari cloud sebelum login / daftar / gabung (supaya tidak menimpa akun yang sudah ada)
+        async function ensureFamiliesLoaded() {
+            if (!isCloudActive || !firestoreDb) return;
+            try {
+                const colRef = collection(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families');
+                const snap = await getDocs(colRef);
+                snap.forEach((d) => {
+                    const data = d.data();
+                    if (data && data.parentUsername) db.families[data.parentUsername] = normalizeFamilyRecord(data);
+                });
+            } catch (err) {
+                console.warn('Gagal memuat data keluarga dari cloud:', err);
+            }
+        }
+
+        async function prepareAuthData() {
+            if (cloudInitPromise) {
+                await Promise.race([cloudInitPromise, new Promise((r) => setTimeout(r, 6000))]);
+            }
+            await ensureFamiliesLoaded();
+        }
+
+        function relationEmoji(rel) {
+            return rel === 'Ayah' ? '👨' : rel === 'Ibu' ? '👩' : '🧑';
+        }
+
+        function fmtDateTime(ts) {
+            return new Date(ts).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderFamilyTab(fam) {
+            const listEl = document.getElementById('family-members-list');
+            if (!listEl || !fam) return;
+            const me = getCurrentParentAccount();
+            const isDemo = fam.parentUsername === 'ortu_demo';
+
+            const members = [{ username: fam.parentUsername, name: fam.parentName, relation: fam.parentRelation || 'Orang Tua', primary: true }]
+                .concat((fam.coParents || []).map((c) => ({ username: c.username, name: c.name, relation: c.relation || 'Wali', primary: false })));
+
+            listEl.innerHTML = '';
+            members.forEach((m) => {
+                const isMe = me && me.username === m.username;
+                const row = document.createElement('div');
+                row.className = 'p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2';
+                const canRemove = me && me.isPrimary && !m.primary && !isDemo;
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center text-xl shrink-0">${relationEmoji(m.relation)}</div>
+                        <div class="min-w-0">
+                            <p class="font-game font-bold text-xs text-slate-800 dark:text-white truncate">${esc(m.name)}${isMe ? ' <span class="text-[10px] text-emerald-600">(Anda)</span>' : ''}</p>
+                            <p class="text-[10px] font-bold text-slate-400 truncate">@${esc(m.username)} • ${esc(m.relation)}${m.primary ? ' • Pemilik Keluarga' : ''}</p>
+                        </div>
+                    </div>
+                    ${canRemove ? '<button data-remove="1" class="px-2.5 py-1.5 rounded-xl bg-rose-100 text-rose-700 font-extrabold text-[11px] shrink-0"><i class="fa-solid fa-user-minus"></i></button>' : ''}
+                `;
+                const rm = row.querySelector('[data-remove]');
+                if (rm) rm.onclick = () => removeCoParent(m.username);
+                listEl.appendChild(row);
+            });
+
+            document.getElementById('family-admin-section').classList.toggle('hidden', !(me && me.isPrimary) || isDemo);
+            document.getElementById('family-demo-note').classList.toggle('hidden', !isDemo);
+            document.getElementById('family-me-label').textContent = me ? currentActorLabel() : '-';
+
+            const valid = fam.inviteCode && (Date.now() - (fam.inviteCreatedAt || 0) <= INVITE_TTL_MS);
+            document.getElementById('family-invite-code').textContent = valid ? fam.inviteCode : '- - - - - -';
+            document.getElementById('family-invite-expiry').textContent = valid
+                ? `Berlaku sampai ${fmtDateTime((fam.inviteCreatedAt || 0) + INVITE_TTL_MS)} • sekali pakai`
+                : 'Belum ada kode aktif. Tekan "Buat Kode Baru".';
+
+            const logEl = document.getElementById('family-activity-log');
+            logEl.innerHTML = '';
+            const logs = fam.activityLog || [];
+            if (logs.length === 0) {
+                logEl.innerHTML = '<p class="text-xs text-slate-400 font-bold text-center py-3">Belum ada aktivitas.</p>';
+            } else {
+                logs.slice(0, 20).forEach((l) => {
+                    const row = document.createElement('div');
+                    row.className = 'px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold flex items-start gap-2';
+                    row.innerHTML = `
+                        <span class="text-base leading-none">${l.kind === 'child' ? '🎮' : '👨‍👩‍👧'}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-slate-700 dark:text-slate-200"><strong>${esc(l.by)}</strong> ${esc(l.text)}</p>
+                            <p class="text-[10px] text-slate-400 font-bold">${fmtDateTime(l.t)}</p>
+                        </div>`;
+                    logEl.appendChild(row);
+                });
+            }
+        }
+
+        function generateFamilyInviteCode() {
+            const fam = getActiveFamily();
+            const me = getCurrentParentAccount();
+            if (!fam || !me || !me.isPrimary || fam.parentUsername === 'ortu_demo') {
+                playSound('wrong');
+                showToast('⚠️ Hanya pemilik keluarga yang bisa membuat kode undangan.');
+                return;
+            }
+            fam.inviteCode = makeInviteCode();
+            fam.inviteCreatedAt = Date.now();
+            logActivity(fam, 'membuat kode undangan untuk pasangan');
+            saveDatabase(fam.parentUsername);
+            playSound('correct');
+            renderFamilyTab(fam);
+            showToast('💌 Kode undangan baru dibuat. Berikan ke pasangan Anda!');
+        }
+
+        async function copyFamilyInviteCode() {
+            const fam = getActiveFamily();
+            if (!fam || !fam.inviteCode) {
+                playSound('wrong');
+                showToast('⚠️ Belum ada kode. Tekan "Buat Kode Baru" dulu.');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(fam.inviteCode);
+                playSound('correct');
+                showToast(`📋 Kode ${fam.inviteCode} disalin!`);
+            } catch (e) {
+                showToast(`Kode undangan: ${fam.inviteCode} (salin manual)`);
+            }
+        }
+
+        async function addCoParentDirect() {
+            const me = getCurrentParentAccount();
+            if (!me || !me.isPrimary) {
+                playSound('wrong');
+                showToast('⚠️ Hanya pemilik keluarga yang bisa menambah akun pasangan.');
+                return;
+            }
+            const name = document.getElementById('family-add-name').value.trim();
+            const relation = document.getElementById('family-add-relation').value;
+            const username = document.getElementById('family-add-user').value.trim().toLowerCase();
+            const password = document.getElementById('family-add-pass').value.trim();
+
+            if (!name || !username || !password) { playSound('wrong'); showToast('⚠️ Lengkapi nama, username, dan password pasangan!'); return; }
+            if (!USERNAME_RE.test(username)) { playSound('wrong'); showToast('⚠️ Username 3-30 karakter: huruf kecil, angka, titik, strip, atau garis bawah.'); return; }
+            if (password.length < 4) { playSound('wrong'); showToast('⚠️ Password minimal 4 karakter.'); return; }
+
+            await ensureFamiliesLoaded();
+            const fam = getActiveFamily();
+            if (!fam) return;
+            if ((fam.coParents || []).length >= MAX_CO_PARENTS) { playSound('wrong'); showToast(`⚠️ Maksimal ${MAX_CO_PARENTS} akun pasangan/wali.`); return; }
+            if (isParentUsernameTaken(username)) { playSound('wrong'); showToast('⚠️ Username sudah dipakai, pilih yang lain.'); return; }
+
+            fam.coParents.push({ username: username, password: password, name: name, relation: relation, joinedAt: Date.now() });
+            logActivity(fam, `menambahkan akun ${name} (${relation})`);
+            await saveDatabase(fam.parentUsername);
+            ['family-add-name', 'family-add-user', 'family-add-pass'].forEach((id) => { document.getElementById(id).value = ''; });
+            playSound('fanfare');
+            fireConfetti(40);
+            renderFamilyTab(fam);
+            showToast(`✅ Akun ${name} ditambahkan. Beri tahu username & passwordnya!`);
+        }
+
+        function removeCoParent(username) {
+            const fam = getActiveFamily();
+            const me = getCurrentParentAccount();
+            if (!fam || !me || !me.isPrimary) return;
+            const co = (fam.coParents || []).find((c) => c.username === username);
+            if (!co) return;
+            if (!confirm(`Hapus akses ${co.name} (@${co.username}) dari keluarga ini?`)) return;
+            fam.coParents = fam.coParents.filter((c) => c.username !== username);
+            logActivity(fam, `menghapus akses ${co.name}`);
+            saveDatabase(fam.parentUsername);
+            playSound('click');
+            renderFamilyTab(fam);
+            showToast(`🗑️ Akses ${co.name} dihapus.`);
+        }
+
+        function changeMyParentPassword() {
+            const fam = getActiveFamily();
+            const me = getCurrentParentAccount();
+            if (!fam || !me) return;
+            const np = document.getElementById('family-new-pass').value.trim();
+            if (np.length < 4) { playSound('wrong'); showToast('⚠️ Password baru minimal 4 karakter.'); return; }
+            if (me.isPrimary) {
+                fam.parentPassword = np;
+            } else {
+                const co = fam.coParents.find((c) => c.username === me.username);
+                if (!co) return;
+                co.password = np;
+            }
+            logActivity(fam, 'mengganti password akunnya');
+            saveDatabase(fam.parentUsername);
+            document.getElementById('family-new-pass').value = '';
+            playSound('correct');
+            showToast('🔑 Password berhasil diganti.');
+        }
+
+        function refreshTargetForNewDay(child) {
+            if (!child || !child.dailyTarget) return false;
+            const today = new Date().toDateString();
+            if (child.dailyTarget.date !== today) {
+                child.dailyTarget.date = today;
+                child.dailyTarget.completedCount = 0;
+                child.dailyTarget.claimed = false;
+                return true;
+            }
+            return false;
+        }
+
         function getActiveFamily() {
             if (!db.currentSession) return null;
             const fam = db.families[db.currentSession.parentUsername];
@@ -2367,7 +2838,7 @@
             const fam = getActiveFamily();
             if (!fam || !Array.isArray(fam.children) || fam.children.length === 0) return null;
             if (db.currentSession.role === 'child' && db.currentSession.childUsername) {
-                return fam.children.find(c => c.username.toLowerCase() === db.currentSession.childUsername.toLowerCase()) || fam.children[0];
+                return fam.children.find(c => c.username.toLowerCase() === db.currentSession.childUsername.toLowerCase()) || null;
             }
             return fam.children.find(c => c.username === fam.selectedChildUsername) || fam.children[0];
         }
@@ -2402,31 +2873,44 @@
             }
         }
 
-        function toggleParentRegisterMode() {
-            playSound('click');
-            isParentRegisterMode = !isParentRegisterMode;
-            const title = document.getElementById('parent-mode-title');
-            const toggleBtn = document.getElementById('btn-toggle-parent-reg');
-            const nameWrap = document.getElementById('parent-reg-name-wrap');
-            const submitBtn = document.getElementById('btn-parent-submit');
+        let parentAuthMode = 'login'; // 'login' | 'register' | 'join'
 
-            if (isParentRegisterMode) {
-                title.textContent = 'Daftar Akun Orang Tua Baru';
-                toggleBtn.textContent = 'Sudah Punya Akun? Login';
-                nameWrap.classList.remove('hidden');
-                submitBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Buat Akun Orang Tua`;
-            } else {
-                title.textContent = 'Login Akun Orang Tua';
-                toggleBtn.textContent = 'Daftar Orang Tua Baru';
-                nameWrap.classList.add('hidden');
-                submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Orang Tua`;
-            }
+        function setParentAuthMode(mode) {
+            parentAuthMode = mode;
+            const isLogin = mode === 'login', isReg = mode === 'register', isJoin = mode === 'join';
+            document.getElementById('parent-reg-name-wrap').classList.toggle('hidden', isLogin);
+            document.getElementById('parent-reg-relation-wrap').classList.toggle('hidden', isLogin);
+            document.getElementById('parent-join-code-wrap').classList.toggle('hidden', !isJoin);
+            document.getElementById('parent-mode-title').textContent = isLogin ? 'Login Akun Orang Tua' : isReg ? 'Daftar Akun Orang Tua Baru' : 'Gabung sebagai Pasangan (Ayah/Ibu)';
+            const toggleBtn = document.getElementById('btn-toggle-parent-reg');
+            toggleBtn.textContent = isReg ? 'Sudah Punya Akun? Login' : 'Daftar Orang Tua Baru';
+            toggleBtn.classList.toggle('hidden', isJoin);
+            document.getElementById('btn-toggle-parent-join').textContent = isJoin
+                ? '← Kembali ke Login'
+                : 'Pasangan saya sudah mendaftar — Gabung dengan Kode Undangan →';
+            document.getElementById('btn-parent-submit').innerHTML = isLogin
+                ? '<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Orang Tua'
+                : isReg
+                ? '<i class="fa-solid fa-user-plus"></i> Buat Akun Orang Tua'
+                : '<i class="fa-solid fa-people-arrows"></i> Gabung ke Keluarga';
         }
 
-        function handleParentAuth() {
+        function toggleParentRegisterMode() {
+            playSound('click');
+            setParentAuthMode(parentAuthMode === 'register' ? 'login' : 'register');
+        }
+
+        function toggleParentJoinMode() {
+            playSound('click');
+            setParentAuthMode(parentAuthMode === 'join' ? 'login' : 'join');
+        }
+
+        async function handleParentAuth() {
             const username = document.getElementById('parent-auth-user').value.trim().toLowerCase();
             const password = document.getElementById('parent-auth-pass').value.trim();
-            const fullname = document.getElementById('parent-auth-fullname').value.trim() || 'Ayah / Bunda';
+            const relation = document.getElementById('parent-auth-relation').value || 'Ayah';
+            const fullname = document.getElementById('parent-auth-fullname').value.trim() || relation;
+            const inviteCode = document.getElementById('parent-auth-invite').value.trim().toUpperCase().replace(/\s+/g, '');
 
             if (!username || !password) {
                 playSound('wrong');
@@ -2434,38 +2918,103 @@
                 return;
             }
 
-            if (isParentRegisterMode) {
-                if (db.families[username]) {
-                    playSound('wrong');
-                    showToast('⚠️ Username Orang Tua sudah terdaftar, silakan login!');
-                    return;
+            const btn = document.getElementById('btn-parent-submit');
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+            try {
+                await prepareAuthData();
+
+                if (parentAuthMode === 'register' || parentAuthMode === 'join') {
+                    if (!USERNAME_RE.test(username)) {
+                        playSound('wrong');
+                        showToast('⚠️ Username 3-30 karakter: huruf kecil, angka, titik, strip, atau garis bawah (tanpa spasi).');
+                        return;
+                    }
+                    if (password.length < 4) {
+                        playSound('wrong');
+                        showToast('⚠️ Password minimal 4 karakter.');
+                        return;
+                    }
+                    if (isParentUsernameTaken(username)) {
+                        playSound('wrong');
+                        showToast('⚠️ Username Orang Tua sudah terdaftar, pilih username lain atau login!');
+                        return;
+                    }
                 }
-                db.families[username] = {
-                    parentUsername: username,
-                    parentPassword: password,
-                    parentName: fullname,
-                    selectedChildUsername: null,
-                    customRewards: createDefaultParentRewards(),
-                    children: [],
-                    child: null
-                };
-                db.currentSession = { role: 'parent', parentUsername: username };
-                saveDatabase(username);
-                playSound('correct');
-                showToast('🎉 Akun Orang Tua berhasil dibuat! Silakan daftarkan akun dan kelas anak Anda.');
-                routeAppView();
-            } else {
-                const fam = db.families[username];
-                if (!fam || fam.parentPassword !== password) {
-                    playSound('wrong');
-                    showToast('❌ Username atau Password Orang Tua tidak tepat!');
-                    return;
+
+                if (parentAuthMode === 'register') {
+                    db.families[username] = {
+                        parentUsername: username,
+                        parentPassword: password,
+                        parentName: fullname,
+                        parentRelation: relation,
+                        selectedChildUsername: null,
+                        customRewards: createDefaultParentRewards(),
+                        children: [],
+                        child: null,
+                        coParents: [],
+                        activityLog: [],
+                        inviteCode: '',
+                        inviteCreatedAt: 0
+                    };
+                    db.currentSession = { role: 'parent', parentUsername: username, accountUsername: username };
+                    logActivity(db.families[username], `membuat keluarga baru (${relation})`, fullname);
+                    await saveDatabase(username);
+                    playSound('correct');
+                    showToast('🎉 Akun Orang Tua berhasil dibuat! Silakan daftarkan akun dan kelas anak Anda.');
+                    routeAppView();
+                } else if (parentAuthMode === 'join') {
+                    if (!inviteCode) {
+                        playSound('wrong');
+                        showToast('⚠️ Masukkan kode undangan dari pasangan Anda!');
+                        return;
+                    }
+                    const famKey = Object.keys(db.families).find((k) => {
+                        const f = normalizeFamilyRecord(db.families[k]);
+                        return f.inviteCode && f.inviteCode === inviteCode;
+                    });
+                    if (!famKey) {
+                        playSound('wrong');
+                        showToast('❌ Kode undangan tidak ditemukan atau sudah dipakai.');
+                        return;
+                    }
+                    const fam = db.families[famKey];
+                    if (Date.now() - (fam.inviteCreatedAt || 0) > INVITE_TTL_MS) {
+                        playSound('wrong');
+                        showToast('⌛ Kode undangan sudah kedaluwarsa. Minta pasangan membuat kode baru.');
+                        return;
+                    }
+                    if ((fam.coParents || []).length >= MAX_CO_PARENTS) {
+                        playSound('wrong');
+                        showToast(`⚠️ Keluarga ini sudah mencapai batas ${MAX_CO_PARENTS} akun pasangan/wali.`);
+                        return;
+                    }
+                    fam.coParents.push({ username: username, password: password, name: fullname, relation: relation, joinedAt: Date.now() });
+                    fam.inviteCode = '';
+                    fam.inviteCreatedAt = 0;
+                    logActivity(fam, `(${relation}) bergabung ke keluarga memakai kode undangan`, fullname);
+                    db.currentSession = { role: 'parent', parentUsername: famKey, accountUsername: username };
+                    await saveDatabase(famKey);
+                    playSound('fanfare');
+                    fireConfetti(50);
+                    showToast(`🎉 Selamat datang, ${fullname}! Anda kini ikut memantau keluarga ini.`);
+                    routeAppView();
+                } else {
+                    const found = findParentAccount(username, password);
+                    if (!found) {
+                        playSound('wrong');
+                        showToast('❌ Username atau Password Orang Tua tidak tepat!');
+                        return;
+                    }
+                    db.currentSession = { role: 'parent', parentUsername: found.famKey, accountUsername: found.accountUsername };
+                    saveDatabase(null, true);
+                    playSound('correct');
+                    showToast(`👋 Selamat datang kembali, ${found.accountName}!`);
+                    routeAppView();
                 }
-                db.currentSession = { role: 'parent', parentUsername: username };
-                saveDatabase(username);
-                playSound('correct');
-                showToast(`👋 Selamat datang kembali, ${fam.parentName}!`);
-                routeAppView();
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-60');
             }
         }
 
@@ -2503,7 +3052,7 @@
                 parentUsername: foundParentKey,
                 childUsername: foundChildUsername
             };
-            saveDatabase(foundParentKey);
+            saveDatabase(null, true);
             playSound('fanfare');
             const child = getActiveChild();
             showToast(`🚀 Selamat datang ${child.name} (${formatGradeLabel(child.grade)})!`);
@@ -2521,7 +3070,7 @@
                 parentUsername: 'ortu_demo',
                 childUsername: 'anak_demo'
             };
-            saveDatabase('ortu_demo');
+            saveDatabase(null, true);
             showToast(role === 'parent' ? '👨‍👩‍👧 Masuk ke Portal Orang Tua (Demo)' : '🎮 Masuk ke Arena Anak Raka (Kelas 6 SD)');
             routeAppView();
         }
@@ -2529,7 +3078,7 @@
         function logoutSession() {
             playSound('click');
             db.currentSession = null;
-            saveDatabase();
+            saveDatabase(null, true);
             routeAppView();
             showToast('👋 Berhasil keluar dari sesi.');
         }
@@ -2545,7 +3094,7 @@
             playSound('correct');
             db.currentSession.role = 'child';
             db.currentSession.childUsername = child.username;
-            saveDatabase();
+            saveDatabase(null, true);
             routeAppView();
             showToast(`🎮 Beralih ke Mode Belajar Anak: ${child.name}`);
         }
@@ -2571,20 +3120,20 @@
                 return;
             }
 
+            if (!isSessionValid()) {
+                db.currentSession = null;
+                saveDatabase(null, true);
+                authEl.classList.remove('hidden');
+                showToast('⚠️ Akun ini sudah tidak aktif atau diubah. Silakan login kembali.');
+                return;
+            }
+
             if (db.currentSession.role === 'parent') {
                 parentEl.classList.remove('hidden');
                 parentEl.classList.add('flex');
                 renderParentDashboard();
             } else {
                 const child = getActiveChild();
-                if (!child) {
-                    db.currentSession.role = 'parent';
-                    saveDatabase();
-                    parentEl.classList.remove('hidden');
-                    parentEl.classList.add('flex');
-                    renderParentDashboard();
-                    return;
-                }
                 childEl.classList.remove('hidden');
                 childEl.classList.add('flex');
                 checkChildDailyReset(child);
@@ -2638,7 +3187,7 @@
         function switchParentTab(tab) {
             playSound('click');
             if (tab !== 'account') isAddingNewChild = false;
-            ['monitor', 'target', 'rewards', 'account'].forEach((t) => {
+            ['monitor', 'target', 'rewards', 'account', 'family'].forEach((t) => {
                 const btn = document.getElementById(`ptab-${t}`);
                 const view = document.getElementById(`pview-${t}`);
                 if (!btn || !view) return;
@@ -2653,8 +3202,8 @@
             renderParentDashboard();
         }
 
-        function selectConfigChildGrade(g) {
-            playSound('click');
+        function selectConfigChildGrade(g, silent = false) {
+            if (!silent) playSound('click');
             tempConfigGrade = g;
             [5, 6, 7, 8, 9].forEach((gradeNum) => {
                 const btn = document.getElementById(`cfg-grade-${gradeNum}`);
@@ -2712,6 +3261,7 @@
                 fam.selectedChildUsername = cUser;
             }
 
+            logActivity(fam, `menyimpan akun anak "${cName}" (${formatGradeLabel(tempConfigGrade)})`);
             normalizeFamilyRecord(fam);
             saveDatabase(fam.parentUsername);
             playSound('correct');
@@ -2745,6 +3295,7 @@
             });
 
             titleInput.value = '';
+            logActivity(fam, `menambah voucher "${title}" (${cost} koin)`);
             saveDatabase(fam.parentUsername);
             playSound('correct');
             renderParentDashboard();
@@ -2755,25 +3306,47 @@
             playSound('click');
             const fam = getActiveFamily();
             if (!fam) return;
+            const delRw = (fam.customRewards || []).find(r => r.id === rewardId);
+            if (delRw) logActivity(fam, `menghapus voucher "${delRw.title}"`);
             fam.customRewards = (fam.customRewards || []).filter(r => r.id !== rewardId);
             saveDatabase(fam.parentUsername);
             renderParentDashboard();
             showToast('🗑️ Voucher dihapus dari daftar.');
         }
 
-        function approveChildVoucher(voucherId) {
+        function approveChildVoucher(voucherId, childUsername) {
             const fam = getActiveFamily();
-            const child = getActiveChild();
-            if (!fam || !child) return;
-
-            const v = (child.redeemedVouchers || []).find(item => item.id === voucherId);
-            if (v) {
+            if (!fam) return;
+            const ch = (fam.children || []).find((c) => c.username === childUsername) || getActiveChild();
+            if (!ch) return;
+            const v = (ch.redeemedVouchers || []).find((item) => item.id === voucherId);
+            if (v && v.status === 'pending') {
                 v.status = 'approved';
+                v.decidedBy = currentActorLabel();
+                logActivity(fam, `menyetujui hadiah "${v.title}" untuk ${ch.name}`);
                 saveDatabase(fam.parentUsername);
                 playSound('fanfare');
                 fireConfetti(40);
                 renderParentDashboard();
-                showToast(`🎉 Hadiah "${v.title}" telah disetujui & diberikan kepada ${child.name}!`);
+                showToast(`🎉 Hadiah "${v.title}" disetujui & diberikan kepada ${ch.name}!`);
+            }
+        }
+
+        function rejectChildVoucher(voucherId, childUsername) {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const ch = (fam.children || []).find((c) => c.username === childUsername) || getActiveChild();
+            if (!ch) return;
+            const v = (ch.redeemedVouchers || []).find((item) => item.id === voucherId);
+            if (v && v.status === 'pending') {
+                v.status = 'rejected';
+                v.decidedBy = currentActorLabel();
+                ch.coins += v.cost; // koin dikembalikan
+                logActivity(fam, `menolak hadiah "${v.title}" untuk ${ch.name} (koin dikembalikan)`);
+                saveDatabase(fam.parentUsername);
+                playSound('click');
+                renderParentDashboard();
+                showToast(`↩️ Klaim "${v.title}" ditolak, ${v.cost} koin dikembalikan ke ${ch.name}.`);
             }
         }
 
@@ -2794,6 +3367,7 @@
             playSound('fanfare');
             fireConfetti(60);
             child.coins -= reward.cost;
+            logActivity(fam, `menebus voucher "${reward.title}" (${reward.cost} koin)`, child.name, 'child');
             child.redeemedVouchers = child.redeemedVouchers || [];
             child.redeemedVouchers.unshift({
                 id: 'vc_' + Date.now(),
@@ -2825,6 +3399,7 @@
             const rewardCoins = parseInt(document.getElementById('target-input-coins').value, 10) || 200;
             const note = document.getElementById('target-input-note').value.trim() || 'Semangat kerjakan kuis hari ini ya nak!';
 
+            logActivity(fam, `memasang target harian untuk ${child.name}: ${count} kuis ${subj === 'ALL' ? 'semua mapel' : subj} (min. ${minScore}%)`);
             child.dailyTarget = {
                 date: new Date().toDateString(),
                 subject: subj,
@@ -2832,6 +3407,7 @@
                 minScore: minScore,
                 rewardCoins: rewardCoins,
                 note: note,
+                setBy: currentActorLabel(),
                 completedCount: 0,
                 claimed: false
             };
@@ -2847,7 +3423,7 @@
             const fam = getActiveFamily();
             if (!fam) return;
 
-            document.getElementById('parent-header-name').textContent = fam.parentName;
+            document.getElementById('parent-header-name').textContent = getCurrentParentAccount() ? currentActorLabel() : fam.parentName;
 
             // Render Bar Pemilih Anak (Multi-Child)
             const selectorBar = document.getElementById('parent-children-selector');
@@ -2860,7 +3436,7 @@
                         active ? 'bg-white text-indigo-800 shadow' : 'bg-white/15 text-white/80 hover:bg-white/25'
                     }`;
                     pill.onclick = () => selectParentActiveChild(ch.username);
-                    pill.innerHTML = `<span>${ch.equipped?.avatar || '🦊'}</span><span>${ch.name} (Kls ${ch.grade})</span>`;
+                    pill.innerHTML = `<span>${esc(ch.equipped?.avatar || '🦊')}</span><span>${esc(ch.name)} (Kls ${ch.grade})</span>`;
                     selectorBar.appendChild(pill);
                 });
                 const addBtn = document.createElement('button');
@@ -2873,6 +3449,8 @@
                 selectorBar.appendChild(addBtn);
             }
 
+            renderFamilyTab(fam);
+
             const child = getActiveChild();
             const alertNoChild = document.getElementById('parent-no-child-alert');
             const summaryCard = document.getElementById('parent-child-summary-card');
@@ -2880,12 +3458,14 @@
             if (!child) {
                 alertNoChild.classList.remove('hidden');
                 summaryCard.classList.add('hidden');
-                selectConfigChildGrade(tempConfigGrade);
+                selectConfigChildGrade(tempConfigGrade, true);
                 return;
             }
 
             alertNoChild.classList.add('hidden');
             summaryCard.classList.remove('hidden');
+
+            if (refreshTargetForNewDay(child)) saveDatabase(fam.parentUsername);
 
             // Populate Account Form jika tidak sedang mode tambah anak baru
             if (!isAddingNewChild) {
@@ -2893,7 +3473,7 @@
                 document.getElementById('cfg-child-name').value = child.name;
                 document.getElementById('cfg-child-user').value = child.username;
                 document.getElementById('cfg-child-pass').value = child.password;
-                selectConfigChildGrade(child.grade);
+                selectConfigChildGrade(child.grade, true);
             }
 
             // Populate Target Form
@@ -3004,7 +3584,9 @@
             const redeemedListEl = document.getElementById('parent-redeemed-vouchers-list');
             const catalogEl = document.getElementById('parent-custom-rewards-catalog');
 
-            const vouchers = child.redeemedVouchers || [];
+            const vouchers = [];
+            (fam.children || []).forEach((ch) => (ch.redeemedVouchers || []).forEach((v) => vouchers.push({ ...v, _childName: ch.name, _childUsername: ch.username })));
+            vouchers.sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1));
             const pendingCount = vouchers.filter(v => v.status === 'pending').length;
             if (voucherBadge) {
                 if (pendingCount > 0) {
@@ -3018,21 +3600,33 @@
             if (redeemedListEl) {
                 redeemedListEl.innerHTML = '';
                 if (vouchers.length === 0) {
-                    redeemedListEl.innerHTML = `<p class="text-xs text-slate-400 font-bold text-center py-3">Belum ada klaim voucher hadiah dari ${child.name}.</p>`;
+                    redeemedListEl.innerHTML = `<p class="text-xs text-slate-400 font-bold text-center py-3">Belum ada klaim voucher hadiah dari anak-anak.</p>`;
                 } else {
-                    vouchers.forEach(v => {
+                    vouchers.forEach((v) => {
                         const row = document.createElement('div');
                         row.className = 'p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2';
+                        const by = v.decidedBy ? ` oleh ${esc(v.decidedBy)}` : '';
+                        let actionHtml;
+                        if (v.status === 'pending') {
+                            actionHtml = `<div class="flex flex-col gap-1 shrink-0">
+                                <button data-act="approve" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px] shadow hover:bg-emerald-600">✓ Berikan</button>
+                                <button data-act="reject" class="px-3 py-1 rounded-xl bg-rose-100 text-rose-700 font-extrabold text-[10px]">✕ Tolak</button>
+                            </div>`;
+                        } else if (v.status === 'rejected') {
+                            actionHtml = `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-rose-100 text-rose-700 text-center">↩️ Ditolak${by}<br>(koin dikembalikan)</span>`;
+                        } else {
+                            actionHtml = `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700 text-center">✅ Diberikan${by}</span>`;
+                        }
                         row.innerHTML = `
-                            <div>
-                                <p class="font-game font-bold text-xs text-slate-800 dark:text-white">${v.title}</p>
-                                <p class="text-[10px] font-bold text-slate-400">Ditebus: ${v.dateStr} • ${v.cost} Koin</p>
+                            <div class="min-w-0">
+                                <p class="font-game font-bold text-xs text-slate-800 dark:text-white">${esc(v.title)}</p>
+                                <p class="text-[10px] font-bold text-slate-400">${esc(v._childName)} • ${esc(v.dateStr)} • ${v.cost} Koin</p>
                             </div>
-                            ${v.status === 'pending'
-                                ? `<button onclick="approveChildVoucher('${v.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px] shadow hover:bg-emerald-600">✓ Berikan Hadiah</button>`
-                                : `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700">✅ Sudah Diberikan</span>`
-                            }
-                        `;
+                            ${actionHtml}`;
+                        const ap = row.querySelector('[data-act="approve"]');
+                        const rj = row.querySelector('[data-act="reject"]');
+                        if (ap) ap.onclick = () => approveChildVoucher(v.id, v._childUsername);
+                        if (rj) rj.onclick = () => rejectChildVoucher(v.id, v._childUsername);
                         redeemedListEl.appendChild(row);
                     });
                 }
@@ -3044,7 +3638,7 @@
                     const item = document.createElement('div');
                     item.className = 'p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs';
                     item.innerHTML = `
-                        <span class="font-bold">${rw.title} <strong class="text-amber-500 ml-1">(${rw.cost} 🪙)</strong></span>
+                        <span class="font-bold">${esc(rw.title)} <strong class="text-amber-500 ml-1">(${rw.cost} 🪙)</strong></span>
                         <button onclick="deleteCustomParentReward('${rw.id}')" class="text-rose-500 hover:text-rose-700 px-2 py-0.5"><i class="fa-solid fa-trash"></i></button>
                     `;
                     catalogEl.appendChild(item);
@@ -3150,10 +3744,12 @@
             if (!child) return;
 
             // Update Misi dari Orang Tua
+            if (refreshTargetForNewDay(child)) saveDatabase();
             const dt = child.dailyTarget;
             const subjLabel = dt.subject === 'ALL' ? 'Mata Pelajaran Bebas' : dt.subject;
             document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis ${subjLabel} (Skor Min. ${dt.minScore}%)`;
             document.getElementById('child-mission-note').textContent = `"${dt.note}"`;
+            document.getElementById('child-mission-setby').textContent = dt.setBy ? `— ${dt.setBy}` : '';
             document.getElementById('child-mission-reward').textContent = `+${dt.rewardCoins} Koin`;
 
             const pct = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
@@ -3261,6 +3857,7 @@
             child.coins += child.dailyTarget.rewardCoins;
             child.xp += 150;
             child.targetsCompleted = (child.targetsCompleted || 0) + 1;
+            logActivity(getActiveFamily(), `menyelesaikan target harian dan membuka peti hadiah (+${child.dailyTarget.rewardCoins} koin)`, child.name, 'child');
 
             checkAndUnlockBadges();
             saveDatabase();
@@ -3574,6 +4171,7 @@
             };
 
             lastCompletedQuizRecord = record;
+            logActivity(getActiveFamily(), `selesai kuis ${activeQuiz.subjectName} (${formatGradeLabel(activeQuiz.grade)}) dengan skor ${scorePct}%`, child.name, 'child');
             child.quizHistory = child.quizHistory || [];
             child.quizHistory.unshift(record);
             if (child.quizHistory.length > 25) child.quizHistory.pop();
@@ -3716,7 +4314,7 @@
                     const card = document.createElement('div');
                     card.className = 'p-3 rounded-2xl bg-white dark:bg-slate-900 border-2 border-rose-200 dark:border-rose-800 flex flex-col justify-between gap-2';
                     card.innerHTML = `
-                        <p class="font-game font-bold text-xs text-slate-800 dark:text-white leading-snug">${rw.title}</p>
+                        <p class="font-game font-bold text-xs text-slate-800 dark:text-white leading-snug">${esc(rw.title)}</p>
                         <button onclick="redeemRealWorldReward('${rw.id}')" class="w-full py-1.5 rounded-xl text-white font-extrabold text-xs btn-3d-rose flex items-center justify-center gap-1">
                             <i class="fa-solid fa-coins"></i> Tebus ${rw.cost}
                         </button>
@@ -3733,9 +4331,9 @@
                         const row = document.createElement('div');
                         row.className = 'px-3 py-2 rounded-xl bg-white/80 dark:bg-slate-900 border border-rose-200 dark:border-rose-800 flex items-center justify-between text-[11px] font-bold';
                         row.innerHTML = `
-                            <span>🎟️ ${v.title} (${v.dateStr})</span>
-                            <span class="${v.status === 'approved' ? 'text-emerald-600' : 'text-amber-600'} font-extrabold">
-                                ${v.status === 'approved' ? '✅ Disetujui Ortu' : '⏳ Menunggu Ortu'}
+                            <span>🎟️ ${esc(v.title)} (${esc(v.dateStr)})</span>
+                            <span class="${v.status === 'approved' ? 'text-emerald-600' : v.status === 'rejected' ? 'text-rose-600' : 'text-amber-600'} font-extrabold">
+                                ${v.status === 'approved' ? '✅ Disetujui Ortu' : v.status === 'rejected' ? '↩️ Ditolak (koin kembali)' : '⏳ Menunggu Ortu'}
                             </span>
                         `;
                         myVouchersEl.appendChild(row);
@@ -4081,7 +4679,8 @@
         function showToast(message) {
             const box = document.getElementById('toast-box');
             const msg = document.getElementById('toast-msg');
-            msg.innerHTML = `<span>${message}</span>`;
+            msg.innerHTML = '<span></span>';
+            msg.firstChild.textContent = message;
             box.classList.remove('opacity-0', '-translate-y-2');
             box.classList.add('opacity-100', 'translate-y-0');
 
@@ -4158,6 +4757,13 @@
         Object.assign(window, {
             switchAuthRole,
             toggleParentRegisterMode,
+            toggleParentJoinMode,
+            generateFamilyInviteCode,
+            copyFamilyInviteCode,
+            addCoParentDirect,
+            removeCoParent,
+            changeMyParentPassword,
+            rejectChildVoucher,
             handleParentAuth,
             handleChildLogin,
             quickDemoLogin,
@@ -4203,7 +4809,7 @@
         window.onload = function () {
             setupDynamicPWAManifest();
             routeAppView();
-            initFirebaseCloudSync();
+            cloudInitPromise = initFirebaseCloudSync();
         };
     </script>
 </body>
