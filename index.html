@@ -242,8 +242,34 @@
                         </button>
                     </div>
 
+                    <!-- Pilihan Mode Pendaftaran Orang Tua: Buat Keluarga Baru vs Gabung Keluarga Pasangan -->
+                    <div id="parent-reg-type-wrap" class="hidden space-y-2">
+                        <div class="grid grid-cols-2 gap-1.5 p-1 bg-purple-50 dark:bg-slate-800 rounded-xl border border-purple-200 dark:border-slate-700">
+                            <button type="button" id="btn-reg-type-create" onclick="switchParentRegType('create')" class="py-2 px-2 rounded-lg font-game font-bold text-[11px] bg-purple-600 text-white shadow transition">
+                                🆕 Keluarga Baru
+                            </button>
+                            <button type="button" id="btn-reg-type-join" onclick="switchParentRegType('join')" class="py-2 px-2 rounded-lg font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 transition">
+                                🤝 Gabung Pasangan
+                            </button>
+                        </div>
+                        <p id="parent-reg-type-desc" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-snug">
+                            Pilih <strong>Keluarga Baru</strong> jika Anda orang tua pertama yang mendaftar. Pilih <strong>Gabung Pasangan</strong> jika Ayah/Bunda sudah punya akun.
+                        </p>
+                    </div>
+
+                    <!-- Input Kode Keluarga (Muncul jika memilih Gabung Pasangan) -->
+                    <div id="parent-reg-familycode-wrap" class="hidden">
+                        <label class="block text-xs font-extrabold text-purple-700 dark:text-purple-300 mb-1">
+                            Kode Keluarga dari Akun Pasangan (Ayah/Bunda)
+                        </label>
+                        <div class="relative">
+                            <i class="fa-solid fa-people-roof absolute left-3.5 top-3 text-purple-500 text-sm"></i>
+                            <input id="parent-auth-familycode" type="text" placeholder="Contoh: FAM-2026 atau username pasangan" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border-2 border-purple-300 dark:border-purple-700 bg-purple-50/50 dark:bg-slate-800 font-extrabold text-sm uppercase focus:outline-none focus:border-purple-600">
+                        </div>
+                    </div>
+
                     <div id="parent-reg-name-wrap" class="hidden">
-                        <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama Ayah / Bunda</label>
+                        <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama Panggilan Anda (Ayah / Bunda)</label>
                         <input id="parent-auth-fullname" type="text" placeholder="Contoh: Ayah Budi / Bunda Sari" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
                     </div>
 
@@ -251,7 +277,7 @@
                         <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Username Orang Tua</label>
                         <div class="relative">
                             <i class="fa-solid fa-user-shield absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                            <input id="parent-auth-user" type="text" placeholder="Contoh: ortu_budi" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
+                            <input id="parent-auth-user" type="text" placeholder="Contoh: ayah_budi atau bunda_sari" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
                         </div>
                     </div>
 
@@ -416,6 +442,9 @@
                         <p id="p-target-desc" class="font-game font-bold text-sm">
                             Target: Mengerjakan 1 Kuis Matematika (Minimal Skor 70%)
                         </p>
+                        <p id="p-target-author" class="text-[11px] text-indigo-200 font-bold">
+                            👨‍👩‍👧 Disetting oleh: Ayah / Bunda
+                        </p>
                         <div class="w-full h-2.5 bg-black/25 rounded-full overflow-hidden p-0.5">
                             <div id="p-target-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
@@ -551,46 +580,47 @@
                             <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center text-2xl">
                                 🍦
                             </div>
-                            <div>
-                                <h3 class="font-game font-bold text-sm">Buat Voucher Hadiah Dunia Nyata</h3>
-                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                                    Anak bisa menabung koin ujian untuk menebus hadiah nyata dari Ayah/Bunda!
-                                </p>
+                <!-- TAB ORANG TUA 4: KELOLA AKUN & KELAS ANAK (KELAS 5 SD - 9 SMP) & KOLABORASI AYAH-BUNDA -->
+                <div id="pview-account" class="hidden space-y-4">
+
+                    <!-- KARTU BARU: KOLABORASI AYAH & BUNDA (CO-PARENTING) -->
+                    <div class="bg-gradient-to-br from-purple-600 via-indigo-600 to-indigo-800 rounded-3xl p-5 text-white shadow-lg space-y-3.5">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl border border-white/20">
+                                    🤝
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Fitur Co-Parenting</span>
+                                    <h3 class="font-game font-bold text-base mt-0.5">Kolaborasi Ayah & Bunda</h3>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="col-span-2">
-                                <label class="block text-[11px] font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama Hadiah Nyata</label>
-                                <input id="custom-reward-title" type="text" placeholder="Contoh: Beli Es Krim / Main 1 Jam" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
-                            </div>
+                        <p class="text-xs text-indigo-100 font-semibold leading-relaxed">
+                            Ingin pasangan (Ibu/Ayah) ikut memantau anak dari HP-nya dengan akun sendiri? Bagikan <strong>Kode Keluarga</strong> di bawah ini saat pasangan mendaftar di menu <em>"Gabung Pasangan"</em>:
+                        </p>
+
+                        <!-- Box Kode Keluarga + Tombol Copy -->
+                        <div class="bg-black/25 backdrop-blur-sm border border-white/20 rounded-2xl p-3 flex items-center justify-between gap-2">
                             <div>
-                                <label class="block text-[11px] font-extrabold text-slate-600 dark:text-slate-300 mb-1">Harga Koin</label>
-                                <select id="custom-reward-cost" class="w-full px-2.5 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
-                                    <option value="200">200 🪙</option>
-                                    <option value="300" selected>300 🪙</option>
-                                    <option value="500">500 🪙</option>
-                                    <option value="800">800 🪙</option>
-                                    <option value="1000">1000 🪙</option>
-                                </select>
+                                <p class="text-[10px] uppercase font-extrabold text-indigo-200">Kode Undangan Keluarga Anda:</p>
+                                <p id="parent-family-code-display" class="font-game font-bold text-xl tracking-widest text-amber-300">FAM-2026</p>
                             </div>
+                            <button onclick="copyFamilyCode()" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-game font-bold text-xs shadow flex items-center gap-1.5 active:scale-95 transition">
+                                <i class="fa-regular fa-copy"></i> Salin Kode
+                            </button>
                         </div>
 
-                        <button onclick="addCustomParentReward()" class="w-full py-3 rounded-2xl font-game font-bold text-white text-xs btn-3d-rose flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-plus-circle"></i> Tambahkan ke Toko Hadiah Anak
-                        </button>
-
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-700 space-y-2">
-                            <p class="text-[11px] font-extrabold text-slate-400 uppercase">Daftar Voucher Aktif di Toko Anak:</p>
-                            <div id="parent-custom-rewards-catalog" class="space-y-2">
+                        <!-- Daftar Akun Orang Tua yang Terhubung di Keluarga Ini -->
+                        <div class="space-y-1.5 pt-1">
+                            <p class="text-[11px] font-extrabold uppercase text-indigo-200">Akun Orang Tua yang Terhubung:</p>
+                            <div id="connected-parents-list" class="space-y-1.5">
                                 <!-- Di-render oleh JS -->
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- TAB ORANG TUA 4: KELOLA AKUN & KELAS ANAK (KELAS 5 SD - 9 SMP) -->
-                <div id="pview-account" class="hidden space-y-4">
                     <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border-2 border-indigo-200 dark:border-indigo-900 space-y-4">
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-3">
@@ -741,7 +771,7 @@
                     <div id="child-parent-mission-card" class="rounded-3xl p-4 bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 text-white shadow-lg relative overflow-hidden">
                         <div class="relative z-10 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                                <span id="child-mission-author" class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
                                     👨‍👩‍👧 Misi dari Orang Tua Hari Ini
                                 </span>
                                 <span id="child-mission-badge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900">
@@ -756,6 +786,27 @@
                             <p id="child-mission-note" class="text-xs bg-black/20 rounded-xl px-3 py-2 font-semibold italic text-indigo-100">
                                 "Semangat belajar hari ini ya nak!"
                             </p>
+
+                            <!-- Progress Bar Misi Orang Tua -->
+                            <div class="w-full h-2.5 bg-black/25 rounded-full overflow-hidden p-0.5">
+                                <div id="child-mission-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+
+                            <div class="pt-1 flex items-center justify-between gap-2">
+                                <div class="text-[11px] font-extrabold text-amber-200 flex items-center gap-1">
+                                    <i class="fa-solid fa-gift"></i> Hadiah Target: <span id="child-mission-reward">+200 Koin</span>
+                                </div>
+                                <button id="btn-claim-mission" onclick="claimParentMissionReward()" class="hidden bg-amber-400 text-slate-900 font-game font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-lg animate-bounce">
+                                    🎁 Buka Peti Hadiah!
+                                </button>
+                                <button id="btn-play-mission" onclick="playTargetMissionNow()" class="bg-white text-indigo-700 font-extrabold text-xs px-3 py-1.5 rounded-xl shadow hover:bg-indigo-50 active:scale-95 transition">
+                                    <i class="fa-solid fa-bolt mr-1"></i> Kerjakan Target
+                                </button>
+                            </div>
+                        </div>
+                        <div class="w-28 h-28 bg-white/10 rounded-full absolute -right-6 -bottom-8"></div>
+                    </div>
+
                     <!-- Info Kurikulum Kelas Anak & Roda Keberuntungan Harian -->
                     <div class="grid grid-cols-2 gap-2.5">
                         <div class="bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 p-3 rounded-2xl flex items-center gap-2.5">
@@ -2137,6 +2188,7 @@
                     minScore: 80,
                     rewardCoins: 200,
                     note: `Semangat kerjakan 1 kuis Matematika nilai minimal 80 ya ${name}!`,
+                    setByParentName: 'Ayah & Bunda',
                     completedCount: 0,
                     claimed: false
                 },
@@ -2179,7 +2231,12 @@
                     'ortu_demo': {
                         parentUsername: 'ortu_demo',
                         parentPassword: '123',
-                        parentName: 'Ayah & Bunda (Demo)',
+                        parentName: 'Ayah Budi (Demo)',
+                        familyCode: 'FAM-2026',
+                        parents: [
+                            { username: 'ortu_demo', password: '123', name: 'Ayah Budi (Demo)', roleLabel: 'Pembuat Keluarga' },
+                            { username: 'bunda_demo', password: '123', name: 'Bunda Sari (Demo)', roleLabel: 'Pasangan Orang Tua' }
+                        ],
                         selectedChildUsername: 'anak_demo',
                         customRewards: createDefaultParentRewards(),
                         children: [demoChild],
@@ -2189,8 +2246,30 @@
             };
         }
 
+        function generateFamilyCode() {
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            let code = 'FAM-';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
         function normalizeFamilyRecord(fam) {
             if (!fam) return fam;
+            if (!fam.familyCode) {
+                fam.familyCode = fam.parentUsername === 'ortu_demo' ? 'FAM-2026' : generateFamilyCode();
+            }
+            if (!Array.isArray(fam.parents) || fam.parents.length === 0) {
+                fam.parents = [
+                    {
+                        username: fam.parentUsername,
+                        password: fam.parentPassword || '123',
+                        name: fam.parentName || 'Ayah / Bunda',
+                        roleLabel: 'Pembuat Keluarga'
+                    }
+                ];
+            }
             if (!Array.isArray(fam.children)) {
                 fam.children = fam.child ? [fam.child] : [];
             }
@@ -2199,6 +2278,9 @@
             }
             fam.children.forEach(c => {
                 if (!Array.isArray(c.redeemedVouchers)) c.redeemedVouchers = [];
+                if (c.dailyTarget && !c.dailyTarget.setByParentName) {
+                    c.dailyTarget.setByParentName = fam.parentName || 'Ayah / Bunda';
+                }
             });
             if (fam.children.length > 0 && !fam.selectedChildUsername) {
                 fam.selectedChildUsername = fam.children[0].username;
@@ -2209,6 +2291,7 @@
 
         let db = loadDatabase();
         let isParentRegisterMode = false;
+        let parentRegType = 'create'; // 'create' | 'join'
         let tempConfigGrade = 6;
         let isAddingNewChild = false;
         let lastCompletedQuizRecord = null;
@@ -2363,6 +2446,14 @@
             return fam ? normalizeFamilyRecord(fam) : null;
         }
 
+        function getLoggedParentProfile() {
+            const fam = getActiveFamily();
+            if (!fam || !db.currentSession) return null;
+            const loggedUser = db.currentSession.loggedParentUsername || fam.parentUsername;
+            const found = (fam.parents || []).find(p => p.username.toLowerCase() === loggedUser.toLowerCase());
+            return found || { username: fam.parentUsername, name: fam.parentName || 'Ayah / Bunda', roleLabel: 'Orang Tua' };
+        }
+
         function getActiveChild() {
             const fam = getActiveFamily();
             if (!fam || !Array.isArray(fam.children) || fam.children.length === 0) return null;
@@ -2408,25 +2499,70 @@
             const title = document.getElementById('parent-mode-title');
             const toggleBtn = document.getElementById('btn-toggle-parent-reg');
             const nameWrap = document.getElementById('parent-reg-name-wrap');
+            const regTypeWrap = document.getElementById('parent-reg-type-wrap');
+            const famCodeWrap = document.getElementById('parent-reg-familycode-wrap');
             const submitBtn = document.getElementById('btn-parent-submit');
 
             if (isParentRegisterMode) {
-                title.textContent = 'Daftar Akun Orang Tua Baru';
+                title.textContent = 'Daftar Akun Orang Tua';
                 toggleBtn.textContent = 'Sudah Punya Akun? Login';
                 nameWrap.classList.remove('hidden');
-                submitBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Buat Akun Orang Tua`;
+                regTypeWrap.classList.remove('hidden');
+                switchParentRegType(parentRegType);
             } else {
                 title.textContent = 'Login Akun Orang Tua';
                 toggleBtn.textContent = 'Daftar Orang Tua Baru';
                 nameWrap.classList.add('hidden');
+                regTypeWrap.classList.add('hidden');
+                famCodeWrap.classList.add('hidden');
                 submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Orang Tua`;
             }
         }
 
+        function switchParentRegType(type) {
+            playSound('click');
+            parentRegType = type;
+            const btnCreate = document.getElementById('btn-reg-type-create');
+            const btnJoin = document.getElementById('btn-reg-type-join');
+            const famCodeWrap = document.getElementById('parent-reg-familycode-wrap');
+            const descEl = document.getElementById('parent-reg-type-desc');
+            const submitBtn = document.getElementById('btn-parent-submit');
+
+            if (type === 'create') {
+                btnCreate.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] bg-purple-600 text-white shadow transition';
+                btnJoin.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 transition';
+                famCodeWrap.classList.add('hidden');
+                descEl.innerHTML = 'Membuat akun keluarga baru. Nanti Anda akan mendapat <strong>Kode Keluarga</strong> untuk dibagikan ke pasangan (Ibu/Ayah).';
+                submitBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Buat Akun Keluarga Baru`;
+            } else {
+                btnJoin.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] bg-purple-600 text-white shadow transition';
+                btnCreate.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 transition';
+                famCodeWrap.classList.remove('hidden');
+                descEl.innerHTML = 'Masukkan <strong>Kode Keluarga (FAM-XXXX)</strong> dari akun pasangan Anda agar bisa ikut memantau anak yang sama.';
+                submitBtn.innerHTML = `<i class="fa-solid fa-people-roof"></i> Daftar & Gabung Keluarga Pasangan`;
+            }
+        }
+
+        function findParentAccountAcrossFamilies(username) {
+            const u = username.toLowerCase();
+            for (const famKey of Object.keys(db.families)) {
+                const fam = normalizeFamilyRecord(db.families[famKey]);
+                if (famKey.toLowerCase() === u) {
+                    return { familyKey: famKey, family: fam, parentProfile: fam.parents[0] };
+                }
+                const foundParent = (fam.parents || []).find(p => p.username.toLowerCase() === u);
+                if (foundParent) {
+                    return { familyKey: famKey, family: fam, parentProfile: foundParent };
+                }
+            }
+            return null;
+        }
+
         function handleParentAuth() {
-            const username = document.getElementById('parent-auth-user').value.trim().toLowerCase();
+            const username = document.getElementById('parent-auth-user').value.trim().toLowerCase().replace(/\s+/g, '_');
             const password = document.getElementById('parent-auth-pass').value.trim();
             const fullname = document.getElementById('parent-auth-fullname').value.trim() || 'Ayah / Bunda';
+            const inputFamCode = (document.getElementById('parent-auth-familycode')?.value || '').trim().toUpperCase();
 
             if (!username || !password) {
                 playSound('wrong');
@@ -2435,38 +2571,119 @@
             }
 
             if (isParentRegisterMode) {
-                if (db.families[username]) {
+                // Pastikan username belum dipakai di keluarga mana pun
+                if (findParentAccountAcrossFamilies(username)) {
                     playSound('wrong');
-                    showToast('⚠️ Username Orang Tua sudah terdaftar, silakan login!');
+                    showToast('⚠️ Username Orang Tua sudah terdaftar, silakan login atau gunakan username lain!');
                     return;
                 }
-                db.families[username] = {
-                    parentUsername: username,
-                    parentPassword: password,
-                    parentName: fullname,
-                    selectedChildUsername: null,
-                    customRewards: createDefaultParentRewards(),
-                    children: [],
-                    child: null
-                };
-                db.currentSession = { role: 'parent', parentUsername: username };
-                saveDatabase(username);
-                playSound('correct');
-                showToast('🎉 Akun Orang Tua berhasil dibuat! Silakan daftarkan akun dan kelas anak Anda.');
-                routeAppView();
+
+                if (parentRegType === 'join') {
+                    if (!inputFamCode) {
+                        playSound('wrong');
+                        showToast('⚠️ Masukkan Kode Keluarga (contoh: FAM-2026) dari akun pasangan Anda!');
+                        return;
+                    }
+                    // Cari keluarga berdasarkan familyCode atau username pasangan
+                    let targetFamKey = null;
+                    Object.keys(db.families).forEach(k => {
+                        const f = normalizeFamilyRecord(db.families[k]);
+                        if (f.familyCode.toUpperCase() === inputFamCode || f.parentUsername.toUpperCase() === inputFamCode) {
+                            targetFamKey = k;
+                        }
+                    });
+
+                    if (!targetFamKey) {
+                        playSound('wrong');
+                        showToast('❌ Kode Keluarga tidak ditemukan! Cek kembali kode di Portal pasangan Anda.');
+                        return;
+                    }
+
+                    const targetFam = normalizeFamilyRecord(db.families[targetFamKey]);
+                    targetFam.parents.push({
+                        username: username,
+                        password: password,
+                        name: fullname,
+                        roleLabel: 'Pasangan Orang Tua'
+                    });
+
+                    db.currentSession = {
+                        role: 'parent',
+                        parentUsername: targetFamKey,
+                        loggedParentUsername: username
+                    };
+                    saveDatabase(targetFamKey);
+                    playSound('fanfare');
+                    fireConfetti(45);
+                    showToast(`🤝 Berhasil bergabung dengan keluarga ${targetFam.parentName}!`);
+                    routeAppView();
+                } else {
+                    // Buat Keluarga Baru
+                    const newCode = generateFamilyCode();
+                    db.families[username] = {
+                        parentUsername: username,
+                        parentPassword: password,
+                        parentName: fullname,
+                        familyCode: newCode,
+                        parents: [
+                            {
+                                username: username,
+                                password: password,
+                                name: fullname,
+                                roleLabel: 'Pembuat Keluarga'
+                            }
+                        ],
+                        selectedChildUsername: null,
+                        customRewards: createDefaultParentRewards(),
+                        children: [],
+                        child: null
+                    };
+                    db.currentSession = {
+                        role: 'parent',
+                        parentUsername: username,
+                        loggedParentUsername: username
+                    };
+                    saveDatabase(username);
+                    playSound('correct');
+                    showToast(`🎉 Akun Keluarga dibuat (Kode: ${newCode})! Silakan daftarkan akun anak Anda.`);
+                    routeAppView();
+                }
             } else {
-                const fam = db.families[username];
-                if (!fam || fam.parentPassword !== password) {
+                // Login Orang Tua (Bisa akun Ayah maupun akun Bunda yang sudah bergabung)
+                const match = findParentAccountAcrossFamilies(username);
+                if (!match || match.parentProfile.password !== password) {
                     playSound('wrong');
                     showToast('❌ Username atau Password Orang Tua tidak tepat!');
                     return;
                 }
-                db.currentSession = { role: 'parent', parentUsername: username };
-                saveDatabase(username);
+                db.currentSession = {
+                    role: 'parent',
+                    parentUsername: match.familyKey,
+                    loggedParentUsername: match.parentProfile.username
+                };
+                saveDatabase(match.familyKey);
                 playSound('correct');
-                showToast(`👋 Selamat datang kembali, ${fam.parentName}!`);
+                showToast(`👋 Selamat datang kembali, ${match.parentProfile.name}!`);
                 routeAppView();
             }
+        }
+
+        function copyFamilyCode() {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const code = fam.familyCode || 'FAM-2026';
+            const tempInput = document.createElement('textarea');
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                playSound('correct');
+                showToast(`📋 Kode Keluarga (${code}) berhasil disalin! Bagikan ke pasangan Anda.`);
+            } catch (e) {
+                showToast(`Kode Keluarga Anda: ${code}`);
+            }
+            document.body.removeChild(tempInput);
         }
 
         function handleChildLogin() {
@@ -2766,14 +2983,16 @@
             const child = getActiveChild();
             if (!fam || !child) return;
 
+            const activeParent = getLoggedParentProfile();
             const v = (child.redeemedVouchers || []).find(item => item.id === voucherId);
             if (v) {
                 v.status = 'approved';
+                v.approvedByParentName = activeParent ? activeParent.name : fam.parentName;
                 saveDatabase(fam.parentUsername);
                 playSound('fanfare');
                 fireConfetti(40);
                 renderParentDashboard();
-                showToast(`🎉 Hadiah "${v.title}" telah disetujui & diberikan kepada ${child.name}!`);
+                showToast(`🎉 Hadiah "${v.title}" telah disetujui oleh ${v.approvedByParentName}!`);
             }
         }
 
@@ -2819,6 +3038,7 @@
                 return;
             }
 
+            const activeParent = getLoggedParentProfile();
             const subj = document.getElementById('target-input-subject').value;
             const count = parseInt(document.getElementById('target-input-count').value, 10) || 1;
             const minScore = parseInt(document.getElementById('target-input-minscore').value, 10) || 70;
@@ -2832,6 +3052,7 @@
                 minScore: minScore,
                 rewardCoins: rewardCoins,
                 note: note,
+                setByParentName: activeParent ? activeParent.name : fam.parentName,
                 completedCount: 0,
                 claimed: false
             };
@@ -2839,7 +3060,7 @@
             saveDatabase(fam.parentUsername);
             playSound('correct');
             fireConfetti(30);
-            showToast(`🎯 Target Harian dikirim secara Real-Time ke HP ${child.name}!`);
+            showToast(`🎯 Target Harian dari ${child.dailyTarget.setByParentName} dikirim ke HP ${child.name}!`);
             switchParentTab('monitor');
         }
 
@@ -2847,7 +3068,33 @@
             const fam = getActiveFamily();
             if (!fam) return;
 
-            document.getElementById('parent-header-name').textContent = fam.parentName;
+            const activeParent = getLoggedParentProfile();
+            document.getElementById('parent-header-name').textContent = activeParent ? activeParent.name : fam.parentName;
+
+            // Render Kode Keluarga & Daftar Akun Orang Tua (Co-Parenting)
+            const famCodeEl = document.getElementById('parent-family-code-display');
+            if (famCodeEl) famCodeEl.textContent = fam.familyCode || 'FAM-2026';
+
+            const parentsListEl = document.getElementById('connected-parents-list');
+            if (parentsListEl) {
+                parentsListEl.innerHTML = '';
+                (fam.parents || []).forEach(p => {
+                    const isMe = activeParent && p.username.toLowerCase() === activeParent.username.toLowerCase();
+                    const row = document.createElement('div');
+                    row.className = 'px-3 py-2 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-between text-xs';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span>${p.roleLabel === 'Pembuat Keluarga' ? '👑' : '🤝'}</span>
+                            <div>
+                                <p class="font-game font-bold leading-tight">${p.name} ${isMe ? '<span class="text-[10px] bg-emerald-400 text-slate-900 px-1.5 py-0.2 rounded-full font-extrabold ml-1">Anda</span>' : ''}</p>
+                                <p class="text-[10px] text-indigo-200 font-bold">Username: ${p.username}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-extrabold text-amber-200">${p.roleLabel || 'Orang Tua'}</span>
+                    `;
+                    parentsListEl.appendChild(row);
+                });
+            }
 
             // Render Bar Pemilih Anak (Multi-Child)
             const selectorBar = document.getElementById('parent-children-selector');
@@ -2925,6 +3172,10 @@
             const dt = child.dailyTarget;
             const subjName = dt.subject === 'ALL' ? 'Semua Mata Pelajaran' : dt.subject;
             document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis ${subjName} (Min. Skor ${dt.minScore}%)`;
+            const targetAuthorEl = document.getElementById('p-target-author');
+            if (targetAuthorEl) {
+                targetAuthorEl.textContent = `👨‍👩‍👧 Disetting oleh: ${dt.setByParentName || fam.parentName}`;
+            }
             const pctTarget = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
             document.getElementById('p-target-bar').style.width = `${pctTarget}%`;
             document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${dt.completedCount} / ${dt.targetCount} Kuis`;
@@ -3030,7 +3281,7 @@
                             </div>
                             ${v.status === 'pending'
                                 ? `<button onclick="approveChildVoucher('${v.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px] shadow hover:bg-emerald-600">✓ Berikan Hadiah</button>`
-                                : `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700">✅ Sudah Diberikan</span>`
+                                : `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700">✅ Diberikan (${v.approvedByParentName || 'Ortu'})</span>`
                             }
                         `;
                         redeemedListEl.appendChild(row);
@@ -3152,6 +3403,10 @@
             // Update Misi dari Orang Tua
             const dt = child.dailyTarget;
             const subjLabel = dt.subject === 'ALL' ? 'Mata Pelajaran Bebas' : dt.subject;
+            const authorBadge = document.getElementById('child-mission-author');
+            if (authorBadge) {
+                authorBadge.textContent = `👨‍👩‍👧 Misi dari ${dt.setByParentName || 'Orang Tua'} Hari Ini`;
+            }
             document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis ${subjLabel} (Skor Min. ${dt.minScore}%)`;
             document.getElementById('child-mission-note').textContent = `"${dt.note}"`;
             document.getElementById('child-mission-reward').textContent = `+${dt.rewardCoins} Koin`;
@@ -3735,7 +3990,7 @@
                         row.innerHTML = `
                             <span>🎟️ ${v.title} (${v.dateStr})</span>
                             <span class="${v.status === 'approved' ? 'text-emerald-600' : 'text-amber-600'} font-extrabold">
-                                ${v.status === 'approved' ? '✅ Disetujui Ortu' : '⏳ Menunggu Ortu'}
+                                ${v.status === 'approved' ? `✅ Disetujui ${v.approvedByParentName || 'Ortu'}` : '⏳ Menunggu Ortu'}
                             </span>
                         `;
                         myVouchersEl.appendChild(row);
@@ -4158,7 +4413,9 @@
         Object.assign(window, {
             switchAuthRole,
             toggleParentRegisterMode,
+            switchParentRegType,
             handleParentAuth,
+            copyFamilyCode,
             handleChildLogin,
             quickDemoLogin,
             logoutSession,
