@@ -565,9 +565,9 @@
                     <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-amber-300 dark:border-amber-700 space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="font-game font-bold text-sm flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                                <i class="fa-solid fa-ticket"></i> Antrean Klaim Hadiah dari Anak
+                                <i class="fa-solid fa-ticket"></i> Permintaan Klaim Hadiah dari Anak
                             </h3>
-                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Butuh Persetujuan</span>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Dunia Nyata</span>
                         </div>
                         <div id="parent-redeemed-vouchers-list" class="space-y-2">
                             <!-- Di-render oleh JS -->
@@ -578,72 +578,8 @@
                     <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border-2 border-purple-200 dark:border-purple-900 space-y-3.5">
                         <div class="flex items-center gap-3">
                             <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center text-2xl">
-                                🎁
+                                🍦
                             </div>
-                            <div>
-                                <h3 class="font-game font-bold text-base">Buat Voucher Hadiah Baru</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                                    Hadiah dunia nyata yang bisa ditebus anak dengan koin hasil ujiannya!
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-3 gap-2">
-                                <div>
-                                    <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Ikon Emoji</label>
-                                    <select id="custom-reward-icon" class="w-full px-2.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
-                                        <option value="🍦">🍦 Es Krim</option>
-                                        <option value="🎮">🎮 Main Game</option>
-                                        <option value="🎬">🎬 Bioskop</option>
-                                        <option value="📚">📚 Buku/Komik</option>
-                                        <option value="🍕">🍕 Makanan</option>
-                                        <option value="🎡">🎡 Jalan-Jalan</option>
-                                        <option value="⚽">⚽ Mainan/Hobi</option>
-                                        <option value="🎁">🎁 Kejutan</option>
-                                    </select>
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Harga Koin</label>
-                                    <select id="custom-reward-cost" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
-                                        <option value="150">🪙 150 Koin Emas</option>
-                                        <option value="200" selected>🪙 200 Koin Emas</option>
-                                        <option value="300">🪙 300 Koin Emas</option>
-                                        <option value="450">🪙 450 Koin Emas</option>
-                                        <option value="500">🪙 500 Koin Emas</option>
-                                        <option value="750">🪙 750 Koin Emas</option>
-                                        <option value="1000">🪙 1000 Koin Emas</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">Nama Hadiah Dunia Nyata</label>
-                                <input id="custom-reward-title" type="text" maxlength="60" placeholder="Contoh: Beli Es Krim Favorit / Main Game 1 Jam" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
-                            </div>
-
-                            <button type="button" onclick="addCustomParentReward()" class="w-full py-3 rounded-2xl font-game font-bold text-white text-xs btn-3d-purple flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-plus"></i> Tambah Voucher Hadiah
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Daftar Katalog Voucher Aktif -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-game font-bold text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-tags text-rose-500"></i> Katalog Voucher Hadiah Aktif
-                            </h3>
-                            <button type="button" onclick="resetDefaultParentRewards()" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400 underline">
-                                Reset Default
-                            </button>
-                        </div>
-                        <div id="parent-custom-rewards-catalog" class="space-y-2">
-                            <!-- Di-render oleh JS -->
-                        </div>
-                    </div>
-                </div>
-
                 <!-- TAB ORANG TUA 4: KELOLA AKUN & KELAS ANAK (KELAS 5 SD - 9 SMP) & KOLABORASI AYAH-BUNDA -->
                 <div id="pview-account" class="hidden space-y-4">
 
@@ -671,7 +607,7 @@
                                 <p class="text-[10px] uppercase font-extrabold text-indigo-200">Kode Undangan Keluarga Anda:</p>
                                 <p id="parent-family-code-display" class="font-game font-bold text-xl tracking-widest text-amber-300">FAM-2026</p>
                             </div>
-                            <button type="button" onclick="copyFamilyCode()" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-game font-bold text-xs shadow flex items-center gap-1.5 active:scale-95 transition">
+                            <button onclick="copyFamilyCode()" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-game font-bold text-xs shadow flex items-center gap-1.5 active:scale-95 transition">
                                 <i class="fa-regular fa-copy"></i> Salin Kode
                             </button>
                         </div>
@@ -692,25 +628,15 @@
                                     🧒
                                 </div>
                                 <div>
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <h3 id="form-child-mode-title" class="font-game font-bold text-base">Edit Akun & Kelas Anak</h3>
-                                        <span id="badge-adding-child-mode" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-                                            Mode Tambah Anak Baru
-                                        </span>
-                                    </div>
+                                    <h3 id="form-child-mode-title" class="font-game font-bold text-base">Edit Akun & Kelas Anak</h3>
                                     <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                                         Pilih jenjang Kelas 5-6 SD atau Kelas 7-9 SMP!
                                     </p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
-                                <button type="button" id="btn-cancel-add-child" onclick="cancelAddChildMode()" class="hidden px-2.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs">
-                                    Batal
-                                </button>
-                                <button type="button" onclick="openAddChildForm()" class="px-3 py-2 rounded-xl bg-emerald-500 text-white font-game font-bold text-xs shadow hover:bg-emerald-600">
-                                    + Anak Baru
-                                </button>
-                            </div>
+                            <button onclick="prepareNewChildForm()" class="px-3 py-2 rounded-xl bg-emerald-500 text-white font-game font-bold text-xs shadow hover:bg-emerald-600 shrink-0">
+                                + Anak Baru
+                            </button>
                         </div>
 
                         <div class="space-y-3">
@@ -761,16 +687,9 @@
                                 </div>
                             </div>
 
-                            <button type="button" onclick="saveChildAccountFromParent()" class="w-full py-3.5 rounded-2xl font-game font-bold text-white text-sm btn-3d-emerald flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> <span id="btn-save-child-label">Simpan Akun & Kelas Anak</span>
+                            <button onclick="saveChildAccountFromParent()" class="w-full py-3.5 rounded-2xl font-game font-bold text-white text-sm btn-3d-emerald flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Akun & Kelas Anak
                             </button>
-
-                            <!-- Tombol Hapus Akun Anak (Muncul jika ada > 1 anak dan tidak sedang mode tambah) -->
-                            <div id="delete-child-wrap" class="hidden pt-2 border-t border-slate-100 dark:border-slate-700">
-                                <button type="button" onclick="deleteSelectedChildAccount()" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-rose-100 transition">
-                                    <i class="fa-solid fa-user-minus"></i> Hapus Akun Anak Ini
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -2295,10 +2214,10 @@
 
         function createDefaultParentRewards() {
             return [
-                { id: 'rw_icecream', icon: '🍦', title: '🍦 Beli Es Krim / Jajanan Favorit', cost: 200 },
-                { id: 'rw_game1h', icon: '🎮', title: '🎮 Bebas Main Game / Gadget 1 Jam', cost: 300 },
-                { id: 'rw_movie', icon: '🎬', title: '🎬 Nonton Bioskop / Film Pilihan Akhir Pekan', cost: 500 },
-                { id: 'rw_comic', icon: '📚', title: '📚 Beli Komik / Buku Cerita Baru', cost: 450 }
+                { id: 'rw_icecream', title: '🍦 Beli Es Krim Favorit', cost: 250 },
+                { id: 'rw_game1h', title: '🎮 Bebas Main Game 1 Jam', cost: 350 },
+                { id: 'rw_snack', title: '🍕 Jajan Camilan Akhir Pekan', cost: 500 },
+                { id: 'rw_trip', title: '🎡 Jalan-Jalan Keluarga', cost: 800 }
             ];
         }
 
@@ -2320,7 +2239,6 @@
                         ],
                         selectedChildUsername: 'anak_demo',
                         customRewards: createDefaultParentRewards(),
-                        rewardClaims: [],
                         children: [demoChild],
                         child: demoChild
                     }
@@ -2358,22 +2276,14 @@
             if (!Array.isArray(fam.customRewards) || fam.customRewards.length === 0) {
                 fam.customRewards = createDefaultParentRewards();
             }
-            if (!Array.isArray(fam.rewardClaims)) {
-                fam.rewardClaims = [];
-            }
             fam.children.forEach(c => {
                 if (!Array.isArray(c.redeemedVouchers)) c.redeemedVouchers = [];
                 if (c.dailyTarget && !c.dailyTarget.setByParentName) {
                     c.dailyTarget.setByParentName = fam.parentName || 'Ayah / Bunda';
                 }
             });
-            if (fam.children.length > 0) {
-                const foundSelected = fam.children.find(c => c.username === fam.selectedChildUsername);
-                if (!foundSelected) {
-                    fam.selectedChildUsername = fam.children[0].username;
-                }
-            } else {
-                fam.selectedChildUsername = null;
+            if (fam.children.length > 0 && !fam.selectedChildUsername) {
+                fam.selectedChildUsername = fam.children[0].username;
             }
             fam.child = fam.children.find(c => c.username === fam.selectedChildUsername) || fam.children[0] || null;
             return fam;
@@ -2382,11 +2292,118 @@
         let db = loadDatabase();
         let isParentRegisterMode = false;
         let parentRegType = 'create'; // 'create' | 'join'
-        let tempConfigGrade = 7;
+        let tempConfigGrade = 6;
         let isAddingNewChild = false;
-        let currentParentTab = 'monitor';
         let lastCompletedQuizRecord = null;
-// ... existing code ... -->
+
+        function loadDatabase() {
+            try {
+                const raw = localStorage.getItem(DB_KEY);
+                if (!raw) return createDefaultDatabase();
+                const parsed = JSON.parse(raw);
+                if (!parsed.families) return createDefaultDatabase();
+                Object.keys(parsed.families).forEach(k => normalizeFamilyRecord(parsed.families[k]));
+                return parsed;
+            } catch (e) {
+                return createDefaultDatabase();
+            }
+        }
+
+        // Simpan lokal + Push Real-time ke Cloud Firestore
+        async function saveDatabase(specificParentUsername = null) {
+            try {
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+            } catch (e) {
+                console.warn('Cache penyimpanan lokal penuh:', e);
+            }
+
+            if (isCloudActive && firestoreDb && currentAuthUser) {
+                const targetKey = specificParentUsername || (db.currentSession && db.currentSession.parentUsername);
+                if (targetKey && db.families[targetKey]) {
+                    try {
+                        const famData = normalizeFamilyRecord(db.families[targetKey]);
+                        const famDocRef = doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families', targetKey);
+                        await setDoc(famDocRef, {
+                            ...famData,
+                            updatedAt: Date.now()
+                        }, { merge: true });
+                    } catch (err) {
+                        console.warn('Gagal sinkronisasi ke Cloud Firestore:', err);
+                    }
+                }
+            }
+        }
+
+        /* =========================================================================
+           6B. INISIALISASI FIREBASE & REAL-TIME LISTENER (TERKUNCI OTOMATIS)
+           ========================================================================= */
+        function resolveFirebaseConfig() {
+            if (CUSTOM_FIREBASE_CONFIG && CUSTOM_FIREBASE_CONFIG.apiKey) {
+                return { config: CUSTOM_FIREBASE_CONFIG, source: 'Embedded Config' };
+            }
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                try {
+                    const envCfg = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+                    if (envCfg && envCfg.apiKey) {
+                        return { config: envCfg, source: 'Cloud Environment' };
+                    }
+                } catch (e) {}
+            }
+            return null;
+        }
+
+        function updateCloudIndicatorUI(active, labelText) {
+            isCloudActive = active;
+            const dot = document.getElementById('cloud-status-dot');
+            const txt = document.getElementById('cloud-status-text');
+            const parentPill = document.getElementById('parent-sync-pill');
+
+            if (dot && txt) {
+                dot.className = active
+                    ? 'w-2 h-2 rounded-full bg-emerald-400 animate-ping'
+                    : 'w-2 h-2 rounded-full bg-amber-400';
+                txt.textContent = active ? 'Cloud Aktif' : 'Mode Lokal';
+            }
+            if (parentPill) {
+                parentPill.innerHTML = active
+                    ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Cloud Aktif`
+                    : `<span class="w-1.5 h-1.5 rounded-full bg-amber-300"></span> Lokal`;
+            }
+        }
+
+        async function initFirebaseCloudSync() {
+            const resolved = resolveFirebaseConfig();
+            if (!resolved) {
+                updateCloudIndicatorUI(false, 'Mode Lokal');
+                return;
+            }
+
+            try {
+                const appInstance = getApps().length === 0 ? initializeApp(resolved.config) : getApp();
+                firebaseAuth = getAuth(appInstance);
+                firestoreDb = getFirestore(appInstance);
+
+                // RULE 3: Auth Before Queries
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(firebaseAuth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(firebaseAuth);
+                }
+
+                currentAuthUser = firebaseAuth.currentUser;
+                if (!currentAuthUser) {
+                    updateCloudIndicatorUI(false, 'Menunggu Cloud...');
+                    return;
+                }
+
+                updateCloudIndicatorUI(true, 'Cloud Aktif');
+
+                const demoRef = doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families', 'ortu_demo');
+                const demoSnap = await getDoc(demoRef);
+                if (!demoSnap.exists() && db.families['ortu_demo']) {
+                    await setDoc(demoRef, normalizeFamilyRecord(db.families['ortu_demo']), { merge: true });
+                }
+
                 if (familiesUnsubscribe) familiesUnsubscribe();
                 const colRef = collection(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families');
                 familiesUnsubscribe = onSnapshot(
@@ -2405,8 +2422,7 @@
                         const quizModalOpen = !document.getElementById('quiz-modal').classList.contains('hidden');
                         if (!quizModalOpen && db.currentSession) {
                             if (db.currentSession.role === 'parent') {
-                                // Jangan menimpa input form akun anak jika orang tua sedang membuka tab account / sedang mengetik
-                                renderParentDashboard({ skipAccountFormReset: currentParentTab === 'account' || isAddingNewChild });
+                                renderParentDashboard();
                             } else if (db.currentSession.role === 'child') {
                                 updateChildHeaderUI();
                                 renderChildHomeView();
@@ -2423,7 +2439,393 @@
                 updateCloudIndicatorUI(false, 'Mode Lokal');
             }
         }
-// ... existing code ... -->
+
+        function getActiveFamily() {
+            if (!db.currentSession) return null;
+            const fam = db.families[db.currentSession.parentUsername];
+            return fam ? normalizeFamilyRecord(fam) : null;
+        }
+
+        function getLoggedParentProfile() {
+            const fam = getActiveFamily();
+            if (!fam || !db.currentSession) return null;
+            const loggedUser = db.currentSession.loggedParentUsername || fam.parentUsername;
+            const found = (fam.parents || []).find(p => p.username.toLowerCase() === loggedUser.toLowerCase());
+            return found || { username: fam.parentUsername, name: fam.parentName || 'Ayah / Bunda', roleLabel: 'Orang Tua' };
+        }
+
+        function getActiveChild() {
+            const fam = getActiveFamily();
+            if (!fam || !Array.isArray(fam.children) || fam.children.length === 0) return null;
+            if (db.currentSession.role === 'child' && db.currentSession.childUsername) {
+                return fam.children.find(c => c.username.toLowerCase() === db.currentSession.childUsername.toLowerCase()) || fam.children[0];
+            }
+            return fam.children.find(c => c.username === fam.selectedChildUsername) || fam.children[0];
+        }
+
+        function getLevelInfo(xp) {
+            const xpPerLevel = 100;
+            const level = Math.floor(xp / xpPerLevel) + 1;
+            const currentLevelXp = xp % xpPerLevel;
+            return { level, currentLevelXp, xpPerLevel };
+        }
+
+        /* =========================================================================
+           7. SISTEM LOGIN & REGISTER (ORANG TUA & ANAK)
+           ========================================================================= */
+        function switchAuthRole(role) {
+            playSound('click');
+            const btnChild = document.getElementById('tab-role-child');
+            const btnParent = document.getElementById('tab-role-parent');
+            const formChild = document.getElementById('form-auth-child');
+            const formParent = document.getElementById('form-auth-parent');
+
+            if (role === 'child') {
+                btnChild.className = 'py-2.5 px-3 rounded-xl font-game font-bold text-xs flex items-center justify-center gap-1.5 transition bg-indigo-600 text-white shadow';
+                btnParent.className = 'py-2.5 px-3 rounded-xl font-game font-bold text-xs flex items-center justify-center gap-1.5 transition text-slate-500 dark:text-slate-400';
+                formChild.classList.remove('hidden');
+                formParent.classList.add('hidden');
+            } else {
+                btnParent.className = 'py-2.5 px-3 rounded-xl font-game font-bold text-xs flex items-center justify-center gap-1.5 transition bg-purple-600 text-white shadow';
+                btnChild.className = 'py-2.5 px-3 rounded-xl font-game font-bold text-xs flex items-center justify-center gap-1.5 transition text-slate-500 dark:text-slate-400';
+                formParent.classList.remove('hidden');
+                formChild.classList.add('hidden');
+            }
+        }
+
+        function toggleParentRegisterMode() {
+            playSound('click');
+            isParentRegisterMode = !isParentRegisterMode;
+            const title = document.getElementById('parent-mode-title');
+            const toggleBtn = document.getElementById('btn-toggle-parent-reg');
+            const nameWrap = document.getElementById('parent-reg-name-wrap');
+            const regTypeWrap = document.getElementById('parent-reg-type-wrap');
+            const famCodeWrap = document.getElementById('parent-reg-familycode-wrap');
+            const submitBtn = document.getElementById('btn-parent-submit');
+
+            if (isParentRegisterMode) {
+                title.textContent = 'Daftar Akun Orang Tua';
+                toggleBtn.textContent = 'Sudah Punya Akun? Login';
+                nameWrap.classList.remove('hidden');
+                regTypeWrap.classList.remove('hidden');
+                switchParentRegType(parentRegType);
+            } else {
+                title.textContent = 'Login Akun Orang Tua';
+                toggleBtn.textContent = 'Daftar Orang Tua Baru';
+                nameWrap.classList.add('hidden');
+                regTypeWrap.classList.add('hidden');
+                famCodeWrap.classList.add('hidden');
+                submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Orang Tua`;
+            }
+        }
+
+        function switchParentRegType(type) {
+            playSound('click');
+            parentRegType = type;
+            const btnCreate = document.getElementById('btn-reg-type-create');
+            const btnJoin = document.getElementById('btn-reg-type-join');
+            const famCodeWrap = document.getElementById('parent-reg-familycode-wrap');
+            const descEl = document.getElementById('parent-reg-type-desc');
+            const submitBtn = document.getElementById('btn-parent-submit');
+
+            if (type === 'create') {
+                btnCreate.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] bg-purple-600 text-white shadow transition';
+                btnJoin.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 transition';
+                famCodeWrap.classList.add('hidden');
+                descEl.innerHTML = 'Membuat akun keluarga baru. Nanti Anda akan mendapat <strong>Kode Keluarga</strong> untuk dibagikan ke pasangan (Ibu/Ayah).';
+                submitBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Buat Akun Keluarga Baru`;
+            } else {
+                btnJoin.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] bg-purple-600 text-white shadow transition';
+                btnCreate.className = 'py-2 px-2 rounded-lg font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 transition';
+                famCodeWrap.classList.remove('hidden');
+                descEl.innerHTML = 'Masukkan <strong>Kode Keluarga (FAM-XXXX)</strong> dari akun pasangan Anda agar bisa ikut memantau anak yang sama.';
+                submitBtn.innerHTML = `<i class="fa-solid fa-people-roof"></i> Daftar & Gabung Keluarga Pasangan`;
+            }
+        }
+
+        function findParentAccountAcrossFamilies(username) {
+            const u = username.toLowerCase();
+            for (const famKey of Object.keys(db.families)) {
+                const fam = normalizeFamilyRecord(db.families[famKey]);
+                if (famKey.toLowerCase() === u) {
+                    return { familyKey: famKey, family: fam, parentProfile: fam.parents[0] };
+                }
+                const foundParent = (fam.parents || []).find(p => p.username.toLowerCase() === u);
+                if (foundParent) {
+                    return { familyKey: famKey, family: fam, parentProfile: foundParent };
+                }
+            }
+            return null;
+        }
+
+        function handleParentAuth() {
+            const username = document.getElementById('parent-auth-user').value.trim().toLowerCase().replace(/\s+/g, '_');
+            const password = document.getElementById('parent-auth-pass').value.trim();
+            const fullname = document.getElementById('parent-auth-fullname').value.trim() || 'Ayah / Bunda';
+            const inputFamCode = (document.getElementById('parent-auth-familycode')?.value || '').trim().toUpperCase();
+
+            if (!username || !password) {
+                playSound('wrong');
+                showToast('⚠️ Harap isi Username dan Password Orang Tua!');
+                return;
+            }
+
+            if (isParentRegisterMode) {
+                // Pastikan username belum dipakai di keluarga mana pun
+                if (findParentAccountAcrossFamilies(username)) {
+                    playSound('wrong');
+                    showToast('⚠️ Username Orang Tua sudah terdaftar, silakan login atau gunakan username lain!');
+                    return;
+                }
+
+                if (parentRegType === 'join') {
+                    if (!inputFamCode) {
+                        playSound('wrong');
+                        showToast('⚠️ Masukkan Kode Keluarga (contoh: FAM-2026) dari akun pasangan Anda!');
+                        return;
+                    }
+                    // Cari keluarga berdasarkan familyCode atau username pasangan
+                    let targetFamKey = null;
+                    Object.keys(db.families).forEach(k => {
+                        const f = normalizeFamilyRecord(db.families[k]);
+                        if (f.familyCode.toUpperCase() === inputFamCode || f.parentUsername.toUpperCase() === inputFamCode) {
+                            targetFamKey = k;
+                        }
+                    });
+
+                    if (!targetFamKey) {
+                        playSound('wrong');
+                        showToast('❌ Kode Keluarga tidak ditemukan! Cek kembali kode di Portal pasangan Anda.');
+                        return;
+                    }
+
+                    const targetFam = normalizeFamilyRecord(db.families[targetFamKey]);
+                    targetFam.parents.push({
+                        username: username,
+                        password: password,
+                        name: fullname,
+                        roleLabel: 'Pasangan Orang Tua'
+                    });
+
+                    db.currentSession = {
+                        role: 'parent',
+                        parentUsername: targetFamKey,
+                        loggedParentUsername: username
+                    };
+                    saveDatabase(targetFamKey);
+                    playSound('fanfare');
+                    fireConfetti(45);
+                    showToast(`🤝 Berhasil bergabung dengan keluarga ${targetFam.parentName}!`);
+                    routeAppView();
+                } else {
+                    // Buat Keluarga Baru
+                    const newCode = generateFamilyCode();
+                    db.families[username] = {
+                        parentUsername: username,
+                        parentPassword: password,
+                        parentName: fullname,
+                        familyCode: newCode,
+                        parents: [
+                            {
+                                username: username,
+                                password: password,
+                                name: fullname,
+                                roleLabel: 'Pembuat Keluarga'
+                            }
+                        ],
+                        selectedChildUsername: null,
+                        customRewards: createDefaultParentRewards(),
+                        children: [],
+                        child: null
+                    };
+                    db.currentSession = {
+                        role: 'parent',
+                        parentUsername: username,
+                        loggedParentUsername: username
+                    };
+                    saveDatabase(username);
+                    playSound('correct');
+                    showToast(`🎉 Akun Keluarga dibuat (Kode: ${newCode})! Silakan daftarkan akun anak Anda.`);
+                    routeAppView();
+                }
+            } else {
+                // Login Orang Tua (Bisa akun Ayah maupun akun Bunda yang sudah bergabung)
+                const match = findParentAccountAcrossFamilies(username);
+                if (!match || match.parentProfile.password !== password) {
+                    playSound('wrong');
+                    showToast('❌ Username atau Password Orang Tua tidak tepat!');
+                    return;
+                }
+                db.currentSession = {
+                    role: 'parent',
+                    parentUsername: match.familyKey,
+                    loggedParentUsername: match.parentProfile.username
+                };
+                saveDatabase(match.familyKey);
+                playSound('correct');
+                showToast(`👋 Selamat datang kembali, ${match.parentProfile.name}!`);
+                routeAppView();
+            }
+        }
+
+        function copyFamilyCode() {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const code = fam.familyCode || 'FAM-2026';
+            const tempInput = document.createElement('textarea');
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                playSound('correct');
+                showToast(`📋 Kode Keluarga (${code}) berhasil disalin! Bagikan ke pasangan Anda.`);
+            } catch (e) {
+                showToast(`Kode Keluarga Anda: ${code}`);
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        function handleChildLogin() {
+            const uInput = document.getElementById('child-login-user').value.trim().toLowerCase();
+            const pInput = document.getElementById('child-login-pass').value.trim();
+
+            if (!uInput || !pInput) {
+                playSound('wrong');
+                showToast('⚠️ Masukkan Username dan Password Anak terlebih dahulu!');
+                return;
+            }
+
+            let foundParentKey = null;
+            let foundChildUsername = null;
+
+            Object.keys(db.families).forEach((pKey) => {
+                const fam = normalizeFamilyRecord(db.families[pKey]);
+                (fam.children || []).forEach((c) => {
+                    if (c && c.username.toLowerCase() === uInput && c.password === pInput) {
+                        foundParentKey = pKey;
+                        foundChildUsername = c.username;
+                    }
+                });
+            });
+
+            if (!foundParentKey) {
+                playSound('wrong');
+                showToast('❌ Akun Anak tidak ditemukan! Pastikan Ayah/Bunda sudah membuatkannya di Portal Orang Tua.');
+                return;
+            }
+
+            db.currentSession = {
+                role: 'child',
+                parentUsername: foundParentKey,
+                childUsername: foundChildUsername
+            };
+            saveDatabase(foundParentKey);
+            playSound('fanfare');
+            const child = getActiveChild();
+            showToast(`🚀 Selamat datang ${child.name} (${formatGradeLabel(child.grade)})!`);
+            routeAppView();
+        }
+
+        function quickDemoLogin(role) {
+            playSound('correct');
+            if (!db.families['ortu_demo']) {
+                const def = createDefaultDatabase();
+                db.families['ortu_demo'] = def.families['ortu_demo'];
+            }
+            db.currentSession = {
+                role: role,
+                parentUsername: 'ortu_demo',
+                childUsername: 'anak_demo'
+            };
+            saveDatabase('ortu_demo');
+            showToast(role === 'parent' ? '👨‍👩‍👧 Masuk ke Portal Orang Tua (Demo)' : '🎮 Masuk ke Arena Anak Raka (Kelas 6 SD)');
+            routeAppView();
+        }
+
+        function logoutSession() {
+            playSound('click');
+            db.currentSession = null;
+            saveDatabase();
+            routeAppView();
+            showToast('👋 Berhasil keluar dari sesi.');
+        }
+
+        function switchToChildDirectly() {
+            const child = getActiveChild();
+            if (!child) {
+                playSound('wrong');
+                showToast('⚠️ Buat akun anak terlebih dahulu di menu Kelola Anak!');
+                switchParentTab('account');
+                return;
+            }
+            playSound('correct');
+            db.currentSession.role = 'child';
+            db.currentSession.childUsername = child.username;
+            saveDatabase();
+            routeAppView();
+            showToast(`🎮 Beralih ke Mode Belajar Anak: ${child.name}`);
+        }
+
+        /* =========================================================================
+           8. ROUTING SCREEN (AUTH vs PARENT DASHBOARD vs CHILD ARENA)
+           ========================================================================= */
+        function routeAppView() {
+            const authEl = document.getElementById('auth-screen');
+            const parentEl = document.getElementById('parent-screen');
+            const childEl = document.getElementById('child-screen');
+
+            authEl.classList.add('hidden');
+            parentEl.classList.add('hidden');
+            parentEl.classList.remove('flex');
+            childEl.classList.add('hidden');
+            childEl.classList.remove('flex');
+
+            applyThemeAndSoundUI();
+
+            if (!db.currentSession || !getActiveFamily()) {
+                authEl.classList.remove('hidden');
+                return;
+            }
+
+            if (db.currentSession.role === 'parent') {
+                parentEl.classList.remove('hidden');
+                parentEl.classList.add('flex');
+                renderParentDashboard();
+            } else {
+                const child = getActiveChild();
+                if (!child) {
+                    db.currentSession.role = 'parent';
+                    saveDatabase();
+                    parentEl.classList.remove('hidden');
+                    parentEl.classList.add('flex');
+                    renderParentDashboard();
+                    return;
+                }
+                childEl.classList.remove('hidden');
+                childEl.classList.add('flex');
+                checkChildDailyReset(child);
+                updateChildHeaderUI();
+                renderChildHomeView();
+            }
+        }
+
+        function checkChildDailyReset(child) {
+            const today = new Date().toDateString();
+            if (child.lastPlayedDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                child.streak = (child.lastPlayedDate === yesterday.toDateString()) ? (child.streak + 1) : 1;
+                child.lastPlayedDate = today;
+                if (child.dailyTarget && child.dailyTarget.date !== today) {
+                    child.dailyTarget.date = today;
+                    child.dailyTarget.completedCount = 0;
+                    child.dailyTarget.claimed = false;
+                }
+                saveDatabase();
+            }
+        }
+
         /* =========================================================================
            9. LOGIKA DASHBOARD ORANG TUA (MULTI-ANAK, TARGET, MONITORING REAL-TIME)
            ========================================================================= */
@@ -2435,72 +2837,24 @@
             isAddingNewChild = false;
             normalizeFamilyRecord(fam);
             saveDatabase(fam.parentUsername);
-            renderParentDashboard({ skipAccountFormReset: false });
+            renderParentDashboard();
             showToast(`👦 Memantau perkembangan: ${fam.child ? fam.child.name : childUsername}`);
         }
 
-        function openAddChildForm() {
+        function prepareNewChildForm() {
             playSound('click');
             isAddingNewChild = true;
-            currentParentTab = 'account';
-
-            // Pindah ke tab 'account' secara langsung tanpa mereset form ke anak lama
-            ['monitor', 'target', 'rewards', 'account'].forEach((t) => {
-                const btn = document.getElementById(`ptab-${t}`);
-                const view = document.getElementById(`pview-${t}`);
-                if (!btn || !view) return;
-                if (t === 'account') {
-                    btn.className = 'py-2 px-1.5 rounded-xl font-game font-bold text-[11px] bg-purple-600 text-white shadow flex items-center justify-center gap-1 relative';
-                    view.classList.remove('hidden');
-                } else {
-                    btn.className = 'py-2 px-1.5 rounded-xl font-game font-bold text-[11px] text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1 relative';
-                    view.classList.add('hidden');
-                }
-            });
-
-            // Kosongkan input & pasang mode Tambah Anak Baru
-            document.getElementById('form-child-mode-title').textContent = '➕ Tambah Akun Anak Baru';
-            document.getElementById('badge-adding-child-mode').classList.remove('hidden');
-            document.getElementById('btn-cancel-add-child').classList.remove('hidden');
-            document.getElementById('btn-save-child-label').textContent = 'Buat & Simpan Akun Anak Baru';
-            document.getElementById('delete-child-wrap').classList.add('hidden');
-
-            const nameInp = document.getElementById('cfg-child-name');
-            const userInp = document.getElementById('cfg-child-user');
-            const passInp = document.getElementById('cfg-child-pass');
-            nameInp.value = '';
-            userInp.value = '';
-            passInp.value = '';
-
-            selectConfigChildGrade(7);
-            renderParentDashboard({ skipAccountFormReset: true });
-
-            setTimeout(() => {
-                nameInp.focus();
-            }, 80);
-            showToast('✨ Mode Tambah Anak Baru aktif! Silakan isi data anak.');
-        }
-
-        function prepareNewChildForm() {
-            openAddChildForm();
-        }
-
-        function cancelAddChildMode() {
-            playSound('click');
-            isAddingNewChild = false;
-            document.getElementById('badge-adding-child-mode').classList.add('hidden');
-            document.getElementById('btn-cancel-add-child').classList.add('hidden');
-            document.getElementById('btn-save-child-label').textContent = 'Simpan Akun & Kelas Anak';
-            renderParentDashboard({ skipAccountFormReset: false });
-            showToast('Kembali ke mode edit akun anak.');
+            document.getElementById('form-child-mode-title').textContent = 'Tambah Akun Anak Baru';
+            document.getElementById('cfg-child-name').value = '';
+            document.getElementById('cfg-child-user').value = '';
+            document.getElementById('cfg-child-pass').value = '';
+            selectConfigChildGrade(6);
+            showToast('✨ Silakan isi nama, username, password, dan pilih kelas anak (Kelas 5 - 9).');
         }
 
         function switchParentTab(tab) {
             playSound('click');
-            currentParentTab = tab;
-            if (tab !== 'account') {
-                isAddingNewChild = false;
-            }
+            if (tab !== 'account') isAddingNewChild = false;
             ['monitor', 'target', 'rewards', 'account'].forEach((t) => {
                 const btn = document.getElementById(`ptab-${t}`);
                 const view = document.getElementById(`pview-${t}`);
@@ -2513,7 +2867,7 @@
                     view.classList.add('hidden');
                 }
             });
-            renderParentDashboard({ skipAccountFormReset: isAddingNewChild });
+            renderParentDashboard();
         }
 
         function selectConfigChildGrade(g) {
@@ -2544,9 +2898,7 @@
                 return;
             }
 
-            if (!Array.isArray(fam.children)) fam.children = [];
-            const hasExistingChildren = fam.children.length > 0;
-            const currentEditingChild = (isAddingNewChild || !hasExistingChildren) ? null : getActiveChild();
+            const currentEditingChild = isAddingNewChild ? null : getActiveChild();
 
             // Cek keunikan username anak di seluruh keluarga
             for (const pKey of Object.keys(db.families)) {
@@ -2562,6 +2914,8 @@
                 }
             }
 
+            if (!Array.isArray(fam.children)) fam.children = [];
+
             if (!currentEditingChild || isAddingNewChild) {
                 const newChild = createDefaultChildObject(cName, cUser, cPass, tempConfigGrade, false);
                 fam.children.push(newChild);
@@ -2575,36 +2929,12 @@
                 fam.selectedChildUsername = cUser;
             }
 
-            document.getElementById('badge-adding-child-mode').classList.add('hidden');
-            document.getElementById('btn-cancel-add-child').classList.add('hidden');
-            document.getElementById('btn-save-child-label').textContent = 'Simpan Akun & Kelas Anak';
-
             normalizeFamilyRecord(fam);
             saveDatabase(fam.parentUsername);
             playSound('correct');
-            fireConfetti(35);
-            showToast(`✅ Akun Anak (${cName} • ${formatGradeLabel(tempConfigGrade)}) berhasil disimpan!`);
+            fireConfetti(30);
+            showToast(`✅ Akun Anak (${cUser} • ${formatGradeLabel(tempConfigGrade)}) berhasil disimpan!`);
             switchParentTab('monitor');
-        }
-
-        function deleteSelectedChildAccount() {
-            const fam = getActiveFamily();
-            const child = getActiveChild();
-            if (!fam || !child) return;
-            if ((fam.children || []).length <= 1) {
-                playSound('wrong');
-                showToast('⚠️ Minimal harus ada 1 akun anak di dalam keluarga.');
-                return;
-            }
-
-            playSound('click');
-            const removedName = child.name;
-            fam.children = fam.children.filter(c => c.username !== child.username);
-            fam.selectedChildUsername = fam.children[0].username;
-            normalizeFamilyRecord(fam);
-            saveDatabase(fam.parentUsername);
-            renderParentDashboard({ skipAccountFormReset: false });
-            showToast(`🗑️ Akun anak "${removedName}" telah dihapus.`);
         }
 
         /* =========================================================================
@@ -2613,44 +2943,29 @@
         function addCustomParentReward() {
             const fam = getActiveFamily();
             if (!fam) return;
-            const iconSelect = document.getElementById('custom-reward-icon');
             const titleInput = document.getElementById('custom-reward-title');
             const costInput = document.getElementById('custom-reward-cost');
+            const title = titleInput.value.trim();
+            const cost = parseInt(costInput.value, 10) || 300;
 
-            const emoji = iconSelect ? iconSelect.value : '🎁';
-            const rawTitle = titleInput.value.trim();
-            const cost = parseInt(costInput.value, 10) || 200;
-
-            if (!rawTitle) {
+            if (!title) {
                 playSound('wrong');
                 showToast('⚠️ Ketik nama hadiah nyata terlebih dahulu!');
                 return;
             }
 
             fam.customRewards = fam.customRewards || [];
-            const fullTitle = rawTitle.startsWith(emoji) ? rawTitle : `${emoji} ${rawTitle}`;
             fam.customRewards.push({
                 id: 'rw_' + Date.now(),
-                icon: emoji,
-                title: fullTitle,
+                title: title.startsWith('🎁') || title.startsWith('🍦') || title.startsWith('🎮') ? title : `🎁 ${title}`,
                 cost: cost
             });
 
             titleInput.value = '';
             saveDatabase(fam.parentUsername);
             playSound('correct');
-            renderParentDashboard({ skipAccountFormReset: true });
+            renderParentDashboard();
             showToast('✅ Voucher Hadiah Nyata ditambahkan ke Toko Anak!');
-        }
-
-        function resetDefaultParentRewards() {
-            playSound('click');
-            const fam = getActiveFamily();
-            if (!fam) return;
-            fam.customRewards = createDefaultParentRewards();
-            saveDatabase(fam.parentUsername);
-            renderParentDashboard({ skipAccountFormReset: true });
-            showToast('🔄 Katalog hadiah nyata dikembalikan ke daftar awal.');
         }
 
         function deleteCustomParentReward(rewardId) {
@@ -2659,68 +2974,26 @@
             if (!fam) return;
             fam.customRewards = (fam.customRewards || []).filter(r => r.id !== rewardId);
             saveDatabase(fam.parentUsername);
-            renderParentDashboard({ skipAccountFormReset: true });
-            showToast('🗑️ Voucher dihapus dari katalog.');
+            renderParentDashboard();
+            showToast('🗑️ Voucher dihapus dari daftar.');
         }
 
-        function approveChildVoucher(voucherId, childUsername = null) {
+        function approveChildVoucher(voucherId) {
             const fam = getActiveFamily();
-            if (!fam) return;
-            const targetChild = childUsername
-                ? (fam.children || []).find(c => c.username === childUsername)
-                : getActiveChild();
-            if (!targetChild) return;
+            const child = getActiveChild();
+            if (!fam || !child) return;
 
             const activeParent = getLoggedParentProfile();
-            const approverName = activeParent ? activeParent.name : fam.parentName;
-
-            const v = (targetChild.redeemedVouchers || []).find(item => item.id === voucherId);
-            if (v && v.status === 'pending') {
+            const v = (child.redeemedVouchers || []).find(item => item.id === voucherId);
+            if (v) {
                 v.status = 'approved';
-                v.approvedByParentName = approverName;
+                v.approvedByParentName = activeParent ? activeParent.name : fam.parentName;
+                saveDatabase(fam.parentUsername);
+                playSound('fanfare');
+                fireConfetti(40);
+                renderParentDashboard();
+                showToast(`🎉 Hadiah "${v.title}" telah disetujui oleh ${v.approvedByParentName}!`);
             }
-
-            const famClaim = (fam.rewardClaims || []).find(item => item.id === voucherId);
-            if (famClaim && famClaim.status === 'pending') {
-                famClaim.status = 'approved';
-                famClaim.approvedByParentName = approverName;
-            }
-
-            saveDatabase(fam.parentUsername);
-            playSound('fanfare');
-            fireConfetti(40);
-            renderParentDashboard({ skipAccountFormReset: true });
-            showToast(`🎉 Hadiah disetujui oleh ${approverName}!`);
-        }
-
-        function rejectChildVoucher(voucherId, childUsername = null) {
-            const fam = getActiveFamily();
-            if (!fam) return;
-            const targetChild = childUsername
-                ? (fam.children || []).find(c => c.username === childUsername)
-                : getActiveChild();
-            if (!targetChild) return;
-
-            const activeParent = getLoggedParentProfile();
-            const parentName = activeParent ? activeParent.name : fam.parentName;
-
-            const v = (targetChild.redeemedVouchers || []).find(item => item.id === voucherId);
-            if (v && v.status === 'pending') {
-                v.status = 'rejected';
-                v.approvedByParentName = parentName;
-                targetChild.coins += (v.cost || 0);
-            }
-
-            const famClaim = (fam.rewardClaims || []).find(item => item.id === voucherId);
-            if (famClaim && famClaim.status === 'pending') {
-                famClaim.status = 'rejected';
-                famClaim.approvedByParentName = parentName;
-            }
-
-            saveDatabase(fam.parentUsername);
-            playSound('click');
-            renderParentDashboard({ skipAccountFormReset: true });
-            showToast(`↩️ Klaim ditolak & koin dikembalikan ke ${targetChild.name}.`);
         }
 
         function redeemRealWorldReward(rewardId) {
@@ -2740,31 +3013,58 @@
             playSound('fanfare');
             fireConfetti(60);
             child.coins -= reward.cost;
-
-            const claimObj = {
+            child.redeemedVouchers = child.redeemedVouchers || [];
+            child.redeemedVouchers.unshift({
                 id: 'vc_' + Date.now(),
-                childUsername: child.username,
-                childName: child.name,
                 title: reward.title,
                 cost: reward.cost,
                 dateStr: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
-                status: 'pending'
-            };
-
-            child.redeemedVouchers = child.redeemedVouchers || [];
-            child.redeemedVouchers.unshift(claimObj);
-
-            fam.rewardClaims = fam.rewardClaims || [];
-            fam.rewardClaims.unshift(claimObj);
+                status: 'pending' // 'pending' | 'approved'
+            });
 
             saveDatabase(fam.parentUsername);
             updateChildHeaderUI();
             renderShop();
             showToast(`🎁 Berhasil menebus "${reward.title}"! Tunjukkan ke Ayah/Bunda ya!`);
         }
-// ... existing code ... -->
-        function renderParentDashboard(options = {}) {
-            const { skipAccountFormReset = false } = options;
+
+        function saveParentDailyTarget() {
+            const fam = getActiveFamily();
+            const child = getActiveChild();
+            if (!fam || !child) {
+                playSound('wrong');
+                showToast('⚠️ Buat akun anak terlebih dahulu!');
+                switchParentTab('account');
+                return;
+            }
+
+            const activeParent = getLoggedParentProfile();
+            const subj = document.getElementById('target-input-subject').value;
+            const count = parseInt(document.getElementById('target-input-count').value, 10) || 1;
+            const minScore = parseInt(document.getElementById('target-input-minscore').value, 10) || 70;
+            const rewardCoins = parseInt(document.getElementById('target-input-coins').value, 10) || 200;
+            const note = document.getElementById('target-input-note').value.trim() || 'Semangat kerjakan kuis hari ini ya nak!';
+
+            child.dailyTarget = {
+                date: new Date().toDateString(),
+                subject: subj,
+                targetCount: count,
+                minScore: minScore,
+                rewardCoins: rewardCoins,
+                note: note,
+                setByParentName: activeParent ? activeParent.name : fam.parentName,
+                completedCount: 0,
+                claimed: false
+            };
+
+            saveDatabase(fam.parentUsername);
+            playSound('correct');
+            fireConfetti(30);
+            showToast(`🎯 Target Harian dari ${child.dailyTarget.setByParentName} dikirim ke HP ${child.name}!`);
+            switchParentTab('monitor');
+        }
+
+        function renderParentDashboard() {
             const fam = getActiveFamily();
             if (!fam) return;
 
@@ -2801,9 +3101,8 @@
             if (selectorBar) {
                 selectorBar.innerHTML = '';
                 (fam.children || []).forEach((ch) => {
-                    const active = !isAddingNewChild && fam.selectedChildUsername === ch.username;
+                    const active = fam.selectedChildUsername === ch.username;
                     const pill = document.createElement('button');
-                    pill.type = 'button';
                     pill.className = `px-3 py-1 rounded-xl font-game font-bold text-xs flex items-center gap-1.5 shrink-0 transition ${
                         active ? 'bg-white text-indigo-800 shadow' : 'bg-white/15 text-white/80 hover:bg-white/25'
                     }`;
@@ -2812,13 +3111,11 @@
                     selectorBar.appendChild(pill);
                 });
                 const addBtn = document.createElement('button');
-                addBtn.type = 'button';
-                addBtn.className = `px-2.5 py-1 rounded-xl font-extrabold text-[11px] border shrink-0 transition ${
-                    isAddingNewChild
-                        ? 'bg-emerald-400 text-slate-900 border-white shadow'
-                        : 'bg-emerald-400/25 border-emerald-300/40 text-emerald-100 hover:bg-emerald-400/40'
-                }`;
-                addBtn.onclick = () => openAddChildForm();
+                addBtn.className = 'px-2.5 py-1 rounded-xl font-extrabold text-[11px] bg-emerald-400/25 border border-emerald-300/40 text-emerald-100 hover:bg-emerald-400/40 shrink-0';
+                addBtn.onclick = () => {
+                    switchParentTab('account');
+                    prepareNewChildForm();
+                };
                 addBtn.innerHTML = `+ Tambah Anak`;
                 selectorBar.appendChild(addBtn);
             }
@@ -2827,60 +3124,27 @@
             const alertNoChild = document.getElementById('parent-no-child-alert');
             const summaryCard = document.getElementById('parent-child-summary-card');
 
-            // Render Katalog Voucher Hadiah Aktif (Selalu dirender meskipun belum ada klaim)
-            const catalogEl = document.getElementById('parent-custom-rewards-catalog');
-            if (catalogEl) {
-                catalogEl.innerHTML = '';
-                (fam.customRewards || []).forEach(rw => {
-                    const item = document.createElement('div');
-                    item.className = 'p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs';
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-800 dark:text-white">${rw.title}</span>
-                            <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">🪙 ${rw.cost} Koin</span>
-                        </div>
-                        <button type="button" onclick="deleteCustomParentReward('${rw.id}')" class="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950 text-rose-500 hover:bg-rose-100 flex items-center justify-center" title="Hapus Voucher">
-                            <i class="fa-solid fa-trash text-xs"></i>
-                        </button>
-                    `;
-                    catalogEl.appendChild(item);
-                });
-            }
-
             if (!child) {
                 alertNoChild.classList.remove('hidden');
                 summaryCard.classList.add('hidden');
-                if (!skipAccountFormReset) {
-                    selectConfigChildGrade(tempConfigGrade);
-                }
+                selectConfigChildGrade(tempConfigGrade);
                 return;
             }
 
             alertNoChild.classList.add('hidden');
             summaryCard.classList.remove('hidden');
 
-            // Populate Account Form hanya jika TIDAK sedang mode tambah anak baru dan tidak sedang di-skip
-            const delWrap = document.getElementById('delete-child-wrap');
-            if (!isAddingNewChild && !skipAccountFormReset) {
+            // Populate Account Form jika tidak sedang mode tambah anak baru
+            if (!isAddingNewChild) {
                 document.getElementById('form-child-mode-title').textContent = `Edit Akun: ${child.name}`;
-                document.getElementById('badge-adding-child-mode').classList.add('hidden');
-                document.getElementById('btn-cancel-add-child').classList.add('hidden');
-                document.getElementById('btn-save-child-label').textContent = 'Simpan Perubahan Akun Anak';
                 document.getElementById('cfg-child-name').value = child.name;
                 document.getElementById('cfg-child-user').value = child.username;
                 document.getElementById('cfg-child-pass').value = child.password;
                 selectConfigChildGrade(child.grade);
             }
-            if (delWrap) {
-                if (!isAddingNewChild && (fam.children || []).length > 1) {
-                    delWrap.classList.remove('hidden');
-                } else {
-                    delWrap.classList.add('hidden');
-                }
-            }
 
             // Populate Target Form
-            if (child.dailyTarget && currentParentTab !== 'target') {
+            if (child.dailyTarget) {
                 document.getElementById('target-input-subject').value = child.dailyTarget.subject;
                 document.getElementById('target-input-count').value = String(child.dailyTarget.targetCount);
                 document.getElementById('target-input-minscore').value = String(child.dailyTarget.minScore);
@@ -2978,7 +3242,7 @@
                             </div>
                             <p class="text-[10px] text-slate-400 font-bold"><i class="fa-regular fa-clock mr-1"></i>${rec.timeStr}</p>
                         </div>
-                        <button type="button" class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-extrabold text-[11px] shrink-0">
+                        <button class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-extrabold text-[11px] shrink-0">
                             Cek Jawaban <i class="fa-solid fa-magnifying-glass ml-0.5"></i>
                         </button>
                     `;
@@ -2986,9 +3250,10 @@
                 });
             }
 
-            // Render Antrean Klaim Hadiah dari Anak di Portal Orang Tua
+            // Render Tab Hadiah Dunia Nyata di Portal Orang Tua
             const voucherBadge = document.getElementById('parent-voucher-badge');
             const redeemedListEl = document.getElementById('parent-redeemed-vouchers-list');
+            const catalogEl = document.getElementById('parent-custom-rewards-catalog');
 
             const vouchers = child.redeemedVouchers || [];
             const pendingCount = vouchers.filter(v => v.status === 'pending').length;
@@ -3009,57 +3274,1141 @@
                     vouchers.forEach(v => {
                         const row = document.createElement('div');
                         row.className = 'p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2';
-                        let actionHtml = '';
-                        if (v.status === 'pending') {
-                            actionHtml = `
-                                <div class="flex items-center gap-1 shrink-0">
-                                    <button type="button" onclick="approveChildVoucher('${v.id}', '${child.username}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[10px] shadow hover:bg-emerald-600">✅ Setujui</button>
-                                    <button type="button" onclick="rejectChildVoucher('${v.id}', '${child.username}')" class="px-2 py-1.5 rounded-xl bg-rose-100 text-rose-600 font-extrabold text-[10px] hover:bg-rose-200" title="Tolak & Kembalikan Koin">❌</button>
-                                </div>
-                            `;
-                        } else if (v.status === 'approved') {
-                            actionHtml = `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700">✅ Disetujui (${v.approvedByParentName || 'Ortu'})</span>`;
-                        } else {
-                            actionHtml = `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-rose-100 text-rose-700">↩️ Ditolak (Koin Kembali)</span>`;
-                        }
-
                         row.innerHTML = `
                             <div>
                                 <p class="font-game font-bold text-xs text-slate-800 dark:text-white">${v.title}</p>
-                                <p class="text-[10px] font-bold text-slate-400">${child.name} • ${v.dateStr} • ${v.cost} Koin</p>
+                                <p class="text-[10px] font-bold text-slate-400">Ditebus: ${v.dateStr} • ${v.cost} Koin</p>
                             </div>
-                            ${actionHtml}
+                            ${v.status === 'pending'
+                                ? `<button onclick="approveChildVoucher('${v.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px] shadow hover:bg-emerald-600">✓ Berikan Hadiah</button>`
+                                : `<span class="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700">✅ Diberikan (${v.approvedByParentName || 'Ortu'})</span>`
+                            }
                         `;
                         redeemedListEl.appendChild(row);
                     });
                 }
             }
+
+            if (catalogEl) {
+                catalogEl.innerHTML = '';
+                (fam.customRewards || []).forEach(rw => {
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs';
+                    item.innerHTML = `
+                        <span class="font-bold">${rw.title} <strong class="text-amber-500 ml-1">(${rw.cost} 🪙)</strong></span>
+                        <button onclick="deleteCustomParentReward('${rw.id}')" class="text-rose-500 hover:text-rose-700 px-2 py-0.5"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    catalogEl.appendChild(item);
+                });
+            }
         }
-// ... existing code ... -->
+
+        function openQuizReviewByIndex(idx) {
+            playSound('click');
+            const child = getActiveChild();
+            if (!child || !child.quizHistory[idx]) return;
+            renderReviewModalContent(child.quizHistory[idx]);
+        }
+
+        function openLastQuizReview() {
+            playSound('click');
+            if (!lastCompletedQuizRecord) return;
+            renderReviewModalContent(lastCompletedQuizRecord);
+        }
+
+        function renderReviewModalContent(record) {
+            const modal = document.getElementById('review-modal');
+            const title = document.getElementById('review-modal-title');
+            const body = document.getElementById('review-modal-body');
+
+            title.textContent = `${record.subject} (Kelas ${record.grade}) • Skor ${record.score}%`;
+            body.innerHTML = '';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            record.details.forEach((d, i) => {
+                const box = document.createElement('div');
+                box.className = `p-4 rounded-2xl border-2 bg-white dark:bg-slate-900 space-y-2 ${
+                    d.isCorrect ? 'border-emerald-300 dark:border-emerald-800' : 'border-rose-300 dark:border-rose-800'
+                }`;
+
+                const chosenText = d.options[d.chosen] !== undefined ? `${letters[d.chosen]}. ${d.options[d.chosen]}` : '-';
+                const correctText = `${letters[d.answer]}. ${d.options[d.answer]}`;
+
+                box.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-game font-bold text-slate-500">Soal #${i + 1}</span>
+                        <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                            d.isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                        }">
+                            ${d.isCorrect ? '✅ Jawaban Anak Benar' : '❌ Jawaban Anak Kurang Tepat'}
+                        </span>
+                    </div>
+                    <p class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-relaxed">${d.q}</p>
+                    <div class="text-[11px] space-y-1 pt-1">
+                        <div class="p-2 rounded-xl ${d.isCorrect ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200'} font-bold">
+                            Jawaban Anak: <strong>${chosenText}</strong>
+                        </div>
+                        ${!d.isCorrect ? `
+                        <div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 font-bold">
+                            Kunci Jawaban Benar: <strong>${correctText}</strong>
+                        </div>` : ''}
+                        <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
+                            💡 <strong>Pembahasan:</strong> ${d.explanation}
+                        </div>
+                    </div>
+                `;
+                body.appendChild(box);
+            });
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeReviewModal() {
+            playSound('click');
+            const modal = document.getElementById('review-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /* =========================================================================
+           10. ARENA BELAJAR ANAK (HOME, MISI ORANG TUA, KUIS 10 SOAL)
+           ========================================================================= */
+        function updateChildHeaderUI() {
+            const child = getActiveChild();
+            if (!child) return;
+
+            const lvl = getLevelInfo(child.xp);
+            document.getElementById('header-avatar-emoji').textContent = child.equipped.avatar;
+            document.getElementById('header-hat-emoji').textContent = child.equipped.hat;
+            document.getElementById('header-pet-emoji').textContent = child.equipped.pet;
+            document.getElementById('header-level-badge').textContent = `Lv.${lvl.level}`;
+            document.getElementById('header-player-name').textContent = child.name;
+            document.getElementById('header-grade-pill').textContent = formatGradeLabel(child.grade);
+            document.getElementById('header-player-title').textContent = child.equipped.title;
+
+            document.getElementById('stat-streak').textContent = child.streak;
+            document.getElementById('stat-coins').textContent = child.coins;
+            document.getElementById('shop-coin-balance').textContent = child.coins;
+
+            const pct = Math.min(100, Math.round((lvl.currentLevelXp / lvl.xpPerLevel) * 100));
+            document.getElementById('xp-bar-fill').style.width = `${pct}%`;
+            document.getElementById('xp-text').textContent = `${lvl.currentLevelXp} / ${lvl.xpPerLevel} XP`;
+        }
+
+        function renderChildHomeView() {
+            const child = getActiveChild();
+            if (!child) return;
+
+            // Update Misi dari Orang Tua
+            const dt = child.dailyTarget;
+            const subjLabel = dt.subject === 'ALL' ? 'Mata Pelajaran Bebas' : dt.subject;
+            const authorBadge = document.getElementById('child-mission-author');
+            if (authorBadge) {
+                authorBadge.textContent = `👨‍👩‍👧 Misi dari ${dt.setByParentName || 'Orang Tua'} Hari Ini`;
+            }
+            document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis ${subjLabel} (Skor Min. ${dt.minScore}%)`;
+            document.getElementById('child-mission-note').textContent = `"${dt.note}"`;
+            document.getElementById('child-mission-reward').textContent = `+${dt.rewardCoins} Koin`;
+
+            const pct = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
+            document.getElementById('child-mission-bar').style.width = `${pct}%`;
+
+            const badge = document.getElementById('child-mission-badge');
+            const btnClaim = document.getElementById('btn-claim-mission');
+            const btnPlay = document.getElementById('btn-play-mission');
+
+            if (dt.completedCount >= dt.targetCount) {
+                if (dt.claimed) {
+                    badge.textContent = '✅ Hadiah Diklaim';
+                    badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-900';
+                    btnClaim.classList.add('hidden');
+                    btnPlay.classList.remove('hidden');
+                } else {
+                    badge.textContent = '🎉 Siap Klaim!';
+                    badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-300 text-slate-900';
+                    btnClaim.classList.remove('hidden');
+                    btnPlay.classList.add('hidden');
+                }
+            } else {
+                badge.textContent = `${dt.completedCount} / ${dt.targetCount} Selesai`;
+                badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900';
+                btnClaim.classList.add('hidden');
+                btnPlay.classList.remove('hidden');
+            }
+
+            // Update Info Kelas Anak (Terkunci sesuai setting Ortu)
+            const gradeEmojis = { 5: '🎈', 6: '🏅', 7: '🌱', 8: '⚡', 9: '👑' };
+            document.getElementById('child-grade-emoji').textContent = gradeEmojis[child.grade] || '🎓';
+            document.getElementById('child-locked-grade-title').textContent = formatGradeLabel(child.grade);
+
+            // Update Status Roda Keberuntungan Harian
+            const todayStr = new Date().toDateString();
+            const spinBadge = document.getElementById('spin-status-badge');
+            if (spinBadge) {
+                if (child.lastSpinDate === todayStr) {
+                    spinBadge.textContent = 'Besok Lagi';
+                } else {
+                    spinBadge.textContent = '1x Gratis!';
+                }
+            }
+
+            // Render Daftar 5 Mata Pelajaran
+            const container = document.getElementById('subjects-container');
+            container.innerHTML = '';
+
+            SUBJECT_META.forEach((meta) => {
+                const isTargetSubj = dt.subject === meta.subject && dt.completedCount < dt.targetCount;
+                const subjHistory = (child.quizHistory || []).filter(h => h.subject === meta.subject && h.grade === child.grade);
+                const bestScore = subjHistory.length > 0 ? Math.max(...subjHistory.map(h => h.score)) : null;
+
+                const card = document.createElement('div');
+                card.className = `card-3d rounded-3xl p-4 bg-white dark:bg-slate-800 border-2 ${
+                    isTargetSubj ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-200 dark:border-slate-700'
+                } flex items-center justify-between gap-3 cursor-pointer hover:border-indigo-400 transition`;
+                card.onclick = () => startQuiz(meta.subject);
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${meta.color} text-white flex items-center justify-center text-2xl shadow-md shrink-0">
+                            <i class="fa-solid ${meta.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <h4 class="font-game font-bold text-base text-slate-800 dark:text-white">${meta.subject}</h4>
+                                ${isTargetSubj ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">🎯 Target Ortu</span>` : ''}
+                                ${bestScore !== null ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">★ Terbaik: ${bestScore}%</span>` : ''}
+                            </div>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${meta.topics[child.grade]}</p>
+                            <div class="flex items-center gap-3 mt-1.5 text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">
+                                <span><i class="fa-solid fa-layer-group mr-1"></i>10 Soal Variatif</span>
+                                <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>+100 Koin</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="px-3.5 py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-indigo shrink-0">
+                        Mulai <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function playTargetMissionNow() {
+            const child = getActiveChild();
+            if (!child) return;
+            const targetSubj = child.dailyTarget.subject;
+            if (targetSubj === 'ALL') {
+                startQuickRandomQuiz();
+            } else {
+                startQuiz(targetSubj);
+            }
+        }
+
+        function claimParentMissionReward() {
+            const child = getActiveChild();
+            if (!child || !child.dailyTarget) return;
+            if (child.dailyTarget.completedCount < child.dailyTarget.targetCount || child.dailyTarget.claimed) return;
+
+            playSound('fanfare');
+            fireConfetti(90);
+            child.dailyTarget.claimed = true;
+            child.coins += child.dailyTarget.rewardCoins;
+            child.xp += 150;
+            child.targetsCompleted = (child.targetsCompleted || 0) + 1;
+
+            checkAndUnlockBadges();
+            saveDatabase();
+            updateChildHeaderUI();
+            renderChildHomeView();
+            showToast(`🎁 Peti Target Orang Tua Terbuka! +${child.dailyTarget.rewardCoins} Koin & +150 XP!`);
+        }
+
+        /* =========================================================================
+           11. ENGINE KUIS 10 SOAL & LOGIKA JAWABAN DETAIL (+ POWER-UP BANTUAN)
+           ========================================================================= */
+        let activeQuiz = {
+            subjectName: '',
+            grade: 7,
+            questions: [],
+            currentIndex: 0,
+            correctCount: 0,
+            currentCombo: 0,
+            earnedXp: 0,
+            earnedCoins: 0,
+            answered: false,
+            lifeline5050Left: 1,
+            lifelineHintLeft: 1,
+            answerLog: []
+        };
+
+        function startQuiz(subjectName) {
+            const child = getActiveChild();
+            if (!child) return;
+            playSound('click');
+
+            const tenQuestions = buildTenQuestionQuiz(child.grade, subjectName, child.recentQuestionHashes || []);
+
+            activeQuiz = {
+                subjectName: subjectName,
+                grade: child.grade,
+                questions: tenQuestions,
+                currentIndex: 0,
+                correctCount: 0,
+                currentCombo: 0,
+                earnedXp: 0,
+                earnedCoins: 0,
+                answered: false,
+                lifeline5050Left: 1,
+                lifelineHintLeft: 1,
+                answerLog: []
+            };
+
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+            renderCurrentQuestion();
+        }
+
+        function useLifeline5050() {
+            if (activeQuiz.answered || activeQuiz.lifeline5050Left <= 0) {
+                playSound('wrong');
+                showToast('⚠️ Bantuan 50:50 sudah digunakan di paket kuis ini!');
+                return;
+            }
+            playSound('correct');
+            activeQuiz.lifeline5050Left -= 1;
+            updateLifelineButtonsUI();
+
+            const qObj = activeQuiz.questions[activeQuiz.currentIndex];
+            const wrongIndices = [0, 1, 2, 3].filter(idx => idx !== qObj.answer);
+            // Acak dan sembunyikan 2 jawaban yang salah
+            wrongIndices.sort(() => Math.random() - 0.5);
+            const toHide = wrongIndices.slice(0, 2);
+            toHide.forEach(idx => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-25', 'line-through');
+                }
+            });
+            showToast('⚡ 2 Pilihan jawaban salah berhasil dihilangkan!');
+        }
+
+        function useLifelineHint() {
+            if (activeQuiz.answered || activeQuiz.lifelineHintLeft <= 0) {
+                playSound('wrong');
+                showToast('⚠️ Bantuan Petunjuk sudah digunakan di paket kuis ini!');
+                return;
+            }
+            playSound('correct');
+            activeQuiz.lifelineHintLeft -= 1;
+            updateLifelineButtonsUI();
+
+            const qObj = activeQuiz.questions[activeQuiz.currentIndex];
+            const hintSnippet = qObj.explanation.split('.')[0] + '.';
+            showToast(`💡 Petunjuk: ${hintSnippet}`);
+        }
+
+        function updateLifelineButtonsUI() {
+            const btn50 = document.getElementById('btn-lifeline-5050');
+            const btnHint = document.getElementById('btn-lifeline-hint');
+            document.getElementById('badge-5050-left').textContent = `(${activeQuiz.lifeline5050Left})`;
+            document.getElementById('badge-hint-left').textContent = `(${activeQuiz.lifelineHintLeft})`;
+
+            if (activeQuiz.lifeline5050Left <= 0) {
+                btn50.classList.add('opacity-40');
+            } else {
+                btn50.classList.remove('opacity-40');
+            }
+            if (activeQuiz.lifelineHintLeft <= 0) {
+                btnHint.classList.add('opacity-40');
+            } else {
+                btnHint.classList.remove('opacity-40');
+            }
+        }
+
+        function startQuickRandomQuiz() {
+            const randMeta = SUBJECT_META[Math.floor(Math.random() * SUBJECT_META.length)];
+            startQuiz(randMeta.subject);
+        }
+
+        function renderCurrentQuestion() {
+            activeQuiz.answered = false;
+            const qObj = activeQuiz.questions[activeQuiz.currentIndex];
+            const total = 10; // Wajib 10 soal
+            const num = activeQuiz.currentIndex + 1;
+
+            document.getElementById('quiz-subject-title').textContent = `${activeQuiz.subjectName} • ${formatGradeLabel(activeQuiz.grade)}`;
+            document.getElementById('quiz-counter-text').textContent = `Soal ${num}/${total}`;
+            document.getElementById('quiz-progress-bar').style.width = `${(num / total) * 100}%`;
+
+            const meta = SUBJECT_META.find(m => m.subject === activeQuiz.subjectName);
+            document.getElementById('quiz-topic-badge').textContent = meta ? meta.topics[activeQuiz.grade] : activeQuiz.subjectName;
+            document.getElementById('quiz-question-text').textContent = qObj.q;
+
+            updateLifelineButtonsUI();
+
+            const comboPill = document.getElementById('quiz-combo-pill');
+            if (activeQuiz.currentCombo >= 2) {
+                comboPill.classList.remove('hidden');
+                comboPill.textContent = `🔥 ${activeQuiz.currentCombo}x Combo!`;
+            } else {
+                comboPill.classList.add('hidden');
+            }
+
+            document.getElementById('quiz-explanation-box').classList.add('hidden');
+            document.getElementById('btn-next-question').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            qObj.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `opt-btn-${idx}`;
+                btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-400 font-bold text-sm flex items-center gap-3 transition card-3d';
+                btn.onclick = () => selectAnswer(idx);
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-game font-bold flex items-center justify-center shrink-0">
+                        ${letters[idx]}
+                    </span>
+                    <span class="flex-1">${optText}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIdx) {
+            if (activeQuiz.answered) return;
+            activeQuiz.answered = true;
+
+            const child = getActiveChild();
+            const qObj = activeQuiz.questions[activeQuiz.currentIndex];
+            const isCorrect = selectedIdx === qObj.answer;
+            const quizCard = document.getElementById('quiz-card');
+
+            // Simpan ke log jawaban untuk dipantau Orang Tua
+            activeQuiz.answerLog.push({
+                q: qObj.q,
+                options: qObj.options,
+                chosen: selectedIdx,
+                answer: qObj.answer,
+                isCorrect: isCorrect,
+                explanation: qObj.explanation
+            });
+
+            // Catat hash soal agar tidak berulang di sesi berikutnya
+            if (child) {
+                child.recentQuestionHashes = child.recentQuestionHashes || [];
+                child.recentQuestionHashes.push(qObj.q.slice(0, 30));
+                if (child.recentQuestionHashes.length > 40) {
+                    child.recentQuestionHashes.shift();
+                }
+            }
+
+            qObj.options.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                btn.disabled = true;
+                if (idx === qObj.answer) {
+                    btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 font-extrabold text-sm flex items-center gap-3 animate-pop';
+                } else if (idx === selectedIdx && !isCorrect) {
+                    btn.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-50 dark:bg-rose-950/70 text-rose-800 dark:text-rose-200 font-extrabold text-sm flex items-center gap-3';
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            const expBox = document.getElementById('quiz-explanation-box');
+            const expIcon = document.getElementById('explanation-icon');
+            const expTitle = document.getElementById('explanation-title');
+            const expText = document.getElementById('explanation-text');
+            expBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                fireConfetti(22);
+                activeQuiz.correctCount += 1;
+                activeQuiz.currentCombo += 1;
+                if (child && activeQuiz.currentCombo > child.maxCombo) {
+                    child.maxCombo = activeQuiz.currentCombo;
+                }
+
+                const multiplier = activeQuiz.currentCombo >= 3 ? 2 : 1;
+                const xpGain = 15 * multiplier;
+                const coinGain = 10 * multiplier;
+                activeQuiz.earnedXp += xpGain;
+                activeQuiz.earnedCoins += coinGain;
+
+                expBox.className = 'rounded-3xl p-4 border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-100 animate-pop';
+                expIcon.className = 'w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-xl shrink-0';
+                expIcon.textContent = '🎉';
+                expTitle.textContent = multiplier > 1 ? `Benar! Combo ${activeQuiz.currentCombo}x (+${xpGain} XP)` : `Mantap! Jawaban Benar (+${xpGain} XP)`;
+                expText.textContent = qObj.explanation;
+            } else {
+                playSound('wrong');
+                activeQuiz.currentCombo = 0;
+                quizCard.classList.remove('animate-shake');
+                void quizCard.offsetWidth;
+                quizCard.classList.add('animate-shake');
+
+                expBox.className = 'rounded-3xl p-4 border-2 border-rose-400 bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-100';
+                expIcon.className = 'w-10 h-10 rounded-2xl bg-rose-500 text-white flex items-center justify-center text-xl shrink-0';
+                expIcon.textContent = '💡';
+                expTitle.textContent = 'Kurang Tepat, Yuk Simak Pembahasannya!';
+                expText.textContent = qObj.explanation;
+            }
+
+            const comboPill = document.getElementById('quiz-combo-pill');
+            if (activeQuiz.currentCombo >= 2) {
+                comboPill.classList.remove('hidden');
+                comboPill.textContent = `🔥 ${activeQuiz.currentCombo}x Combo!`;
+            } else {
+                comboPill.classList.add('hidden');
+            }
+
+            const nextBtn = document.getElementById('btn-next-question');
+            nextBtn.classList.remove('hidden');
+            if (activeQuiz.currentIndex === 9) {
+                nextBtn.innerHTML = `Selesaikan 10 Soal & Lihat Nilai <i class="fa-solid fa-flag-checkered ml-1"></i>`;
+            } else {
+                nextBtn.innerHTML = `Lanjut Soal ${activeQuiz.currentIndex + 2}/10 <i class="fa-solid fa-arrow-right ml-1"></i>`;
+            }
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            if (activeQuiz.currentIndex < activeQuiz.questions.length - 1) {
+                activeQuiz.currentIndex += 1;
+                renderCurrentQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-modal').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('flex');
+
+            const child = getActiveChild();
+            if (!child) return;
+
+            const total = activeQuiz.questions.length; // 10 soal
+            const scorePct = Math.round((activeQuiz.correctCount / total) * 100);
+
+            child.xp += activeQuiz.earnedXp;
+            child.coins += activeQuiz.earnedCoins;
+            child.quizzesCompleted += 1;
+            if (scorePct === 100) child.perfectScores += 1;
+
+            // Cek apakah memenuhi Target Harian Orang Tua
+            const dt = child.dailyTarget;
+            let targetProgressAdded = false;
+            if (dt) {
+                const subjMatch = dt.subject === 'ALL' || dt.subject === activeQuiz.subjectName;
+                if (subjMatch && scorePct >= dt.minScore) {
+                    dt.completedCount += 1;
+                    targetProgressAdded = true;
+                }
+            }
+
+            // Simpan Riwayat Kuis Lengkap (10 Soal & Jawaban Anak) untuk Dashboard Orang Tua
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ', ' +
+                            now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            const record = {
+                id: 'qz-' + Date.now(),
+                date: now.toDateString(),
+                timeStr: timeStr,
+                subject: activeQuiz.subjectName,
+                grade: activeQuiz.grade,
+                score: scorePct,
+                correctCount: activeQuiz.correctCount,
+                totalQuestions: total,
+                details: activeQuiz.answerLog
+            };
+
+            lastCompletedQuizRecord = record;
+            child.quizHistory = child.quizHistory || [];
+            child.quizHistory.unshift(record);
+            if (child.quizHistory.length > 25) child.quizHistory.pop();
+
+            checkAndUnlockBadges();
+            saveDatabase();
+            updateChildHeaderUI();
+            renderChildHomeView();
+
+            playSound('fanfare');
+            fireConfetti(75);
+
+            document.getElementById('result-score').textContent = `${scorePct}%`;
+            document.getElementById('result-xp').textContent = `+${activeQuiz.earnedXp}`;
+            document.getElementById('result-coins').textContent = `+${activeQuiz.earnedCoins}`;
+
+            if (scorePct === 100) {
+                document.getElementById('result-emoji').textContent = '👑';
+                document.getElementById('result-title').textContent = 'Sempurna! 10/10 Benar!';
+                document.getElementById('result-subtitle').textContent = 'Luar biasa! Ayah & Bunda pasti sangat bangga melihat hasil ini!';
+            } else if (scorePct >= 70) {
+                document.getElementById('result-emoji').textContent = '🎉';
+                document.getElementById('result-title').textContent = `Hebat! Benar ${activeQuiz.correctCount} dari 10 Soal`;
+                document.getElementById('result-subtitle').textContent = targetProgressAdded
+                    ? '🎯 Target Harian Orang Tua bertambah! Jangan lupa buka Peti Hadiahmu!'
+                    : 'Hasil ujianmu sudah tercatat di Rapor Orang Tua!';
+            } else {
+                document.getElementById('result-emoji').textContent = '💪';
+                document.getElementById('result-title').textContent = `Tetap Semangat! (${activeQuiz.correctCount}/10)`;
+                document.getElementById('result-subtitle').textContent = 'Klik "Lihat Koreksi" untuk mempelajari pembahasan soalnya ya!';
+            }
+
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('result-modal').classList.add('flex');
+        }
+
+        function closeResultModal() {
+            playSound('click');
+            document.getElementById('result-modal').classList.add('hidden');
+            document.getElementById('result-modal').classList.remove('flex');
+        }
+
+        function quitQuiz() {
+            playSound('click');
+            document.getElementById('quiz-modal').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('flex');
+        }
+
+        /* =========================================================================
+           12. TOKO REWARD, VOUCHER NYATA, RODA HOKI, BADGES, & PROFIL ANAK
+           ========================================================================= */
+        function openSpinModal() {
+            playSound('click');
+            const child = getActiveChild();
+            if (!child) return;
+
+            const todayStr = new Date().toDateString();
+            const alreadySpun = child.lastSpinDate === todayStr;
+
+            document.getElementById('spin-result-emoji').textContent = alreadySpun ? '⏳' : '🎁';
+            document.getElementById('spin-result-label').textContent = alreadySpun ? 'Sudah Diputar' : 'Siap Putar!';
+            const btn = document.getElementById('btn-do-spin');
+            if (alreadySpun) {
+                btn.textContent = 'Sudah Diputar Hari Ini (Kembali Besok!)';
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            } else {
+                btn.textContent = '🎰 Putar Roda Sekarang!';
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            }
+
+            document.getElementById('spin-modal').classList.remove('hidden');
+            document.getElementById('spin-modal').classList.add('flex');
+        }
+
+        function closeSpinModal() {
+            playSound('click');
+            document.getElementById('spin-modal').classList.add('hidden');
+            document.getElementById('spin-modal').classList.remove('flex');
+        }
+
+        function spinDailyWheel() {
+            const child = getActiveChild();
+            if (!child) return;
+            const todayStr = new Date().toDateString();
+            if (child.lastSpinDate === todayStr) {
+                playSound('wrong');
+                showToast('⚠️ Kamu sudah memutar Roda Keberuntungan hari ini!');
+                return;
+            }
+
+            playSound('click');
+            const wheel = document.getElementById('spin-wheel-visual');
+            const btn = document.getElementById('btn-do-spin');
+            btn.disabled = true;
+            wheel.style.transform = 'rotate(1080deg)';
+
+            const prizes = [
+                { emoji: '🪙', label: '+50 Koin Emas!', coins: 50, xp: 20 },
+                { emoji: '💎', label: '+100 Koin Emas!', coins: 100, xp: 30 },
+                { emoji: '⚡', label: '+80 XP & +40 Koin!', coins: 40, xp: 80 },
+                { emoji: '👑', label: 'JACKPOT +150 Koin!', coins: 150, xp: 50 }
+            ];
+            const won = prizes[Math.floor(Math.random() * prizes.length)];
+
+            setTimeout(() => {
+                playSound('fanfare');
+                fireConfetti(70);
+                child.lastSpinDate = todayStr;
+                child.coins += won.coins;
+                child.xp += won.xp;
+                saveDatabase();
+
+                document.getElementById('spin-result-emoji').textContent = won.emoji;
+                document.getElementById('spin-result-label').textContent = won.label;
+                btn.textContent = '🎉 Hadiah Berhasil Diklaim!';
+                btn.classList.add('opacity-50');
+                wheel.style.transform = 'rotate(0deg)';
+
+                updateChildHeaderUI();
+                renderChildHomeView();
+                showToast(`🎰 Selamat! Kamu mendapat ${won.label}`);
+            }, 1000);
+        }
+
+        function renderShop() {
+            const fam = getActiveFamily();
+            const child = getActiveChild();
+            if (!child || !fam) return;
+
+            document.getElementById('shop-coin-balance').textContent = child.coins;
+
+            // Render Voucher Hadiah Dunia Nyata dari Orang Tua
+            const realGrid = document.getElementById('child-real-rewards-grid');
+            const myVouchersEl = document.getElementById('child-my-vouchers-list');
+            if (realGrid) {
+                realGrid.innerHTML = '';
+                (fam.customRewards || []).forEach(rw => {
+                    const card = document.createElement('div');
+                    card.className = 'p-3 rounded-2xl bg-white dark:bg-slate-900 border-2 border-rose-200 dark:border-rose-800 flex flex-col justify-between gap-2';
+                    card.innerHTML = `
+                        <p class="font-game font-bold text-xs text-slate-800 dark:text-white leading-snug">${rw.title}</p>
+                        <button onclick="redeemRealWorldReward('${rw.id}')" class="w-full py-1.5 rounded-xl text-white font-extrabold text-xs btn-3d-rose flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-coins"></i> Tebus ${rw.cost}
+                        </button>
+                    `;
+                    realGrid.appendChild(card);
+                });
+            }
+
             if (myVouchersEl) {
                 myVouchersEl.innerHTML = '';
                 const myVouchers = child.redeemedVouchers || [];
                 if (myVouchers.length > 0) {
-                    myVouchers.slice(0, 5).forEach(v => {
+                    myVouchers.slice(0, 4).forEach(v => {
                         const row = document.createElement('div');
                         row.className = 'px-3 py-2 rounded-xl bg-white/80 dark:bg-slate-900 border border-rose-200 dark:border-rose-800 flex items-center justify-between text-[11px] font-bold';
-                        let statusBadge = '';
-                        if (v.status === 'approved') {
-                            statusBadge = `<span class="text-emerald-600 font-extrabold">✅ Disetujui ${v.approvedByParentName || 'Ortu'}</span>`;
-                        } else if (v.status === 'rejected') {
-                            statusBadge = `<span class="text-rose-500 font-extrabold">↩️ Ditolak (Koin Kembali)</span>`;
-                        } else {
-                            statusBadge = `<span class="text-amber-600 font-extrabold">⏳ Menunggu Ortu</span>`;
-                        }
                         row.innerHTML = `
                             <span>🎟️ ${v.title} (${v.dateStr})</span>
-                            ${statusBadge}
+                            <span class="${v.status === 'approved' ? 'text-emerald-600' : 'text-amber-600'} font-extrabold">
+                                ${v.status === 'approved' ? `✅ Disetujui ${v.approvedByParentName || 'Ortu'}` : '⏳ Menunggu Ortu'}
+                            </span>
                         `;
                         myVouchersEl.appendChild(row);
                     });
                 }
             }
-// ... existing code ... -->
+
+            const container = document.getElementById('shop-items-container');
+            container.innerHTML = '';
+
+            const categories = [
+                { key: 'avatar', label: '🎭 Karakter Avatar Utama' },
+                { key: 'hat', label: '👑 Mahkota & Aura Kepala' },
+                { key: 'pet', label: '🐉 Pet Pendamping Belajar' },
+                { key: 'title', label: '⚡ Gelar Kehormatan' }
+            ];
+
+            categories.forEach((cat) => {
+                const section = document.createElement('div');
+                section.className = 'space-y-2.5';
+                section.innerHTML = `<h3 class="font-game font-bold text-sm text-slate-700 dark:text-slate-200">${cat.label}</h3>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-2.5';
+
+                SHOP_ITEMS.filter((i) => i.type === cat.key).forEach((item) => {
+                    const isOwned = child.ownedItems.includes(item.id);
+                    const isEquipped =
+                        (item.type === 'avatar' && child.equipped.avatar === item.icon) ||
+                        (item.type === 'hat' && child.equipped.hat === item.icon) ||
+                        (item.type === 'pet' && child.equipped.pet === item.icon) ||
+                        (item.type === 'title' && child.equipped.title === item.name);
+
+                    const card = document.createElement('div');
+                    card.className = `p-3.5 rounded-2xl border-2 flex flex-col justify-between bg-white dark:bg-slate-800 ${
+                        isEquipped ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-slate-200 dark:border-slate-700'
+                    }`;
+
+                    let btnHtml = '';
+                    if (isEquipped) {
+                        btnHtml = `<button disabled class="w-full py-2 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-extrabold text-xs">✓ Dipakai</button>`;
+                    } else if (isOwned) {
+                        btnHtml = `<button onclick="equipItem('${item.id}')" class="w-full py-2 rounded-xl text-white font-extrabold text-xs btn-3d-emerald">Pakai</button>`;
+                    } else {
+                        btnHtml = `<button onclick="buyItem('${item.id}')" class="w-full py-2 rounded-xl text-white font-extrabold text-xs btn-3d-amber flex items-center justify-center gap-1"><i class="fa-solid fa-coins"></i> ${item.price}</button>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="text-center space-y-1 mb-3">
+                            <div class="text-3xl h-10 flex items-center justify-center">${item.icon || '✨'}</div>
+                            <h4 class="font-game font-bold text-xs text-slate-800 dark:text-white">${item.name}</h4>
+                            <p class="text-[10px] text-slate-400 font-semibold leading-tight">${item.desc}</p>
+                        </div>
+                        ${btnHtml}
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+        }
+
+        function buyItem(itemId) {
+            const child = getActiveChild();
+            const item = SHOP_ITEMS.find((i) => i.id === itemId);
+            if (!child || !item) return;
+
+            if (child.coins < item.price) {
+                playSound('wrong');
+                showToast('⚠️ Koin belum cukup! Selesaikan kuis 10 soal atau Target Orang Tua dulu yuk!');
+                return;
+            }
+
+            playSound('correct');
+            fireConfetti(35);
+            child.coins -= item.price;
+            child.ownedItems.push(item.id);
+            equipItem(itemId, false);
+            checkAndUnlockBadges();
+            saveDatabase();
+            updateChildHeaderUI();
+            renderShop();
+            showToast(`🎉 Berhasil membeli & memakai ${item.name}!`);
+        }
+
+        function equipItem(itemId, notify = true) {
+            const child = getActiveChild();
+            const item = SHOP_ITEMS.find((i) => i.id === itemId);
+            if (!child || !item) return;
+
+            if (notify) playSound('click');
+            if (item.type === 'avatar') child.equipped.avatar = item.icon;
+            if (item.type === 'hat') child.equipped.hat = item.icon;
+            if (item.type === 'pet') child.equipped.pet = item.icon;
+            if (item.type === 'title') child.equipped.title = item.name;
+
+            saveDatabase();
+            updateChildHeaderUI();
+            renderShop();
+            if (notify) showToast(`✨ ${item.name} berhasil dipasang!`);
+        }
+
+        function checkAndUnlockBadges() {
+            const child = getActiveChild();
+            if (!child) return;
+            BADGES_LIST.forEach((b) => {
+                if (!child.unlockedBadges.includes(b.id) && b.check(child)) {
+                    child.unlockedBadges.push(b.id);
+                    showToast(`🏆 Piala Baru Terbuka: ${b.name}!`);
+                }
+            });
+        }
+
+        function renderBadges() {
+            const child = getActiveChild();
+            if (!child) return;
+            checkAndUnlockBadges();
+            const grid = document.getElementById('badges-grid');
+            grid.innerHTML = '';
+
+            BADGES_LIST.forEach((b) => {
+                const unlocked = child.unlockedBadges.includes(b.id);
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-3xl border-2 text-center space-y-1.5 transition ${
+                    unlocked
+                        ? 'bg-white dark:bg-slate-800 border-amber-400 shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-55 grayscale'
+                }`;
+                card.innerHTML = `
+                    <div class="text-4xl">${b.icon}</div>
+                    <h4 class="font-game font-bold text-xs text-slate-800 dark:text-white">${b.name}</h4>
+                    <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 leading-snug">${b.desc}</p>
+                    <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                        unlocked ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                    }">
+                        ${unlocked ? '✓ Terbuka' : '🔒 Terkunci'}
+                    </span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderProfile() {
+            const child = getActiveChild();
+            if (!child) return;
+            checkAndUnlockBadges();
+            document.getElementById('profile-avatar-emoji').textContent = child.equipped.avatar;
+            document.getElementById('profile-hat-emoji').textContent = child.equipped.hat;
+            document.getElementById('profile-pet-emoji').textContent = child.equipped.pet;
+            document.getElementById('profile-name-display').textContent = child.name;
+            document.getElementById('profile-grade-badge').textContent = formatGradeLabel(child.grade);
+            document.getElementById('profile-title-display').textContent = child.equipped.title;
+
+            document.getElementById('profile-stat-xp').textContent = `${child.xp} XP`;
+            document.getElementById('profile-stat-quizzes').textContent = `${child.quizzesCompleted} Paket`;
+            document.getElementById('profile-stat-combo').textContent = `${child.maxCombo}x Beruntun`;
+            document.getElementById('profile-stat-badges').textContent = `${child.unlockedBadges.length} / ${BADGES_LIST.length}`;
+        }
+
+        function switchTab(tabName) {
+            playSound('click');
+            const tabs = ['home', 'shop', 'badges', 'profile'];
+            tabs.forEach((t) => {
+                document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tabName);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition';
+                } else {
+                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-slate-400 font-bold text-xs transition';
+                }
+            });
+
+            if (tabName === 'home') renderChildHomeView();
+            if (tabName === 'shop') renderShop();
+            if (tabName === 'badges') renderBadges();
+            if (tabName === 'profile') renderProfile();
+        }
+
+        /* =========================================================================
+           13. AUDIO ENGINE, CONFETTI, TEMA & PWA
+           ========================================================================= */
+        let audioCtx = null;
+        function getAudioCtx() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (!db.soundEnabled) return;
+            const ctx = getAudioCtx();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+
+            if (type === 'click') {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(680, now + 0.06);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.06);
+            } else if (type === 'correct') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                    gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+                    gain.gain.exponentialRampToValueAtTime(0.008, now + idx * 0.07 + 0.18);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.07);
+                    osc.stop(now + idx * 0.07 + 0.18);
+                });
+            } else if (type === 'wrong') {
+                [260, 195].forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+                    gain.gain.setValueAtTime(0.15, now + idx * 0.14);
+                    gain.gain.exponentialRampToValueAtTime(0.008, now + idx * 0.14 + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.14);
+                    osc.stop(now + idx * 0.14 + 0.22);
+                });
+            } else if (type === 'fanfare') {
+                const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
+                const times = [0, 0.1, 0.2, 0.32, 0.46, 0.58];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + times[idx]);
+                    gain.gain.setValueAtTime(0.22, now + times[idx]);
+                    gain.gain.exponentialRampToValueAtTime(0.008, now + times[idx] + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + times[idx]);
+                    osc.stop(now + times[idx] + 0.25);
+                });
+            }
+        }
+
+        const canvas = document.getElementById('confetti-canvas');
+        const cCtx = canvas.getContext('2d');
+        let particles = [];
+        let animFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function fireConfetti(amount = 55) {
+            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#a855f7'];
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2 + (Math.random() - 0.5) * 120,
+                    y: window.innerHeight * 0.45,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -Math.random() * 14 - 4,
+                    size: Math.random() * 8 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12,
+                    gravity: 0.38,
+                    alpha: 1
+                });
+            }
+            if (!animFrameId) renderParticles();
+        }
+
+        function renderParticles() {
+            cCtx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.rotation += p.vRot;
+                p.alpha -= 0.012;
+
+                cCtx.save();
+                cCtx.globalAlpha = Math.max(0, p.alpha);
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate((p.rotation * Math.PI) / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                cCtx.restore();
+            });
+
+            particles = particles.filter((p) => p.alpha > 0 && p.y < canvas.height + 30);
+            if (particles.length > 0) {
+                animFrameId = requestAnimationFrame(renderParticles);
+            } else {
+                cCtx.clearRect(0, 0, canvas.width, canvas.height);
+                animFrameId = null;
+            }
+        }
+
+        function applyThemeAndSoundUI() {
+            if (db.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            const soundIcon = document.getElementById('icon-sound');
+            if (soundIcon) {
+                soundIcon.className = db.soundEnabled
+                    ? 'fa-solid fa-volume-high text-xs text-indigo-600 dark:text-indigo-400'
+                    : 'fa-solid fa-volume-xmark text-xs text-rose-500';
+            }
+        }
+
+        function toggleSound() {
+            db.soundEnabled = !db.soundEnabled;
+            if (db.soundEnabled) playSound('click');
+            saveDatabase();
+            applyThemeAndSoundUI();
+            showToast(db.soundEnabled ? '🔊 Suara Efek Aktif' : '🔇 Suara Efek Dibisukan');
+        }
+
+        function toggleTheme() {
+            playSound('click');
+            db.darkMode = !db.darkMode;
+            saveDatabase();
+            applyThemeAndSoundUI();
+        }
+
+        let toastTimer = null;
+        function showToast(message) {
+            const box = document.getElementById('toast-box');
+            const msg = document.getElementById('toast-msg');
+            msg.innerHTML = `<span>${message}</span>`;
+            box.classList.remove('opacity-0', '-translate-y-2');
+            box.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                box.classList.add('opacity-0', '-translate-y-2');
+                box.classList.remove('opacity-100', 'translate-y-0');
+            }, 2800);
+        }
+
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('btn-native-install').classList.remove('hidden');
+        });
+
+        function openInstallModal() {
+            playSound('click');
+            document.getElementById('install-modal').classList.remove('hidden');
+            document.getElementById('install-modal').classList.add('flex');
+        }
+
+        function closeInstallModal() {
+            playSound('click');
+            document.getElementById('install-modal').classList.add('hidden');
+            document.getElementById('install-modal').classList.remove('flex');
+        }
+
+        async function triggerNativeInstall() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.getElementById('btn-native-install').classList.add('hidden');
+            closeInstallModal();
+        }
+
+        function setupDynamicPWAManifest() {
+            const manifest = {
+                name: 'EduQuest SMP - Family Cloud Edition',
+                short_name: 'EduQuest SMP',
+                description: 'Aplikasi Game Latihan Soal Ujian SMP Kelas 7-9 dengan Sinkronisasi Real-Time Orang Tua & Anak',
+                start_url: '.',
+                display: 'standalone',
+                background_color: '#0f172a',
+                theme_color: '#6366f1',
+                icons: [
+                    { src: 'https://placehold.co/192x192/6366f1/ffffff?text=EQ', sizes: '192x192', type: 'image/png' },
+                    { src: 'https://placehold.co/512x512/6366f1/ffffff?text=EduQuest', sizes: '512x512', type: 'image/png' }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = URL.createObjectURL(blob);
+            document.head.appendChild(link);
+
+            // Registrasi Service Worker PWA via Blob agar siap di-host di GitHub Pages dalam 1 file
+            if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', (e) => {});
+                `;
+                try {
+                    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+                } catch (e) {}
+            }
+        }
+
         // Ekspos seluruh handler ke global window karena script bertipe module
         Object.assign(window, {
             switchAuthRole,
@@ -3074,17 +4423,12 @@
             switchParentTab,
             selectConfigChildGrade,
             saveChildAccountFromParent,
-            deleteSelectedChildAccount,
             saveParentDailyTarget,
             selectParentActiveChild,
-            openAddChildForm,
             prepareNewChildForm,
-            cancelAddChildMode,
             addCustomParentReward,
-            resetDefaultParentRewards,
             deleteCustomParentReward,
             approveChildVoucher,
-            rejectChildVoucher,
             redeemRealWorldReward,
             openQuizReviewByIndex,
             openLastQuizReview,
@@ -3120,4 +4464,4 @@
         };
     </script>
 </body>
-                    </html>
+</html>
