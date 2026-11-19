@@ -436,8 +436,12 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <button onclick="resetChildStats('coins')" class="py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-extrabold text-[11px]"><i class="fa-solid fa-coins"></i> Reset Koin</button>
                                 <button onclick="resetChildStats('xp')" class="py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-extrabold text-[11px]"><i class="fa-solid fa-bolt"></i> Reset XP</button>
-                                <button onclick="resetChildStats('both')" class="py-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-extrabold text-[11px]"><i class="fa-solid fa-rotate-left"></i> Reset Semua</button>
+                                <button onclick="resetChildStats('both')" class="py-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-extrabold text-[11px]"><i class="fa-solid fa-rotate-left"></i> Koin & XP</button>
                             </div>
+                            <button onclick="resetChildStats('all')" class="w-full mt-2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-[11px] flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Reset Keseluruhan (Termasuk Riwayat Hasil)
+                            </button>
+                            <p class="text-[10px] font-semibold text-slate-400 mt-1.5 leading-snug">Mengosongkan XP, koin, riwayat kuis & koreksi, badge, streak, serta barang toko. Akun, kelas, dan setelan target tetap ada.</p>
                         </div>
                     </div>
 
@@ -507,7 +511,7 @@
                                 <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
                                     1. Pilih Mata Pelajaran Wajib Hari Ini
                                 </label>
-                                <select id="target-input-subject" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
+                                <select id="target-input-subject" onchange="updateTargetQuestionHint()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
                                     <option value="ALL">🌟 Bebas / Semua Mata Pelajaran</option>
                                     <option value="Matematika">📐 Matematika</option>
                                     <option value="IPA Terpadu">🔬 IPA Terpadu (Fisika & Biologi)</option>
@@ -517,21 +521,37 @@
                                 </select>
                             </div>
 
+                            <div>
+                                <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
+                                    2. Jumlah Soal per Kuis (langsung dikerjakan anak)
+                                </label>
+                                <select id="target-input-questions" onchange="updateTargetQuestionHint()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
+                                    <option value="10">10 Soal (Standar)</option>
+                                    <option value="15">15 Soal</option>
+                                    <option value="20">20 Soal</option>
+                                    <option value="25">25 Soal</option>
+                                    <option value="30">30 Soal</option>
+                                    <option value="40">40 Soal</option>
+                                    <option value="50">50 Soal</option>
+                                </select>
+                                <p id="target-questions-hint" class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5 leading-snug"></p>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
-                                        2. Target Jumlah Kuis
+                                        3. Target Jumlah Kuis
                                     </label>
                                     <select id="target-input-count" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
-                                        <option value="1">1 Paket (10 Soal)</option>
-                                        <option value="2">2 Paket (20 Soal)</option>
-                                        <option value="3">3 Paket (30 Soal)</option>
-                                        <option value="5">5 Paket (50 Soal)</option>
+                                        <option value="1">1 Kuis</option>
+                                        <option value="2">2 Kuis</option>
+                                        <option value="3">3 Kuis</option>
+                                        <option value="5">5 Kuis</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
-                                        3. Nilai Minimal Lulus
+                                        4. Nilai Minimal Lulus
                                     </label>
                                     <select id="target-input-minscore" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
                                         <option value="60">Minimal 60%</option>
@@ -545,7 +565,7 @@
 
                             <div>
                                 <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
-                                    4. Bonus Koin Game dari Orang Tua
+                                    5. Bonus Koin Game dari Orang Tua
                                 </label>
                                 <select id="target-input-coins" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
                                     <option value="100">🪙 +100 Koin Emas & +100 XP</option>
@@ -556,7 +576,7 @@
 
                             <div>
                                 <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
-                                    5. Pesan Semangat / Janji Hadiah dari Ayah & Bunda
+                                    6. Pesan Semangat / Janji Hadiah dari Ayah & Bunda
                                 </label>
                                 <input id="target-input-note" type="text" maxlength="90" placeholder="Contoh: Semangat nak! Kalau selesai nanti kita makan es krim!" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
                             </div>
@@ -1158,6 +1178,23 @@
         <!-- =====================================================================
              MODAL 2: HASIL UJIAN 10 SOAL (CELEBRATION MODAL)
              ===================================================================== -->
+        <!-- MODAL KONFIRMASI BAWAAN APLIKASI (pengganti confirm() browser yang sering diblokir) -->
+        <div id="app-confirm-modal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
+            <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-5 border-2 border-rose-400 shadow-2xl space-y-3 animate-pop">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 id="app-confirm-title" class="font-game font-bold text-base">Konfirmasi</h3>
+                </div>
+                <p id="app-confirm-msg" class="text-xs font-semibold text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed"></p>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="app-confirm-cancel" onclick="resolveAppConfirm(false)" class="py-3 rounded-2xl font-game font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Batal</button>
+                    <button id="app-confirm-ok" onclick="resolveAppConfirm(true)" class="py-3 rounded-2xl font-game font-bold text-xs text-white btn-3d-rose">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+
         <div id="result-modal" class="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
             <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-6 text-center border-2 border-indigo-500 shadow-2xl space-y-4 animate-pop">
                 <div id="result-emoji" class="text-6xl animate-float">🏆</div>
@@ -1201,7 +1238,7 @@
         <div id="review-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex-col max-w-md mx-auto">
             <div class="bg-white dark:bg-slate-900 px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                    <span class="text-[10px] font-extrabold uppercase text-indigo-600 dark:text-indigo-400">Lembar Inspeksi 10 Soal</span>
+                    <span class="text-[10px] font-extrabold uppercase text-indigo-600 dark:text-indigo-400">Lembar Inspeksi Jawaban</span>
                     <h3 id="review-modal-title" class="font-game font-bold text-base">Detail Jawaban Kuis</h3>
                 </div>
                 <button onclick="closeReviewModal()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -2358,21 +2395,44 @@
         /* =========================================================================
            4. BUILDER KUIS 10 SOAL (KOMBINASI GENERATOR DINAMIS + BANK SOAL ACAK)
            ========================================================================= */
-        function buildTenQuestionQuiz(grade, subjectName, recentHashes = []) {
-            const dynamicList = generateDynamicQuestions(grade, subjectName, 6);
+        const MIN_QUIZ_QUESTIONS = 5;
+        const MAX_QUIZ_QUESTIONS = 50;
+
+        function clampQuestionCount(n) {
+            n = parseInt(n, 10);
+            if (!isFinite(n)) return 10;
+            return Math.min(MAX_QUIZ_QUESTIONS, Math.max(MIN_QUIZ_QUESTIONS, n));
+        }
+
+        // Jumlah soal untuk 1 kuis: mengikuti Target Orang Tua bila mapelnya sesuai (atau target "Semua Mapel"), selain itu 10
+        function getQuestionCountFor(child, subjectName) {
+            const dt = child && child.dailyTarget;
+            if (dt && dt.questionCount && (dt.subject === 'ALL' || dt.subject === subjectName)) {
+                return clampQuestionCount(dt.questionCount);
+            }
+            return 10;
+        }
+
+        // Perkiraan jumlah soal UNIK yang tersedia di bank soal untuk kelas & mapel tertentu
+        function getQuestionCapacity(grade, subjectName) {
+            const st = (STATIC_QUESTION_POOL[grade] && STATIC_QUESTION_POOL[grade][subjectName]) || [];
+            const seen = new Set(st.map((x) => x.q));
+            generateDynamicQuestions(grade, subjectName, 60).forEach((x) => seen.add(x.q));
+            return seen.size;
+        }
+
+        function buildTenQuestionQuiz(grade, subjectName, recentHashes = [], total = 10) {
+            total = clampQuestionCount(total);
+            const dynamicList = generateDynamicQuestions(grade, subjectName, Math.max(6, Math.round(total * 0.6)));
             const staticRaw = (STATIC_QUESTION_POOL[grade] && STATIC_QUESTION_POOL[grade][subjectName]) || [];
 
+            const reshuffleQ = (item) => {
+                const sh = shuffleOptionsObject(item.options, item.options[item.answer]);
+                return { q: item.q, options: sh.options, answer: sh.answer, explanation: item.explanation };
+            };
+
             // Shuffle opsi pada setiap soal statis agar letak kunci jawaban A/B/C/D selalu berubah
-            const staticProcessed = staticRaw.map((item) => {
-                const correctText = item.options[item.answer];
-                const shuffled = shuffleOptionsObject(item.options, correctText);
-                return {
-                    q: item.q,
-                    options: shuffled.options,
-                    answer: shuffled.answer,
-                    explanation: item.explanation
-                };
-            });
+            const staticProcessed = staticRaw.map(reshuffleQ);
 
             // Prioritaskan soal statis yang belum pernah keluar baru-baru ini
             const unseenStatic = staticProcessed.filter(q => !recentHashes.includes(q.q.slice(0, 30)));
@@ -2387,31 +2447,64 @@
                 return copy;
             };
 
-            let combined = [...shuffleArray(dynamicList), ...shuffleArray(unseenStatic), ...shuffleArray(seenStatic)];
+            // Gabungkan tanpa soal ganda
+            const seenQ = new Set();
+            const combined = [];
+            [...shuffleArray(dynamicList), ...shuffleArray(unseenStatic), ...shuffleArray(seenStatic)].forEach((c) => {
+                if (!seenQ.has(c.q)) { seenQ.add(c.q); combined.push(c); }
+            });
 
-            // Jika masih kurang dari 10, tambahkan soal dinamis ekstra
-            // Jika kurang dari 10, tambah dari mapel YANG SAMA (bukan mapel lain) tanpa soal ganda
-            const seenQ = new Set(combined.map((x) => x.q));
+            // Jika kurang dari target, tambah soal dinamis/statis dari mapel YANG SAMA tanpa soal ganda
             let guard = 0;
-            while (combined.length < 10 && guard < 40) {
+            const maxGuard = Math.max(40, total * 4);
+            while (combined.length < total && guard < maxGuard) {
                 guard++;
-                const reshuffledStatic = staticRaw.map((item) => {
-                    const sh = shuffleOptionsObject(item.options, item.options[item.answer]);
-                    return { q: item.q, options: sh.options, answer: sh.answer, explanation: item.explanation };
-                });
-                const candidates = shuffleArray([...generateDynamicQuestions(grade, subjectName, 2), ...reshuffledStatic]);
+                const candidates = shuffleArray([
+                    ...generateDynamicQuestions(grade, subjectName, 2),
+                    ...staticRaw.map(reshuffleQ)
+                ]);
                 for (const c of candidates) {
-                    if (combined.length >= 10) break;
+                    if (combined.length >= total) break;
                     if (!seenQ.has(c.q)) { seenQ.add(c.q); combined.push(c); }
                 }
             }
-            // Pengaman terakhir: ulangi soal yang ada (hanya bila bank soal sangat sedikit)
-            const baseLen = combined.length;
-            let k = 0;
-            while (baseLen > 0 && combined.length < 10) combined.push(combined[k++ % baseLen]);
 
-            // Ambil tepat 10 soal dan acak urutannya
-            return shuffleArray(combined.slice(0, 10));
+            if (combined.length >= total) {
+                return shuffleArray(combined.slice(0, total));
+            }
+
+            // Bank soal mapel ini lebih kecil dari target: semua soal unik dipakai dulu,
+            // lalu sisanya diulang per putaran dengan urutan soal & pilihan jawaban diacak ulang
+            const base = shuffleArray(combined);
+            const result = [...base];
+            while (base.length > 0 && result.length < total) {
+                shuffleArray(base).forEach((item) => {
+                    if (result.length < total) result.push(reshuffleQ(item));
+                });
+            }
+            return result;
+        }
+
+        // Petunjuk di form target orang tua: apakah bank soal cukup untuk jumlah soal yang dipilih
+        function updateTargetQuestionHint() {
+            const el = document.getElementById('target-questions-hint');
+            if (!el) return;
+            const child = getActiveChild();
+            const qSel = document.getElementById('target-input-questions');
+            const sSel = document.getElementById('target-input-subject');
+            if (!child || !qSel || !sSel) { el.textContent = ''; return; }
+            const n = parseInt(qSel.value, 10) || 10;
+            const subjects = sSel.value === 'ALL' ? SUBJECT_META.map((m) => m.subject) : [sSel.value];
+            const short = subjects
+                .map((sub) => ({ sub, cap: getQuestionCapacity(child.grade, sub) }))
+                .filter((x) => x.cap < n);
+            if (short.length === 0) {
+                el.className = 'text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1.5 leading-snug';
+                el.textContent = `✅ Bank soal cukup: ${child.name} mengerjakan ${n} soal berbeda di setiap kuis.`;
+            } else {
+                el.className = 'text-[11px] font-semibold text-amber-600 dark:text-amber-400 mt-1.5 leading-snug';
+                el.textContent = `⚠️ Bank soal ${short.map((x) => `${x.sub} (±${x.cap} soal)`).join(', ')} untuk ${formatGradeLabel(child.grade)} lebih sedikit dari ${n}. Soal akan diulang di akhir dengan urutan jawaban diacak.`;
+            }
         }
 
         /* =========================================================================
@@ -2492,6 +2585,7 @@
                     date: todayStr,
                     subject: 'Matematika',
                     targetCount: 1,
+                    questionCount: 10,
                     minScore: 80,
                     rewardCoins: 200,
                     note: `Semangat kerjakan 1 kuis Matematika nilai minimal 80 ya ${name}!`,
@@ -2562,6 +2656,7 @@
             if (!fam.parentRelation) fam.parentRelation = 'Orang Tua';
             fam.children.forEach(c => {
                 if (!Array.isArray(c.redeemedVouchers)) c.redeemedVouchers = [];
+                if (c.dailyTarget && !c.dailyTarget.questionCount) c.dailyTarget.questionCount = 10;
             });
             if (fam.children.length > 0 && !fam.selectedChildUsername) {
                 fam.selectedChildUsername = fam.children[0].username;
@@ -2967,13 +3062,13 @@
             showToast(`✅ Akun ${name} ditambahkan. Beri tahu username & passwordnya!`);
         }
 
-        function removeCoParent(username) {
+        async function removeCoParent(username) {
             const fam = getActiveFamily();
             const me = getCurrentParentAccount();
             if (!fam || !me || !me.isPrimary) return;
             const co = (fam.coParents || []).find((c) => c.username === username);
             if (!co) return;
-            if (!confirm(`Hapus akses ${co.name} (@${co.username}) dari keluarga ini?`)) return;
+            if (!(await appConfirm(`Hapus akses ${co.name} (@${co.username}) dari keluarga ini?`, { title: 'Hapus Akses', okText: 'Ya, Hapus' }))) return;
             fam.coParents = fam.coParents.filter((c) => c.username !== username);
             logActivity(fam, `menghapus akses ${co.name}`);
             saveDatabase(fam.parentUsername);
@@ -3518,20 +3613,99 @@
             }
         }
 
-        // Reset koin / XP anak (hanya tersedia di Dashboard Orang Tua)
-        function resetChildStats(mode) {
+        // Dialog konfirmasi bawaan aplikasi (confirm() browser sering diblokir di aplikasi yang berjalan dalam iframe/PWA)
+        let appConfirmResolver = null;
+
+        function appConfirm(message, opts = {}) {
+            const o = Object.assign({ title: 'Konfirmasi', okText: 'Ya, Lanjutkan', cancelText: 'Batal', danger: true }, opts);
+            return new Promise((resolve) => {
+                if (appConfirmResolver) appConfirmResolver(false);
+                appConfirmResolver = resolve;
+                document.getElementById('app-confirm-title').textContent = o.title;
+                document.getElementById('app-confirm-msg').textContent = message;
+                const okBtn = document.getElementById('app-confirm-ok');
+                okBtn.textContent = o.okText;
+                okBtn.className = `py-3 rounded-2xl font-game font-bold text-xs text-white ${o.danger ? 'btn-3d-rose' : 'btn-3d-purple'}`;
+                document.getElementById('app-confirm-cancel').textContent = o.cancelText;
+                const modal = document.getElementById('app-confirm-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+        }
+
+        function resolveAppConfirm(value) {
+            const modal = document.getElementById('app-confirm-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            const r = appConfirmResolver;
+            appConfirmResolver = null;
+            if (r) r(!!value);
+        }
+
+        // Reset data game anak (hanya tersedia di Dashboard Orang Tua)
+        // mode: 'coins' | 'xp' | 'both' (koin & XP) | 'all' (keseluruhan, termasuk riwayat hasil)
+        async function resetChildStats(mode) {
+            const fam0 = getActiveFamily();
+            const child0 = getActiveChild();
+            if (!fam0 || !child0) {
+                playSound('wrong');
+                showToast('⚠️ Belum ada akun anak yang dipilih.');
+                return;
+            }
+            const childUsername = child0.username;
+            const labels = { coins: 'KOIN', xp: 'XP (level)', both: 'KOIN dan XP', all: 'KESELURUHAN DATA' };
+            const label = labels[mode] || labels.both;
+
+            const message = mode === 'all'
+                ? `Reset KESELURUHAN data ${child0.name}?\n\nYang akan dikosongkan:\n• XP & Koin menjadi 0\n• Riwayat hasil kuis & koreksi jawaban\n• Progres target harian, badge, streak & combo\n• Barang toko, avatar, & voucher kembali ke awal\n\nAkun, kelas, dan setelan target tetap ada. Tindakan ini tidak bisa dibatalkan.`
+                : `Reset ${label} milik ${child0.name} menjadi 0? Tindakan ini tidak bisa dibatalkan.`;
+
+            const ok = await appConfirm(message, {
+                title: mode === 'all' ? 'Reset Keseluruhan Data Anak' : `Reset ${label}`,
+                okText: mode === 'all' ? 'Ya, Reset Semuanya' : 'Ya, Reset',
+                danger: true
+            });
+            if (!ok) return;
+
+            // Ambil ulang data terbaru (bisa berubah dari HP lain saat dialog terbuka)
             const fam = getActiveFamily();
-            const child = getActiveChild();
-            if (!fam || !child) return;
-            const label = mode === 'coins' ? 'KOIN' : mode === 'xp' ? 'XP (level)' : 'KOIN dan XP';
-            if (!confirm(`Reset ${label} milik ${child.name} menjadi 0? Tindakan ini tidak bisa dibatalkan.`)) return;
-            if (mode === 'coins' || mode === 'both') child.coins = 0;
-            if (mode === 'xp' || mode === 'both') child.xp = 0;
-            logActivity(fam, `mereset ${label} milik ${child.name} menjadi 0`);
-            saveDatabase(fam.parentUsername);
+            if (!fam) return;
+            const child = (fam.children || []).find((c) => c.username === childUsername);
+            if (!child) return;
+
+            if (mode === 'coins' || mode === 'both' || mode === 'all') child.coins = 0;
+            if (mode === 'xp' || mode === 'both' || mode === 'all') child.xp = 0;
+
+            if (mode === 'all') {
+                child.streak = 1;
+                child.lastPlayedDate = new Date().toDateString();
+                child.lastSpinDate = '';
+                child.quizzesCompleted = 0;
+                child.perfectScores = 0;
+                child.targetsCompleted = 0;
+                child.maxCombo = 0;
+                child.unlockedBadges = [];
+                child.recentQuestionHashes = [];
+                child.redeemedVouchers = [];
+                child.quizHistory = [];
+                child.ownedItems = ['av_fox', 'hat_none', 'pet_none', 'title_1'];
+                child.equipped = { avatar: '🦊', hat: '', pet: '', title: 'Siswa Pemula' };
+                if (child.dailyTarget) {
+                    child.dailyTarget.completedCount = 0;
+                    child.dailyTarget.claimed = false;
+                }
+                lastCompletedQuizRecord = null;
+                const reviewModal = document.getElementById('review-modal');
+                if (reviewModal) { reviewModal.classList.add('hidden'); reviewModal.classList.remove('flex'); }
+            }
+
+            logActivity(fam, `mereset ${label} milik ${child.name}${mode === 'all' ? ' (termasuk riwayat hasil)' : ' menjadi 0'}`);
+            await saveDatabase(fam.parentUsername);
             playSound('click');
             renderParentDashboard();
-            showToast(`♻️ ${label} ${child.name} berhasil direset menjadi 0.`);
+            showToast(mode === 'all'
+                ? `♻️ Seluruh data ${child.name} berhasil direset, riwayat hasil kini kosong.`
+                : `♻️ ${label} ${child.name} berhasil direset menjadi 0.`);
         }
 
         function rejectChildVoucher(voucherId, childUsername) {
@@ -3597,15 +3771,17 @@
 
             const subj = document.getElementById('target-input-subject').value;
             const count = parseInt(document.getElementById('target-input-count').value, 10) || 1;
+            const questionCount = clampQuestionCount(document.getElementById('target-input-questions').value);
             const minScore = parseInt(document.getElementById('target-input-minscore').value, 10) || 70;
             const rewardCoins = parseInt(document.getElementById('target-input-coins').value, 10) || 200;
             const note = document.getElementById('target-input-note').value.trim() || 'Semangat kerjakan kuis hari ini ya nak!';
 
-            logActivity(fam, `memasang target harian untuk ${child.name}: ${count} kuis ${subj === 'ALL' ? 'semua mapel' : subj} (min. ${minScore}%)`);
+            logActivity(fam, `memasang target harian untuk ${child.name}: ${count} kuis × ${questionCount} soal ${subj === 'ALL' ? 'semua mapel' : subj} (min. ${minScore}%)`);
             child.dailyTarget = {
                 date: new Date().toDateString(),
                 subject: subj,
                 targetCount: count,
+                questionCount: questionCount,
                 minScore: minScore,
                 rewardCoins: rewardCoins,
                 note: note,
@@ -3682,6 +3858,8 @@
             if (child.dailyTarget) {
                 document.getElementById('target-input-subject').value = child.dailyTarget.subject;
                 document.getElementById('target-input-count').value = String(child.dailyTarget.targetCount);
+                document.getElementById('target-input-questions').value = String(clampQuestionCount(child.dailyTarget.questionCount || 10));
+                updateTargetQuestionHint();
                 document.getElementById('target-input-minscore').value = String(child.dailyTarget.minScore);
                 document.getElementById('target-input-coins').value = String(child.dailyTarget.rewardCoins);
                 document.getElementById('target-input-note').value = child.dailyTarget.note;
@@ -3706,10 +3884,10 @@
             // Target Status on Parent Dashboard
             const dt = child.dailyTarget;
             const subjName = dt.subject === 'ALL' ? 'Semua Mata Pelajaran' : dt.subject;
-            document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis ${subjName} (Min. Skor ${dt.minScore}%)`;
+            document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjName} (Min. Skor ${dt.minScore}%)`;
             const pctTarget = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
             document.getElementById('p-target-bar').style.width = `${pctTarget}%`;
-            document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${dt.completedCount} / ${dt.targetCount} Kuis`;
+            document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${dt.completedCount} / ${dt.targetCount} Kuis (${clampQuestionCount(dt.questionCount || 10)} soal/kuis)`;
 
             const badgeEl = document.getElementById('p-target-status-badge');
             if (dt.completedCount >= dt.targetCount) {
@@ -3949,7 +4127,7 @@
             if (refreshTargetForNewDay(child)) saveDatabase();
             const dt = child.dailyTarget;
             const subjLabel = dt.subject === 'ALL' ? 'Mata Pelajaran Bebas' : dt.subject;
-            document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis ${subjLabel} (Skor Min. ${dt.minScore}%)`;
+            document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjLabel} (Skor Min. ${dt.minScore}%)`;
             document.getElementById('child-mission-note').textContent = `"${dt.note}"`;
             document.getElementById('child-mission-setby').textContent = dt.setBy ? `— ${dt.setBy}` : '';
             document.getElementById('child-mission-reward').textContent = `+${dt.rewardCoins} Koin`;
@@ -4024,7 +4202,7 @@
                             </div>
                             <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${meta.topics[child.grade]}</p>
                             <div class="flex items-center gap-3 mt-1.5 text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">
-                                <span><i class="fa-solid fa-layer-group mr-1"></i>10 Soal Variatif</span>
+                                <span><i class="fa-solid fa-layer-group mr-1"></i>${getQuestionCountFor(child, meta.subject)} Soal Variatif</span>
                                 <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>+100 Koin</span>
                             </div>
                         </div>
@@ -4091,7 +4269,12 @@
             if (!child) return;
             playSound('click');
 
-            const tenQuestions = buildTenQuestionQuiz(child.grade, subjectName, child.recentQuestionHashes || []);
+            const questionTotal = getQuestionCountFor(child, subjectName);
+            const tenQuestions = buildTenQuestionQuiz(child.grade, subjectName, child.recentQuestionHashes || [], questionTotal);
+            if (!tenQuestions.length) {
+                showToast('⚠️ Bank soal untuk mata pelajaran ini belum tersedia.');
+                return;
+            }
 
             activeQuiz = {
                 subjectName: subjectName,
@@ -4179,7 +4362,7 @@
         function renderCurrentQuestion() {
             activeQuiz.answered = false;
             const qObj = activeQuiz.questions[activeQuiz.currentIndex];
-            const total = 10; // Wajib 10 soal
+            const total = activeQuiz.questions.length; // mengikuti target orang tua (default 10)
             const num = activeQuiz.currentIndex + 1;
 
             document.getElementById('quiz-subject-title').textContent = `${activeQuiz.subjectName} • ${formatGradeLabel(activeQuiz.grade)}`;
@@ -4313,10 +4496,11 @@
 
             const nextBtn = document.getElementById('btn-next-question');
             nextBtn.classList.remove('hidden');
-            if (activeQuiz.currentIndex === 9) {
-                nextBtn.innerHTML = `Selesaikan 10 Soal & Lihat Nilai <i class="fa-solid fa-flag-checkered ml-1"></i>`;
+            const totalQ = activeQuiz.questions.length;
+            if (activeQuiz.currentIndex === totalQ - 1) {
+                nextBtn.innerHTML = `Selesaikan ${totalQ} Soal & Lihat Nilai <i class="fa-solid fa-flag-checkered ml-1"></i>`;
             } else {
-                nextBtn.innerHTML = `Lanjut Soal ${activeQuiz.currentIndex + 2}/10 <i class="fa-solid fa-arrow-right ml-1"></i>`;
+                nextBtn.innerHTML = `Lanjut Soal ${activeQuiz.currentIndex + 2}/${totalQ} <i class="fa-solid fa-arrow-right ml-1"></i>`;
             }
         }
 
@@ -4387,23 +4571,25 @@
             playSound('fanfare');
             fireConfetti(75);
 
+            const badgeTag = document.getElementById('result-badge-tag');
+            if (badgeTag) badgeTag.textContent = `${total} Soal Selesai!`;
             document.getElementById('result-score').textContent = `${scorePct}%`;
             document.getElementById('result-xp').textContent = `+${activeQuiz.earnedXp}`;
             document.getElementById('result-coins').textContent = activeQuiz.earnedCoins >= 0 ? `+${activeQuiz.earnedCoins}` : `${activeQuiz.earnedCoins}`;
 
             if (scorePct === 100) {
                 document.getElementById('result-emoji').textContent = '👑';
-                document.getElementById('result-title').textContent = 'Sempurna! 10/10 Benar!';
+                document.getElementById('result-title').textContent = `Sempurna! ${total}/${total} Benar!`;
                 document.getElementById('result-subtitle').textContent = 'Luar biasa! Ayah & Bunda pasti sangat bangga melihat hasil ini!';
             } else if (scorePct >= 70) {
                 document.getElementById('result-emoji').textContent = '🎉';
-                document.getElementById('result-title').textContent = `Hebat! Benar ${activeQuiz.correctCount} dari 10 Soal`;
+                document.getElementById('result-title').textContent = `Hebat! Benar ${activeQuiz.correctCount} dari ${total} Soal`;
                 document.getElementById('result-subtitle').textContent = targetProgressAdded
                     ? '🎯 Target Harian Orang Tua bertambah! Jangan lupa buka Peti Hadiahmu!'
                     : 'Hasil ujianmu sudah tercatat di Rapor Orang Tua!';
             } else {
                 document.getElementById('result-emoji').textContent = '💪';
-                document.getElementById('result-title').textContent = `Tetap Semangat! (${activeQuiz.correctCount}/10)`;
+                document.getElementById('result-title').textContent = `Tetap Semangat! (${activeQuiz.correctCount}/${total})`;
                 document.getElementById('result-subtitle').textContent = 'Klik "Lihat Koreksi" untuk mempelajari pembahasan soalnya ya!';
             }
 
@@ -4970,6 +5156,9 @@
             removeCoParent,
             changeMyParentPassword,
             rejectChildVoucher,
+            resetChildStats,
+            resolveAppConfirm,
+            updateTargetQuestionHint,
             handleParentAuth,
             handleChildLogin,
             quickDemoLogin,
