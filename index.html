@@ -1132,7 +1132,7 @@
                             Topik Soal
                         </span>
                         <span class="text-xs font-extrabold text-amber-500 flex items-center gap-1">
-                            <i class="fa-solid fa-bolt"></i> +15 XP & +5 Koin | Salah -10 Koin
+                            <i class="fa-solid fa-bolt"></i> +15 XP per jawaban benar
                         </span>
                     </div>
                     <p id="quiz-question-text" class="whitespace-pre-line font-bold text-base leading-relaxed text-slate-800 dark:text-slate-100">
@@ -5686,7 +5686,7 @@ T([9], S_BE, CLOZE, [
                             <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${meta.topics[child.grade]}</p>
                             <div class="flex items-center gap-3 mt-1.5 text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">
                                 <span><i class="fa-solid fa-layer-group mr-1"></i>${getQuestionCountFor(child, meta.subject)} Soal ${isTargetQuestionCount(child, meta.subject) ? '🎯 Target Ortu' : 'Variatif'}</span>
-                                <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>+100 Koin</span>
+                                <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${(child.dailyTarget && (child.dailyTarget.subject === 'ALL' || child.dailyTarget.subject === meta.subject)) ? `+100 Koin (min ${child.dailyTarget.minScore}%)` : '100% = +50 Koin'}</span>
                             </div>
                         </div>
                     </div>
@@ -5948,19 +5948,16 @@ T([9], S_BE, CLOZE, [
 
                 const multiplier = activeQuiz.currentCombo >= 3 ? 2 : 1;
                 const xpGain = 15 * multiplier;
-                const coinGain = 5 * multiplier;
                 activeQuiz.earnedXp += xpGain;
-                activeQuiz.earnedCoins += coinGain;
 
                 expBox.className = 'rounded-3xl p-4 border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-100 animate-pop';
                 expIcon.className = 'w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-xl shrink-0';
                 expIcon.textContent = '🎉';
-                expTitle.textContent = multiplier > 1 ? `Benar! Combo ${activeQuiz.currentCombo}x (+${xpGain} XP, +${coinGain} Koin)` : `Mantap! Jawaban Benar (+${xpGain} XP, +${coinGain} Koin)`;
+                expTitle.textContent = multiplier > 1 ? `Benar! Combo ${activeQuiz.currentCombo}x (+${xpGain} XP)` : `Mantap! Jawaban Benar (+${xpGain} XP)`;
                 expText.textContent = qObj.explanation;
             } else {
                 playSound('wrong');
                 activeQuiz.currentCombo = 0;
-                activeQuiz.earnedCoins -= 10; // Jawaban salah: koin dikurangi 10
                 quizCard.classList.remove('animate-shake');
                 void quizCard.offsetWidth;
                 quizCard.classList.add('animate-shake');
@@ -5968,7 +5965,7 @@ T([9], S_BE, CLOZE, [
                 expBox.className = 'rounded-3xl p-4 border-2 border-rose-400 bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-100';
                 expIcon.className = 'w-10 h-10 rounded-2xl bg-rose-500 text-white flex items-center justify-center text-xl shrink-0';
                 expIcon.textContent = '💡';
-                expTitle.textContent = 'Kurang Tepat (-10 Koin), Yuk Simak Pembahasannya!';
+                expTitle.textContent = 'Kurang Tepat, Yuk Simak Pembahasannya!';
                 expText.textContent = qObj.explanation;
             }
 
@@ -6011,7 +6008,24 @@ T([9], S_BE, CLOZE, [
             const scorePct = Math.round((activeQuiz.correctCount / total) * 100);
 
             child.xp += activeQuiz.earnedXp;
-            child.coins = Math.max(0, child.coins + activeQuiz.earnedCoins); // koin tidak bisa negatif
+            // Koin dihitung di akhir kuis berdasarkan target orang tua
+            const dtc = child.dailyTarget;
+            const isTargetSubj = !!(dtc && (dtc.subject === 'ALL' || dtc.subject === activeQuiz.subjectName));
+            let coinDelta = 0, coinNote = '';
+            if (isTargetSubj) {
+                if (scorePct >= dtc.minScore) {
+                    coinDelta = 100 + (scorePct === 100 ? 10 : 0);
+                    coinNote = scorePct === 100 ? '🎯 Target tercapai + bonus 100%! ' : '🎯 Target tercapai! ';
+                } else {
+                    coinDelta = -10;
+                    coinNote = `Skor di bawah target ${dtc.minScore}% (-10 koin). `;
+                }
+            } else if (scorePct === 100) {
+                coinDelta = 50;
+                coinNote = '💯 Sempurna di mapel non-target! +50 koin. ';
+            }
+            activeQuiz.earnedCoins = coinDelta;
+            child.coins = Math.max(0, child.coins + coinDelta); // koin tidak bisa negatif
             child.quizzesCompleted += 1;
             if (scorePct === 100) child.perfectScores += 1;
 
@@ -6044,7 +6058,7 @@ T([9], S_BE, CLOZE, [
             };
 
             lastCompletedQuizRecord = record;
-            logActivity(getActiveFamily(), `selesai kuis ${activeQuiz.subjectName} (${formatGradeLabel(activeQuiz.grade)}) dengan skor ${scorePct}%`, child.name, 'child');
+            logActivity(getActiveFamily(), `selesai kuis ${activeQuiz.subjectName} (${formatGradeLabel(activeQuiz.grade)}) dengan skor ${scorePct}% (${coinDelta>=0?'+':''}${coinDelta} koin)`, child.name, 'child');
             child.quizHistory = child.quizHistory || [];
             child.quizHistory.unshift(record);
             if (child.quizHistory.length > 25) child.quizHistory.pop();
@@ -6066,17 +6080,17 @@ T([9], S_BE, CLOZE, [
             if (scorePct === 100) {
                 document.getElementById('result-emoji').textContent = '👑';
                 document.getElementById('result-title').textContent = `Sempurna! ${total}/${total} Benar!`;
-                document.getElementById('result-subtitle').textContent = 'Luar biasa! Ayah & Bunda pasti sangat bangga melihat hasil ini!';
+                document.getElementById('result-subtitle').textContent = coinNote + 'Luar biasa! Ayah & Bunda pasti sangat bangga melihat hasil ini!';
             } else if (scorePct >= 70) {
                 document.getElementById('result-emoji').textContent = '🎉';
                 document.getElementById('result-title').textContent = `Hebat! Benar ${activeQuiz.correctCount} dari ${total} Soal`;
-                document.getElementById('result-subtitle').textContent = targetProgressAdded
+                document.getElementById('result-subtitle').textContent = coinNote + (targetProgressAdded
                     ? '🎯 Target Harian Orang Tua bertambah! Jangan lupa buka Peti Hadiahmu!'
-                    : 'Hasil ujianmu sudah tercatat di Rapor Orang Tua!';
+                    : 'Hasil ujianmu sudah tercatat di Rapor Orang Tua!');
             } else {
                 document.getElementById('result-emoji').textContent = '💪';
                 document.getElementById('result-title').textContent = `Tetap Semangat! (${activeQuiz.correctCount}/${total})`;
-                document.getElementById('result-subtitle').textContent = 'Klik "Lihat Koreksi" untuk mempelajari pembahasan soalnya ya!';
+                document.getElementById('result-subtitle').textContent = coinNote + 'Klik "Lihat Koreksi" untuk mempelajari pembahasan soalnya ya!';
             }
 
             document.getElementById('result-modal').classList.remove('hidden');
