@@ -509,16 +509,17 @@
                         <div class="space-y-3">
                             <div>
                                 <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
-                                    1. Pilih Mata Pelajaran Wajib Hari Ini
+                                    1. Pilih Mata Pelajaran Wajib Hari Ini (bisa lebih dari 1)
                                 </label>
-                                <select id="target-input-subject" onchange="updateTargetQuestionHint()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
-                                    <option value="ALL">🌟 Bebas / Semua Mata Pelajaran</option>
-                                    <option value="Matematika">📐 Matematika</option>
-                                    <option value="IPA Terpadu">🔬 IPA Terpadu (Fisika & Biologi)</option>
-                                    <option value="IPS Terpadu">🌏 IPS Terpadu (Geografi, Sejarah, Ekonomi)</option>
-                                    <option value="Bahasa Indonesia">📖 Bahasa Indonesia</option>
-                                    <option value="Bahasa Inggris">🇬🇧 Bahasa Inggris</option>
-                                </select>
+                                <div id="target-input-subject-group" class="space-y-1.5">
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" id="target-subj-all" value="ALL" checked onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 🌟 Bebas / Semua Mata Pelajaran</label>
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" class="target-subj-cb" value="Matematika" onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 📐 Matematika</label>
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" class="target-subj-cb" value="IPA Terpadu" onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 🔬 IPA Terpadu (Fisika & Biologi)</label>
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" class="target-subj-cb" value="IPS Terpadu" onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 🌏 IPS Terpadu (Geografi, Sejarah, Ekonomi)</label>
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" class="target-subj-cb" value="Bahasa Indonesia" onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 📖 Bahasa Indonesia</label>
+<label class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm cursor-pointer"><input type="checkbox" class="target-subj-cb" value="Bahasa Inggris" onchange="onTargetSubjectChange(this)" class="w-4 h-4 accent-purple-600"> 🇬🇧 Bahasa Inggris</label>
+<p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 leading-snug">Boleh pilih lebih dari 1 mapel. Kuis dari mapel mana pun yang dipilih dihitung untuk target.</p>
+</div>
                             </div>
 
                             <div>
@@ -570,7 +571,7 @@
                                 <label class="block text-xs font-extrabold text-slate-600 dark:text-slate-300 mb-1">
                                     5. Bonus Koin Game dari Orang Tua
                                 </label>
-                                <input id="target-input-coins" type="number" min="0" max="100000" step="10" inputmode="numeric" value="200" list="coin-suggestions" placeholder="Ketik jumlah koin" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
+                                <input id="target-input-coins" type="number" min="0" step="10" inputmode="numeric" value="200" list="coin-suggestions" placeholder="Ketik jumlah koin" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-purple-500">
                                 <datalist id="coin-suggestions"><option value="100"><option value="200"><option value="350"><option value="500"><option value="1000"></datalist>
                                 <p class="text-[10px] font-semibold text-slate-400 mt-1">Ketik sendiri jumlah koinnya, atau pilih saran yang muncul.</p>
                             </div>
@@ -625,7 +626,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-extrabold text-slate-600 dark:text-slate-300 mb-1">Harga Koin 🪙</label>
-                                <input id="custom-reward-cost" type="number" min="1" max="1000000" step="1" inputmode="numeric" value="300" placeholder="Ketik" class="w-full px-2.5 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
+                                <input id="custom-reward-cost" type="number" min="1" step="1" inputmode="numeric" value="300" placeholder="Ketik" class="w-full px-2.5 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-purple-500">
                             </div>
                         </div>
 
@@ -3842,15 +3843,68 @@ T([9], S_BE, CLOZE, [
             return Math.min(MAX_QUIZ_QUESTIONS, Math.max(MIN_QUIZ_QUESTIONS, n));
         }
 
+        // ===== Target multi-mapel: dt.subjects = [] (semua) atau daftar nama mapel =====
+        function getTargetSubjects(dt) {
+            if (!dt) return [];
+            if (Array.isArray(dt.subjects)) return dt.subjects;
+            return (dt.subject && dt.subject !== 'ALL') ? [dt.subject] : [];
+        }
+        function targetCoversSubject(dt, name) {
+            if (!dt) return false;
+            const list = getTargetSubjects(dt);
+            return list.length === 0 || list.includes(name);
+        }
+        function targetSubjectLabel(dt, allLabel) {
+            const list = getTargetSubjects(dt);
+            return list.length === 0 ? allLabel : list.join(', ');
+        }
+        // Progres per mapel: bila target > 1 mapel, tiap mapel punya hitungan sendiri (dt.progress[mapel])
+        function getSubjectProgress(dt, name) {
+            const list = getTargetSubjects(dt);
+            if (list.length > 1) return Math.min((dt.progress && dt.progress[name]) || 0, dt.targetCount);
+            return Math.min(dt.completedCount || 0, dt.targetCount);
+        }
+        function getTargetTotal(dt) {
+            return dt.targetCount * Math.max(1, getTargetSubjects(dt).length);
+        }
+        function getTargetDone(dt) {
+            const list = getTargetSubjects(dt);
+            if (list.length > 1) return list.reduce((a, n) => a + getSubjectProgress(dt, n), 0);
+            return Math.min(dt.completedCount || 0, dt.targetCount);
+        }
+        function isTargetComplete(dt) { return getTargetDone(dt) >= getTargetTotal(dt); }
+        function targetProgressDetail(dt) {
+            const list = getTargetSubjects(dt);
+            if (list.length < 2) return '';
+            return ' — ' + list.map((n) => `${n} ${getSubjectProgress(dt, n)}/${dt.targetCount}`).join(', ');
+        }
+        function onTargetSubjectChange(el) {
+            const all = document.getElementById('target-subj-all');
+            const cbs = Array.from(document.querySelectorAll('.target-subj-cb'));
+            if (el === all && all.checked) cbs.forEach((c) => { c.checked = false; });
+            else if (el !== all && el.checked) all.checked = false;
+            if (!all.checked && !cbs.some((c) => c.checked)) all.checked = true;
+            updateTargetQuestionHint();
+        }
+        function readTargetSubjectsInput() {
+            return Array.from(document.querySelectorAll('.target-subj-cb')).filter((c) => c.checked).map((c) => c.value);
+        }
+        function setTargetSubjectsInput(list) {
+            const all = document.getElementById('target-subj-all');
+            const cbs = Array.from(document.querySelectorAll('.target-subj-cb'));
+            cbs.forEach((c) => { c.checked = list.includes(c.value); });
+            all.checked = list.length === 0;
+        }
+
         // Jumlah soal untuk 1 kuis: mengikuti Target Orang Tua bila mapelnya sesuai (atau target "Semua Mapel"), selain itu 10
         function isTargetQuestionCount(child, subjectName) {
             const dt = child && child.dailyTarget;
-            return !!(dt && dt.questionCount && (dt.subject === 'ALL' || dt.subject === subjectName));
+            return !!(dt && dt.questionCount && targetCoversSubject(dt, subjectName));
         }
 
         function getQuestionCountFor(child, subjectName) {
             const dt = child && child.dailyTarget;
-            if (dt && dt.questionCount && (dt.subject === 'ALL' || dt.subject === subjectName)) {
+            if (dt && dt.questionCount && targetCoversSubject(dt, subjectName)) {
                 return clampQuestionCount(dt.questionCount);
             }
             return 10;
@@ -3936,10 +3990,11 @@ T([9], S_BE, CLOZE, [
             if (!el) return;
             const child = getActiveChild();
             const qSel = document.getElementById('target-input-questions');
-            const sSel = document.getElementById('target-input-subject');
+            const sSel = document.getElementById('target-subj-all');
             if (!child || !qSel || !sSel) { el.textContent = ''; return; }
             const n = parseInt(qSel.value, 10) || 10;
-            const subjects = sSel.value === 'ALL' ? SUBJECT_META.map((m) => m.subject) : [sSel.value];
+            const picked = readTargetSubjectsInput();
+            const subjects = picked.length === 0 ? SUBJECT_META.map((m) => m.subject) : picked;
             const short = subjects
                 .map((sub) => ({ sub, cap: getQuestionCapacity(child.grade, sub) }))
                 .filter((x) => x.cap < n);
@@ -4548,6 +4603,7 @@ T([9], S_BE, CLOZE, [
             if (child.dailyTarget.date !== today) {
                 child.dailyTarget.date = today;
                 child.dailyTarget.completedCount = 0;
+                child.dailyTarget.progress = {};
                 child.dailyTarget.claimed = false;
                 return true;
             }
@@ -4878,6 +4934,7 @@ T([9], S_BE, CLOZE, [
                 if (child.dailyTarget && child.dailyTarget.date !== today) {
                     child.dailyTarget.date = today;
                     child.dailyTarget.completedCount = 0;
+                child.dailyTarget.progress = {};
                     child.dailyTarget.claimed = false;
                 }
                 saveDatabase();
@@ -5006,14 +5063,9 @@ T([9], S_BE, CLOZE, [
             const costInput = document.getElementById('custom-reward-cost');
             const title = titleInput.value.trim();
             const cost = parseInt(String(costInput.value).replace(/[.\s,]/g, ''), 10);
-            if (!Number.isFinite(cost) || cost < 1) {
+            if (!Number.isSafeInteger(cost) || cost < 1) {
                 playSound('wrong');
                 showToast('⚠️ Ketik harga koin dengan angka, minimal 1 koin.');
-                return;
-            }
-            if (cost > 1000000) {
-                playSound('wrong');
-                showToast('⚠️ Harga koin terlalu besar (maksimal 1.000.000).');
                 return;
             }
 
@@ -5174,6 +5226,7 @@ T([9], S_BE, CLOZE, [
                 child.equipped = { avatar: '🦊', hat: '', pet: '', title: 'Siswa Pemula' };
                 if (child.dailyTarget) {
                     child.dailyTarget.completedCount = 0;
+                child.dailyTarget.progress = {};
                     child.dailyTarget.claimed = false;
                 }
                 lastCompletedQuizRecord = null;
@@ -5251,18 +5304,20 @@ T([9], S_BE, CLOZE, [
                 return;
             }
 
-            const subj = document.getElementById('target-input-subject').value;
+            const subjList = readTargetSubjectsInput();
+            const subj = subjList.length === 0 ? 'ALL' : subjList.join(', ');
             const count = parseInt(document.getElementById('target-input-count').value, 10) || 1;
             const questionCount = clampQuestionCount(document.getElementById('target-input-questions').value);
             const minScore = parseInt(document.getElementById('target-input-minscore').value, 10) || 70;
             const coinRaw = parseInt(document.getElementById('target-input-coins').value, 10);
-            const rewardCoins = Number.isFinite(coinRaw) && coinRaw >= 0 ? Math.min(coinRaw, 100000) : 200;
+            const rewardCoins = Number.isSafeInteger(coinRaw) && coinRaw >= 0 ? coinRaw : 200;
             const note = document.getElementById('target-input-note').value.trim() || 'Semangat kerjakan kuis hari ini ya nak!';
 
-            logActivity(fam, `memasang target harian untuk ${child.name}: ${count} kuis × ${questionCount} soal ${subj === 'ALL' ? 'semua mapel' : subj} (min. ${minScore}%)`);
+            logActivity(fam, `memasang target harian untuk ${child.name}: ${count} kuis × ${questionCount} soal ${subjList.length === 0 ? 'semua mapel' : subj} (min. ${minScore}%)`);
             child.dailyTarget = {
                 date: new Date().toDateString(),
                 subject: subj,
+                subjects: subjList,
                 targetCount: count,
                 questionCount: questionCount,
                 minScore: minScore,
@@ -5270,6 +5325,7 @@ T([9], S_BE, CLOZE, [
                 note: note,
                 setBy: currentActorLabel(),
                 completedCount: 0,
+                progress: {},
                 claimed: false
             };
 
@@ -5339,7 +5395,7 @@ T([9], S_BE, CLOZE, [
 
             // Populate Target Form
             if (child.dailyTarget) {
-                document.getElementById('target-input-subject').value = child.dailyTarget.subject;
+                setTargetSubjectsInput(getTargetSubjects(child.dailyTarget));
                 document.getElementById('target-input-count').value = String(child.dailyTarget.targetCount);
                 document.getElementById('target-input-questions').value = String(clampQuestionCount(child.dailyTarget.questionCount || 10));
                 updateTargetQuestionHint();
@@ -5366,14 +5422,14 @@ T([9], S_BE, CLOZE, [
 
             // Target Status on Parent Dashboard
             const dt = child.dailyTarget;
-            const subjName = dt.subject === 'ALL' ? 'Semua Mata Pelajaran' : dt.subject;
-            document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjName} (Min. Skor ${dt.minScore}%)`;
-            const pctTarget = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
+            const subjName = targetSubjectLabel(dt, 'Semua Mata Pelajaran');
+            document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis${getTargetSubjects(dt).length > 1 ? ' per mapel' : ''} × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjName} (Min. Skor ${dt.minScore}%)`;
+            const pctTarget = Math.min(100, Math.round((getTargetDone(dt) / getTargetTotal(dt)) * 100));
             document.getElementById('p-target-bar').style.width = `${pctTarget}%`;
-            document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${dt.completedCount} / ${dt.targetCount} Kuis (${clampQuestionCount(dt.questionCount || 10)} soal/kuis)`;
+            document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${getTargetDone(dt)} / ${getTargetTotal(dt)} Kuis (${clampQuestionCount(dt.questionCount || 10)} soal/kuis)${targetProgressDetail(dt)}`;
 
             const badgeEl = document.getElementById('p-target-status-badge');
-            if (dt.completedCount >= dt.targetCount) {
+            if (isTargetComplete(dt)) {
                 badgeEl.textContent = '✅ Target Tercapai!';
                 badgeEl.className = 'text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-900';
             } else {
@@ -5609,20 +5665,20 @@ T([9], S_BE, CLOZE, [
             // Update Misi dari Orang Tua
             if (refreshTargetForNewDay(child)) saveDatabase();
             const dt = child.dailyTarget;
-            const subjLabel = dt.subject === 'ALL' ? 'Mata Pelajaran Bebas' : dt.subject;
-            document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjLabel} (Skor Min. ${dt.minScore}%)`;
-            document.getElementById('child-mission-note').textContent = `"${dt.note}"`;
+            const subjLabel = targetSubjectLabel(dt, 'Mata Pelajaran Bebas');
+            document.getElementById('child-mission-title').textContent = `Target: ${dt.targetCount} Kuis${getTargetSubjects(dt).length > 1 ? ' per mapel' : ''} × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjLabel} (Skor Min. ${dt.minScore}%)`;
+            document.getElementById('child-mission-note').textContent = `"${dt.note}"` + targetProgressDetail(dt);
             document.getElementById('child-mission-setby').textContent = dt.setBy ? `— ${dt.setBy}` : '';
             document.getElementById('child-mission-reward').textContent = `+${dt.rewardCoins} Koin`;
 
-            const pct = Math.min(100, Math.round((dt.completedCount / dt.targetCount) * 100));
+            const pct = Math.min(100, Math.round((getTargetDone(dt) / getTargetTotal(dt)) * 100));
             document.getElementById('child-mission-bar').style.width = `${pct}%`;
 
             const badge = document.getElementById('child-mission-badge');
             const btnClaim = document.getElementById('btn-claim-mission');
             const btnPlay = document.getElementById('btn-play-mission');
 
-            if (dt.completedCount >= dt.targetCount) {
+            if (isTargetComplete(dt)) {
                 if (dt.claimed) {
                     badge.textContent = '✅ Hadiah Diklaim';
                     badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-900';
@@ -5635,7 +5691,7 @@ T([9], S_BE, CLOZE, [
                     btnPlay.classList.add('hidden');
                 }
             } else {
-                badge.textContent = `${dt.completedCount} / ${dt.targetCount} Selesai`;
+                badge.textContent = `${getTargetDone(dt)} / ${getTargetTotal(dt)} Selesai`;
                 badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900';
                 btnClaim.classList.add('hidden');
                 btnPlay.classList.remove('hidden');
@@ -5662,7 +5718,7 @@ T([9], S_BE, CLOZE, [
             container.innerHTML = '';
 
             SUBJECT_META.forEach((meta) => {
-                const isTargetSubj = dt.subject === meta.subject && dt.completedCount < dt.targetCount;
+                const isTargetSubj = getTargetSubjects(dt).includes(meta.subject) && getSubjectProgress(dt, meta.subject) < dt.targetCount;
                 const subjHistory = (child.quizHistory || []).filter(h => h.subject === meta.subject && h.grade === child.grade);
                 const bestScore = subjHistory.length > 0 ? Math.max(...subjHistory.map(h => h.score)) : null;
 
@@ -5680,13 +5736,13 @@ T([9], S_BE, CLOZE, [
                         <div>
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <h4 class="font-game font-bold text-base text-slate-800 dark:text-white">${meta.subject}</h4>
-                                ${isTargetSubj ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">🎯 Target Ortu</span>` : ''}
+                                ${isTargetSubj ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">🎯 Target Ortu${getTargetSubjects(dt).length > 1 ? ` ${getSubjectProgress(dt, meta.subject)}/${dt.targetCount}` : ''}</span>` : (getTargetSubjects(dt).length > 1 && getTargetSubjects(dt).includes(meta.subject) ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">✅ Target mapel selesai</span>` : '')}
                                 ${bestScore !== null ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">★ Terbaik: ${bestScore}%</span>` : ''}
                             </div>
                             <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${meta.topics[child.grade]}</p>
                             <div class="flex items-center gap-3 mt-1.5 text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">
                                 <span><i class="fa-solid fa-layer-group mr-1"></i>${getQuestionCountFor(child, meta.subject)} Soal ${isTargetQuestionCount(child, meta.subject) ? '🎯 Target Ortu' : 'Variatif'}</span>
-                                <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${(child.dailyTarget && (child.dailyTarget.subject === 'ALL' || child.dailyTarget.subject === meta.subject)) ? `+100 Koin (min ${child.dailyTarget.minScore}%)` : '100% = +50 Koin'}</span>
+                                <span><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${targetCoversSubject(child.dailyTarget, meta.subject) ? `+100 Koin (min ${child.dailyTarget.minScore}%)` : '100% = +50 Koin'}</span>
                             </div>
                         </div>
                     </div>
@@ -5701,18 +5757,18 @@ T([9], S_BE, CLOZE, [
         function playTargetMissionNow() {
             const child = getActiveChild();
             if (!child) return;
-            const targetSubj = child.dailyTarget.subject;
-            if (targetSubj === 'ALL') {
+            const list = getTargetSubjects(child.dailyTarget);
+            if (list.length === 0) {
                 startQuickRandomQuiz();
             } else {
-                startQuiz(targetSubj);
+                startQuiz(list[Math.floor(Math.random() * list.length)]);
             }
         }
 
         function claimParentMissionReward() {
             const child = getActiveChild();
             if (!child || !child.dailyTarget) return;
-            if (child.dailyTarget.completedCount < child.dailyTarget.targetCount || child.dailyTarget.claimed) return;
+            if (!isTargetComplete(child.dailyTarget) || child.dailyTarget.claimed) return;
 
             playSound('fanfare');
             fireConfetti(90);
@@ -6010,7 +6066,7 @@ T([9], S_BE, CLOZE, [
             child.xp += activeQuiz.earnedXp;
             // Koin dihitung di akhir kuis berdasarkan target orang tua
             const dtc = child.dailyTarget;
-            const isTargetSubj = !!(dtc && (dtc.subject === 'ALL' || dtc.subject === activeQuiz.subjectName));
+            const isTargetSubj = !!(dtc && targetCoversSubject(dtc, activeQuiz.subjectName));
             let coinDelta = 0, coinNote = '';
             if (isTargetSubj) {
                 if (scorePct >= dtc.minScore) {
@@ -6033,10 +6089,19 @@ T([9], S_BE, CLOZE, [
             const dt = child.dailyTarget;
             let targetProgressAdded = false;
             if (dt) {
-                const subjMatch = dt.subject === 'ALL' || dt.subject === activeQuiz.subjectName;
+                const subjMatch = targetCoversSubject(dt, activeQuiz.subjectName);
                 if (subjMatch && scorePct >= dt.minScore) {
-                    dt.completedCount += 1;
-                    targetProgressAdded = true;
+                    if (getTargetSubjects(dt).length > 1) {
+                        dt.progress = dt.progress || {};
+                        if (getSubjectProgress(dt, activeQuiz.subjectName) < dt.targetCount) {
+                            dt.progress[activeQuiz.subjectName] = getSubjectProgress(dt, activeQuiz.subjectName) + 1;
+                            dt.completedCount = getTargetDone(dt);
+                            targetProgressAdded = true;
+                        }
+                    } else {
+                        dt.completedCount += 1;
+                        targetProgressAdded = true;
+                    }
                 }
             }
 
