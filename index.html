@@ -137,6 +137,19 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+        /* Kartu orang tua yang bisa diminimalkan */
+        .cc-head { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .cc-chev { transition: transform .2s ease; }
+        .cc-collapsed > :not(:first-child) { display: none !important; }
+        .cc-collapsed .cc-chev { transform: rotate(-90deg); }
+        /* Mode fokus kuis: cegah salin teks & sembunyikan soal saat layar kuis ditinggalkan */
+        #quiz-modal { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        #quiz-modal.quiz-blur > * { filter: blur(18px); pointer-events: none; }
+        #quiz-modal.quiz-blur::after {
+            content: "🔒 Kuis disembunyikan. Kembali ke layar kuis untuk melanjutkan.";
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            padding: 2rem; text-align: center; font-weight: 800; font-size: 0.9rem; color: #4338ca; z-index: 5;
+        }
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -394,6 +407,7 @@
 
                 <!-- TAB ORANG TUA 1: MONITORING & RIWAYAT JAWABAN ANAK -->
                 <div id="pview-monitor" class="space-y-4">
+                    <div id="p-presence-banner" class="space-y-1.5"></div>
                     <div id="p-weekly-report"></div>
                     <!-- Kartu Ringkasan Anak -->
                     <div id="parent-child-summary-card" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
@@ -473,7 +487,7 @@
                     </div>
 
                     <!-- Penguasaan Per Mata Pelajaran -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div data-collapsible="p-mastery" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
                         <h3 class="font-game font-bold text-sm flex items-center gap-2">
                             <i class="fa-solid fa-chart-pie text-indigo-500"></i> Rapor Rata-Rata Nilai per Mata Pelajaran
                         </h3>
@@ -483,16 +497,34 @@
                     </div>
 
                     <!-- Riwayat Kuis & Inspeksi Jawaban Anak (10 Soal) -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div data-collapsible="p-history" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
                         <div class="flex items-center justify-between">
-                            <h3 class="font-game font-bold text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-clipboard-check text-emerald-500"></i> Riwayat Hasil & Koreksi Jawaban Anak
+                            <h3 class="font-game font-bold text-sm flex items-center gap-2 flex-1 min-w-0">
+                                <i class="fa-solid fa-clipboard-check text-emerald-500"></i> Riwayat Hasil & Koreksi
                             </h3>
-                            <span class="text-[10px] font-extrabold text-slate-400">Klik untuk detail</span>
+                            <span id="p-hist-count" class="text-[10px] font-extrabold text-slate-400 shrink-0">Ketuk untuk detail</span>
                         </div>
-                        <div id="p-quiz-history-list" class="space-y-2.5">
-                            <!-- Di-render oleh JS -->
+                        <!-- Ringkasan 3 angka -->
+                        <div id="p-hist-summary" class="grid grid-cols-3 gap-2"></div>
+                        <!-- Rentang tanggal -->
+                        <div id="p-hist-range" class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 pb-0.5"></div>
+                        <div id="p-hist-custom" class="hidden">
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="block">
+                                    <span class="text-[10px] font-extrabold text-slate-400 ml-1">Dari tanggal</span>
+                                    <input type="date" id="p-hist-from" onchange="setPHistDates()" class="w-full mt-0.5 px-2.5 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-400">
+                                </label>
+                                <label class="block">
+                                    <span class="text-[10px] font-extrabold text-slate-400 ml-1">Sampai tanggal</span>
+                                    <input type="date" id="p-hist-to" onchange="setPHistDates()" class="w-full mt-0.5 px-2.5 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-400">
+                                </label>
+                            </div>
                         </div>
+                        <!-- Filter mata pelajaran (geser samping) -->
+                        <div id="p-hist-filter" class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 pb-0.5"></div>
+                        <!-- Daftar ringkas -->
+                        <div id="p-quiz-history-list" class="space-y-1.5"></div>
+                        <button id="p-hist-more" onclick="togglePHistExpanded()" class="hidden w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-300 font-extrabold text-[11px] hover:bg-slate-200 dark:hover:bg-slate-700 transition"></button>
                     </div>
                 </div>
 
@@ -598,12 +630,12 @@
                 <!-- TAB ORANG TUA 3: TOKO HADIAH DUNIA NYATA (VOUCHER KELUARGA) -->
                 <div id="pview-rewards" class="hidden space-y-4">
                     <!-- Klaim Voucher Anak yang Menunggu Persetujuan Ortu -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-amber-300 dark:border-amber-700 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-game font-bold text-sm flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                    <div data-collapsible="p-claims" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-amber-300 dark:border-amber-700 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-game font-bold text-sm flex items-center gap-2 text-amber-700 dark:text-amber-300 flex-1 min-w-0">
                                 <i class="fa-solid fa-ticket"></i> Permintaan Klaim Hadiah dari Anak
                             </h3>
-                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Dunia Nyata</span>
+                            <span id="parent-claims-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 shrink-0">Dunia Nyata</span>
                         </div>
                         <div id="parent-redeemed-vouchers-list" class="space-y-2">
                             <!-- Di-render oleh JS -->
@@ -611,7 +643,7 @@
                     </div>
 
                     <!-- Buat Voucher Hadiah Nyata Baru -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border-2 border-purple-200 dark:border-purple-900 space-y-3.5">
+                    <div data-collapsible="p-create-voucher" data-cc-default="collapsed" class="bg-white dark:bg-slate-800 rounded-3xl p-5 border-2 border-purple-200 dark:border-purple-900 space-y-3.5">
                         <div class="flex items-center gap-3">
                             <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 flex items-center justify-center text-2xl">
                                 🍦
@@ -1387,7 +1419,7 @@
            ========================================================================= */
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Konfigurasi Cloud Firebase Permanen (Terkunci di latar belakang, tidak bisa diutak-atik)
         const CUSTOM_FIREBASE_CONFIG = {
@@ -4340,10 +4372,18 @@ T([9], S_BE, CLOZE, [
                     (snapshot) => {
                         snapshot.forEach((docSnap) => {
                             const data = docSnap.data();
-                            if (data && data.parentUsername) {
+                            if (docSnap.id.endsWith('__presence')) {
+                                presenceCache[docSnap.id.slice(0, -'__presence'.length)] = (data && data.children) || {};
+                            } else if (data && data.parentUsername) {
                                 db.families[data.parentUsername] = normalizeFamilyRecord(data);
                             }
                         });
+                        // Hanya status online yang berubah -> cukup segarkan banner, tanpa render ulang dashboard
+                        const changes = snapshot.docChanges();
+                        if (changes.length > 0 && changes.every((c) => c.doc.id.endsWith('__presence'))) {
+                            renderPresenceUI();
+                            return;
+                        }
                         try {
                             localStorage.setItem(DB_KEY, JSON.stringify(db));
                         } catch (e) {}
@@ -4903,7 +4943,211 @@ T([9], S_BE, CLOZE, [
             routeAppView();
         }
 
+
+
+        /* =========================================================================
+           KARTU ORANG TUA YANG BISA DIMINIMALKAN (status disimpan per perangkat)
+           ========================================================================= */
+        const CC_KEY = 'eduquest_card_collapse_v1';
+        let ccState = {};
+        try { ccState = JSON.parse(localStorage.getItem(CC_KEY) || '{}') || {}; } catch (e) { ccState = {}; }
+
+        function ccIsCollapsed(card) {
+            const id = card.dataset.collapsible;
+            return Object.prototype.hasOwnProperty.call(ccState, id) ? !!ccState[id] : card.dataset.ccDefault === 'collapsed';
+        }
+        function ccToggle(card) {
+            const collapsed = !ccIsCollapsed(card);
+            ccState[card.dataset.collapsible] = collapsed;
+            try { localStorage.setItem(CC_KEY, JSON.stringify(ccState)); } catch (e) {}
+            card.classList.toggle('cc-collapsed', collapsed);
+            if (card.firstElementChild) card.firstElementChild.setAttribute('aria-expanded', String(!collapsed));
+            playSound('click');
+        }
+        function enhanceCollapsibleCards() {
+            document.querySelectorAll('#parent-screen [data-collapsible]').forEach((card) => {
+                const head = card.firstElementChild;
+                if (!head) return;
+                if (!card.dataset.ccReady) {
+                    card.dataset.ccReady = '1';
+                    head.classList.add('cc-head');
+                    head.setAttribute('role', 'button');
+                    head.setAttribute('tabindex', '0');
+                    const chev = document.createElement('span');
+                    chev.className = 'cc-chev ml-auto shrink-0 w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center text-[11px]';
+                    chev.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+                    head.appendChild(chev);
+                    head.addEventListener('click', (e) => {
+                        // tombol/isian di dalam header (mis. "Salin") tetap berfungsi normal
+                        if (e.target.closest('button, a, input, select, textarea, label') && !e.target.closest('.cc-chev')) return;
+                        ccToggle(card);
+                    });
+                    head.addEventListener('keydown', (e) => {
+                        if ((e.key === 'Enter' || e.key === ' ') && e.target === head) { e.preventDefault(); ccToggle(card); }
+                    });
+                }
+                const collapsed = ccIsCollapsed(card);
+                card.classList.toggle('cc-collapsed', collapsed);
+                head.setAttribute('aria-expanded', String(!collapsed));
+            });
+        }
+
+        /* =========================================================================
+           STATUS ONLINE ANAK + MODE FOKUS KUIS
+           ========================================================================= */
+        const presenceCache = {};          // { parentUsername: { childKey: {status, ts, ...} } }
+        const PRESENCE_FRESH_MS = 75 * 1000;
+        const PRESENCE_AWAY_MS = 5 * 60 * 1000;
+        let presenceBeatTimer = null, presenceViewTimer = null, presQuizSince = 0;
+
+        function presKey(u) { return String(u || '').toLowerCase().replace(/[.\[\]*`\/~]/g, '_'); }
+
+        function buildPresencePayload(forceStatus) {
+            const sess = db.currentSession;
+            if (!sess || sess.role !== 'child' || sess.fromParent) return null; // orang tua yang "menyamar" jadi anak tidak dihitung
+            const child = getActiveChild();
+            if (!child) return null;
+            const qm = document.getElementById('quiz-modal');
+            const inQuiz = !!qm && !qm.classList.contains('hidden');
+            if (inQuiz && !presQuizSince) presQuizSince = Date.now();
+            if (!inQuiz) presQuizSince = 0;
+            const status = forceStatus || (document.hidden ? 'away' : (inQuiz ? 'quiz' : 'online'));
+            return {
+                parentUsername: sess.parentUsername,
+                key: presKey(child.username),
+                data: {
+                    name: child.name, status, inQuiz,
+                    subject: inQuiz ? activeQuiz.subjectName : '',
+                    qNum: inQuiz ? activeQuiz.currentIndex + 1 : 0,
+                    total: inQuiz ? activeQuiz.questions.length : 0,
+                    elapsedSec: inQuiz ? Math.round((Date.now() - presQuizSince) / 1000) : 0,
+                    ts: serverTimestamp()
+                }
+            };
+        }
+
+        async function pushPresence(forceStatus) {
+            const pl = buildPresencePayload(forceStatus); // dibentuk sinkron, jadi aman dipanggil sebelum logout
+            if (!pl || !(isCloudActive && firestoreDb && currentAuthUser)) return;
+            try {
+                const ref = doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'eduquest_families', pl.parentUsername + '__presence');
+                await setDoc(ref, { children: { [pl.key]: pl.data } }, { merge: true });
+            } catch (e) { console.warn('Status online gagal dikirim:', e); }
+        }
+
+        function syncPresenceLoop() {
+            const sess = db.currentSession;
+            const isChild = !!(sess && sess.role === 'child' && !sess.fromParent);
+            const isParent = !!(sess && sess.role === 'parent');
+            if (isChild && !presenceBeatTimer) {
+                pushPresence();
+                presenceBeatTimer = setInterval(() => pushPresence(), 30000);
+            } else if (!isChild && presenceBeatTimer) {
+                clearInterval(presenceBeatTimer); presenceBeatTimer = null; presQuizSince = 0;
+            }
+            if (isParent && !presenceViewTimer) {
+                presenceViewTimer = setInterval(renderPresenceUI, 20000);
+            } else if (!isParent && presenceViewTimer) {
+                clearInterval(presenceViewTimer); presenceViewTimer = null;
+            }
+        }
+
+        function agoText(ms) {
+            const s = Math.max(0, Math.round(ms / 1000));
+            if (s < 60) return 'baru saja';
+            const m = Math.round(s / 60);
+            if (m < 60) return `${m} menit lalu`;
+            const h = Math.round(m / 60);
+            if (h < 24) return `${h} jam lalu`;
+            return `${Math.round(h / 24)} hari lalu`;
+        }
+        function minText(sec) {
+            const m = Math.floor(sec / 60);
+            return m < 1 ? 'kurang dari 1 menit' : `${m} menit`;
+        }
+
+        function renderPresenceUI() {
+            const el = document.getElementById('p-presence-banner');
+            if (!el) return;
+            const sess = db.currentSession;
+            const fam = getActiveFamily();
+            if (!sess || sess.role !== 'parent' || !fam || !isCloudActive) { el.innerHTML = ''; return; }
+            const pres = presenceCache[sess.parentUsername] || {};
+            const now = Date.now();
+            el.innerHTML = '';
+            (fam.children || []).forEach((ch) => {
+                const p = pres[presKey(ch.username)];
+                const ts = p && p.ts ? (typeof p.ts.toMillis === 'function' ? p.ts.toMillis() : Number(p.ts)) : 0;
+                const age = ts ? Math.max(0, now - ts) : Infinity;
+                const name = esc(ch.name);
+                let tone, dot, html;
+                if (p && p.status === 'quiz' && age <= PRESENCE_FRESH_MS) {
+                    tone = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200';
+                    dot = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0"></span>';
+                    html = `<b>${name}</b> sedang mengerjakan <b>${esc(p.subject)}</b> • soal ${p.qNum}/${p.total} <span class="opacity-70">• ${minText((p.elapsedSec || 0) + age / 1000)}</span>`;
+                } else if (p && p.status === 'online' && age <= PRESENCE_FRESH_MS) {
+                    tone = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200';
+                    dot = '<span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>';
+                    html = `<b>${name}</b> sedang online <span class="opacity-70">• di beranda</span>`;
+                } else if (p && p.status === 'away' && age <= PRESENCE_AWAY_MS) {
+                    tone = 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200';
+                    dot = '<span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>';
+                    html = p.inQuiz
+                        ? `<b>${name}</b> meninggalkan layar kuis <b>${esc(p.subject)}</b> (soal ${p.qNum}/${p.total}) <span class="opacity-70">• ${agoText(age)}</span>`
+                        : `<b>${name}</b> membuka aplikasi lain <span class="opacity-70">• ${agoText(age)}</span>`;
+                } else {
+                    tone = 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400';
+                    dot = '<span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>';
+                    html = ts
+                        ? `<b>${name}</b> offline <span class="opacity-70">• terakhir terlihat ${agoText(age)}</span>`
+                        : `<b>${name}</b> offline <span class="opacity-70">• belum pernah terlihat online</span>`;
+                }
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border text-[11px] font-semibold leading-snug ${tone}`;
+                row.innerHTML = dot + `<span class="min-w-0">${html}</span>`;
+                el.appendChild(row);
+            });
+        }
+
+        // ---- Mode fokus: hitung berapa kali anak meninggalkan layar kuis ----
+        let quizFocus = { leaves: 0, awayMs: 0, awaySince: 0 };
+        const quizIsOpen = () => { const q = document.getElementById('quiz-modal'); return !!q && !q.classList.contains('hidden'); };
+        const isChildSession = () => !!(db.currentSession && db.currentSession.role === 'child');
+        function resetQuizFocus() { quizFocus = { leaves: 0, awayMs: 0, awaySince: 0 }; }
+
+        function quizFocusLost() {
+            if (!quizIsOpen() || !isChildSession()) return;
+            document.getElementById('quiz-modal').classList.add('quiz-blur');
+            if (!quizFocus.awaySince) quizFocus.awaySince = Date.now();
+        }
+        function quizFocusBack() {
+            const qm = document.getElementById('quiz-modal');
+            if (qm) qm.classList.remove('quiz-blur');
+            if (quizFocus.awaySince) {
+                const away = Date.now() - quizFocus.awaySince;
+                quizFocus.awaySince = 0;
+                if (away >= 2000 && quizIsOpen() && isChildSession()) {   // abaikan blip < 2 detik
+                    quizFocus.leaves += 1;
+                    quizFocus.awayMs += away;
+                    showToast('⚠️ Kamu keluar dari layar kuis. Orang tua bisa melihat ini ya!');
+                }
+            }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) quizFocusLost(); else quizFocusBack();
+            pushPresence();
+        });
+        window.addEventListener('blur', quizFocusLost);
+        window.addEventListener('focus', quizFocusBack);
+        window.addEventListener('pagehide', () => pushPresence('offline'));
+        ['contextmenu', 'copy', 'cut', 'dragstart', 'selectstart'].forEach((evt) =>
+            document.addEventListener(evt, (e) => {
+                const qm = document.getElementById('quiz-modal');
+                if (qm && !qm.classList.contains('hidden') && qm.contains(e.target)) e.preventDefault();
+            }));
+
         function logoutSession() {
+            pushPresence('offline');
             playSound('click');
             db.currentSession = null;
             saveDatabase(null, true);
@@ -4981,6 +5225,7 @@ T([9], S_BE, CLOZE, [
            8. ROUTING SCREEN (AUTH vs PARENT DASHBOARD vs CHILD ARENA)
            ========================================================================= */
         function routeAppView() {
+            syncPresenceLoop();
             const authEl = document.getElementById('auth-screen');
             const parentEl = document.getElementById('parent-screen');
             const childEl = document.getElementById('child-screen');
@@ -5592,43 +5837,9 @@ T([9], S_BE, CLOZE, [
                 masteryContainer.appendChild(row);
             });
 
-            // Render Quiz History List for Parent Inspection
-            const histContainer = document.getElementById('p-quiz-history-list');
-            histContainer.innerHTML = '';
-            if (history.length === 0) {
-                histContainer.innerHTML = `
-                    <div class="text-center py-6 text-slate-400 text-xs font-bold">
-                        Belum ada riwayat kuis yang dikerjakan anak.
-                    </div>
-                `;
-            } else {
-                history.forEach((rec, idx) => {
-                    const item = document.createElement('div');
-                    item.className = 'p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 cursor-pointer hover:border-indigo-400 transition';
-                    item.onclick = () => openQuizReviewByIndex(idx);
-                    const badgeColor = rec.score >= 80
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                        : rec.score >= 60
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                        : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
-
-                    item.innerHTML = `
-                        <div class="space-y-0.5">
-                            <div class="flex items-center gap-2">
-                                <span class="font-game font-bold text-xs text-slate-800 dark:text-white">${rec.subject} (${formatGradeLabel(rec.grade)})</span>
-                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
-                                    Skor: ${rec.score}% (${rec.correctCount}/${rec.totalQuestions})
-                                </span>
-                            </div>
-                            <p class="text-[10px] text-slate-400 font-bold"><i class="fa-regular fa-clock mr-1"></i>${rec.timeStr}</p>
-                        </div>
-                        <button class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-extrabold text-[11px] shrink-0">
-                            Cek Jawaban <i class="fa-solid fa-magnifying-glass ml-0.5"></i>
-                        </button>
-                    `;
-                    histContainer.appendChild(item);
-                });
-            }
+            // Render Quiz History List for Parent Inspection (versi ringkas)
+            renderParentQuizHistory();
+            renderPresenceUI();
 
             // Render Tab Hadiah Dunia Nyata di Portal Orang Tua
             const voucherBadge = document.getElementById('parent-voucher-badge');
@@ -5639,6 +5850,11 @@ T([9], S_BE, CLOZE, [
             (fam.children || []).forEach((ch) => (ch.redeemedVouchers || []).forEach((v) => vouchers.push({ ...v, _childName: ch.name, _childUsername: ch.username })));
             vouchers.sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1));
             const pendingCount = vouchers.filter(v => v.status === 'pending').length;
+            const claimsBadge = document.getElementById('parent-claims-badge');
+            if (claimsBadge) {
+                claimsBadge.textContent = pendingCount > 0 ? `${pendingCount} menunggu` : 'Dunia Nyata';
+                claimsBadge.className = `text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 ${pendingCount > 0 ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700'}`;
+            }
             if (voucherBadge) {
                 if (pendingCount > 0) {
                     voucherBadge.textContent = pendingCount;
@@ -5710,6 +5926,216 @@ T([9], S_BE, CLOZE, [
                     catalogEl.appendChild(item);
                 });
             }
+            enhanceCollapsibleCards();
+        }
+
+
+        /* ---------- RIWAYAT RINGKAS (ORANG TUA): dikelompokkan per hari + rentang tanggal ---------- */
+        let pHistFilter = 'all';
+        let pHistExpanded = false;
+        let pHistRange = 'all';   // all | today | 7 | 30 | custom
+        let pHistFrom = '';       // yyyy-mm-dd (custom)
+        let pHistTo = '';
+        const P_HIST_PREVIEW = 5;
+
+        const pad2 = (n) => String(n).padStart(2, '0');
+        function dateKeyOf(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+        function keyToDate(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+        function shiftKey(daysAgo) { const d = new Date(); d.setDate(d.getDate() - daysAgo); return dateKeyOf(d); }
+        function recDateKey(rec) { const d = new Date(rec.date); return isNaN(d) ? null : dateKeyOf(d); }
+
+        function dayLabel(key) {
+            if (!key) return 'Tanggal tidak tercatat';
+            if (key === shiftKey(0)) return 'Hari ini';
+            if (key === shiftKey(1)) return 'Kemarin';
+            const d = keyToDate(key);
+            const opts = { weekday: 'long', day: 'numeric', month: 'short' };
+            if (d.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+            return d.toLocaleDateString('id-ID', opts);
+        }
+        function timeOnly(rec) {
+            const t = String(rec.timeStr || '');
+            const i = t.lastIndexOf(', ');
+            return i >= 0 ? t.slice(i + 2) : t;
+        }
+
+        function setPHistFilter(f) { playSound('click'); pHistFilter = f; pHistExpanded = false; renderParentQuizHistory(); }
+        function togglePHistExpanded() { playSound('click'); pHistExpanded = !pHistExpanded; renderParentQuizHistory(); }
+        function setPHistRange(r) {
+            playSound('click');
+            pHistRange = r;
+            pHistExpanded = false;
+            if (r === 'custom' && !pHistFrom && !pHistTo) { pHistFrom = shiftKey(6); pHistTo = shiftKey(0); }
+            renderParentQuizHistory();
+        }
+        function setPHistDates() {
+            pHistFrom = document.getElementById('p-hist-from').value || '';
+            pHistTo = document.getElementById('p-hist-to').value || '';
+            if (pHistFrom && pHistTo && pHistFrom > pHistTo) { const t = pHistFrom; pHistFrom = pHistTo; pHistTo = t; }
+            pHistExpanded = false;
+            renderParentQuizHistory();
+        }
+        function resetPHistFilters() {
+            playSound('click');
+            pHistFilter = 'all'; pHistRange = 'all'; pHistFrom = ''; pHistTo = ''; pHistExpanded = false;
+            renderParentQuizHistory();
+        }
+
+        function scoreTone(score) {
+            if (score >= 80) return { bg: 'bg-emerald-100 dark:bg-emerald-950', text: 'text-emerald-700 dark:text-emerald-300' };
+            if (score >= 60) return { bg: 'bg-amber-100 dark:bg-amber-950', text: 'text-amber-700 dark:text-amber-300' };
+            return { bg: 'bg-rose-100 dark:bg-rose-950', text: 'text-rose-700 dark:text-rose-300' };
+        }
+
+        function histChip(label, active, onclick, icon) {
+            const b = document.createElement('button');
+            b.className = `shrink-0 px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${active
+                ? 'bg-indigo-600 border-indigo-600 text-white'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300'}`;
+            b.innerHTML = (icon ? `<i class="${icon} mr-1"></i>` : '') + esc(label);
+            b.onclick = onclick;
+            return b;
+        }
+
+        function renderParentQuizHistory() {
+            const child = getActiveChild();
+            const history = (child && child.quizHistory) || [];
+            const listEl = document.getElementById('p-quiz-history-list');
+            const sumEl = document.getElementById('p-hist-summary');
+            const rangeEl = document.getElementById('p-hist-range');
+            const customEl = document.getElementById('p-hist-custom');
+            const filterEl = document.getElementById('p-hist-filter');
+            const moreBtn = document.getElementById('p-hist-more');
+            const countEl = document.getElementById('p-hist-count');
+            if (!listEl) return;
+
+            if (history.length === 0) {
+                sumEl.innerHTML = ''; rangeEl.innerHTML = ''; filterEl.innerHTML = '';
+                customEl.classList.add('hidden');
+                moreBtn.classList.add('hidden');
+                countEl.textContent = '';
+                listEl.className = 'space-y-1.5';
+                listEl.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-bold">Belum ada riwayat kuis yang dikerjakan anak.</div>`;
+                return;
+            }
+
+            // --- Chip rentang tanggal ---
+            rangeEl.innerHTML = '';
+            [['all', 'Semua'], ['today', 'Hari ini'], ['7', '7 hari'], ['30', '30 hari']].forEach(([k, l]) =>
+                rangeEl.appendChild(histChip(l, pHistRange === k, () => setPHistRange(k))));
+            rangeEl.appendChild(histChip('Pilih tanggal', pHistRange === 'custom', () => setPHistRange('custom'), 'fa-regular fa-calendar'));
+            customEl.classList.toggle('hidden', pHistRange !== 'custom');
+            if (pHistRange === 'custom') {
+                const fromEl = document.getElementById('p-hist-from');
+                const toEl = document.getElementById('p-hist-to');
+                fromEl.value = pHistFrom; toEl.value = pHistTo;
+                const todayK = shiftKey(0);
+                fromEl.max = pHistTo || todayK; toEl.max = todayK; toEl.min = pHistFrom || '';
+            }
+
+            // --- Batas rentang ---
+            let from = '', to = '';
+            const todayKey = shiftKey(0);
+            if (pHistRange === 'today') { from = to = todayKey; }
+            else if (pHistRange === '7') { from = shiftKey(6); to = todayKey; }
+            else if (pHistRange === '30') { from = shiftKey(29); to = todayKey; }
+            else if (pHistRange === 'custom') { from = pHistFrom; to = pHistTo; }
+            const inRange = (key) => pHistRange === 'all' || (key !== null && (!from || key >= from) && (!to || key <= to));
+
+            // --- Filter mapel (opsi mapel dari rentang terpilih) ---
+            const ranged = history.map((rec, idx) => ({ rec, idx, key: recDateKey(rec) })).filter(r => inRange(r.key));
+            const subjects = [...new Set(ranged.map(r => r.rec.subject))];
+            if (pHistFilter !== 'all' && !subjects.includes(pHistFilter)) pHistFilter = 'all';
+            filterEl.innerHTML = '';
+            if (subjects.length > 1) {
+                ['all', ...subjects].forEach(f =>
+                    filterEl.appendChild(histChip(f === 'all' ? 'Semua mapel' : f, pHistFilter === f, () => setPHistFilter(f))));
+            }
+            const rows = ranged.filter(r => pHistFilter === 'all' || r.rec.subject === pHistFilter);
+            countEl.textContent = rows.length + ' hasil';
+
+            // --- Ringkasan mengikuti filter ---
+            const stat = (val, label, tone) => `
+                <div class="rounded-2xl ${tone.bg} px-2 py-2 text-center">
+                    <p class="font-game font-bold text-base leading-none ${tone.text}">${val}</p>
+                    <p class="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 mt-1">${label}</p>
+                </div>`;
+            const neutral = { bg: 'bg-slate-100 dark:bg-slate-900', text: 'text-slate-400' };
+            if (rows.length) {
+                const avg = Math.round(rows.reduce((a, r) => a + r.rec.score, 0) / rows.length);
+                const best = Math.max(...rows.map(r => r.rec.score));
+                sumEl.innerHTML =
+                    stat(rows.length, 'Kuis dikerjakan', { bg: 'bg-indigo-50 dark:bg-indigo-950/60', text: 'text-indigo-600 dark:text-indigo-300' }) +
+                    stat(avg + '%', 'Rata-rata skor', scoreTone(avg)) +
+                    stat(best + '%', 'Skor terbaik', scoreTone(best));
+            } else {
+                sumEl.innerHTML = stat('0', 'Kuis dikerjakan', neutral) + stat('–', 'Rata-rata skor', neutral) + stat('–', 'Skor terbaik', neutral);
+            }
+
+            // --- Daftar ---
+            listEl.innerHTML = '';
+            if (rows.length === 0) {
+                listEl.className = 'space-y-1.5';
+                listEl.innerHTML = `
+                    <div class="text-center py-5 space-y-2">
+                        <p class="text-xs font-bold text-slate-400">Tidak ada hasil kuis pada rentang ini.</p>
+                        <button onclick="resetPHistFilters()" class="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-extrabold text-[11px]">Tampilkan semua</button>
+                    </div>`;
+                moreBtn.classList.add('hidden');
+                return;
+            }
+
+            const groupStat = {};
+            rows.forEach(r => { const k = r.key || '?'; (groupStat[k] = groupStat[k] || { n: 0, sum: 0 }); groupStat[k].n++; groupStat[k].sum += r.rec.score; });
+
+            const shown = pHistExpanded ? rows : rows.slice(0, P_HIST_PREVIEW);
+            listEl.className = 'space-y-1.5' + (pHistExpanded && rows.length > P_HIST_PREVIEW ? ' max-h-[22rem] overflow-y-auto no-scrollbar pr-0.5' : '');
+
+            let lastKey = null;
+            shown.forEach(({ rec, idx, key }) => {
+                const gk = key || '?';
+                if (gk !== lastKey) {
+                    lastKey = gk;
+                    const g = groupStat[gk];
+                    const head = document.createElement('div');
+                    head.className = 'sticky top-0 z-[1] flex items-center gap-2 pt-2 pb-1 bg-white dark:bg-slate-800';
+                    head.innerHTML = `
+                        <span class="font-game font-bold text-[11px] text-slate-600 dark:text-slate-300 capitalize">${esc(dayLabel(key))}</span>
+                        <span class="flex-1 h-px bg-slate-200 dark:bg-slate-700"></span>
+                        <span class="text-[10px] font-extrabold text-slate-400">${g.n} kuis • rata-rata ${Math.round(g.sum / g.n)}%</span>`;
+                    listEl.appendChild(head);
+                }
+                const tone = scoreTone(rec.score);
+                const dots = (rec.details || []).map(d =>
+                    `<span class="w-1.5 h-1.5 rounded-full ${d.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}"></span>`).join('');
+                const item = document.createElement('div');
+                item.className = 'p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3 cursor-pointer hover:border-indigo-400 active:scale-[0.99] transition';
+                item.onclick = () => openQuizReviewByIndex(idx);
+                item.innerHTML = `
+                    <div class="w-11 h-11 rounded-xl shrink-0 flex flex-col items-center justify-center ${tone.bg} ${tone.text}">
+                        <span class="font-game font-bold text-sm leading-none">${rec.score}</span>
+                        <span class="text-[8px] font-extrabold leading-none mt-0.5">%</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-game font-bold text-xs text-slate-800 dark:text-white truncate">${esc(rec.subject)} <span class="text-slate-400 font-bold">• ${formatGradeLabel(rec.grade)}</span></p>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="flex items-center gap-[3px]">${dots}</span>
+                            <span class="text-[10px] font-bold text-slate-400 truncate">${rec.correctCount}/${rec.totalQuestions} • ${esc(timeOnly(rec))}</span>${rec.leaves > 0 ? `<span class="text-[10px] font-extrabold text-amber-600 dark:text-amber-400 shrink-0" title="Meninggalkan layar kuis">⚠️ ${rec.leaves}x</span>` : ''}
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-300 dark:text-slate-600 text-xs shrink-0"></i>
+                `;
+                listEl.appendChild(item);
+            });
+
+            if (rows.length > P_HIST_PREVIEW) {
+                moreBtn.classList.remove('hidden');
+                moreBtn.innerHTML = pHistExpanded
+                    ? 'Ringkas <i class="fa-solid fa-chevron-up ml-1"></i>'
+                    : `Lihat ${rows.length - P_HIST_PREVIEW} lainnya <i class="fa-solid fa-chevron-down ml-1"></i>`;
+            } else {
+                moreBtn.classList.add('hidden');
+            }
         }
 
         function openQuizReviewByIndex(idx) {
@@ -5734,41 +6160,96 @@ T([9], S_BE, CLOZE, [
             body.innerHTML = '';
 
             const letters = ['A', 'B', 'C', 'D'];
-            record.details.forEach((d, i) => {
-                const box = document.createElement('div');
-                box.className = `p-4 rounded-2xl border-2 bg-white dark:bg-slate-900 space-y-2 ${
-                    d.isCorrect ? 'border-emerald-300 dark:border-emerald-800' : 'border-rose-300 dark:border-rose-800'
-                }`;
+            const details = record.details || [];
+            const wrongCount = details.filter(d => !d.isCorrect).length;
+            const plain = (html) => { const t = document.createElement('div'); t.innerHTML = html; return (t.textContent || '').trim(); };
+            let onlyWrong = false;
+            const items = [];
 
+            // --- Header lengket: ringkasan + navigator nomor soal ---
+            const head = document.createElement('div');
+            head.className = 'sticky -top-4 -mx-4 -mt-4 px-4 pt-4 pb-3 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 space-y-2.5';
+            head.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">✅ ${details.length - wrongCount} Benar</span>
+                    <span class="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-rose-100 text-rose-700">❌ ${wrongCount} Salah</span>
+                    <button id="rv-filter-btn" class="${wrongCount > 0 && wrongCount < details.length ? '' : 'hidden'} ml-auto text-[11px] font-extrabold px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-300">Hanya yang salah</button>
+                </div>
+                <div id="rv-nav" class="flex flex-wrap gap-1.5"></div>`;
+            body.appendChild(head);
+
+            if (record.leaves > 0) {
+                const warn = document.createElement('div');
+                warn.className = 'p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-[11px] font-bold text-amber-800 dark:text-amber-200 leading-snug';
+                warn.textContent = `⚠️ Anak meninggalkan layar kuis ${record.leaves}x (total ${record.awaySecs || 0} detik) saat mengerjakan. Bisa jadi membuka aplikasi lain.`;
+                body.appendChild(warn);
+            }
+            const list = document.createElement('div');
+            list.className = 'space-y-2';
+            body.appendChild(list);
+
+            const setOpen = (it, open) => {
+                it.open = open;
+                it.panel.classList.toggle('hidden', !open);
+                it.chev.style.transform = open ? 'rotate(180deg)' : '';
+            };
+
+            details.forEach((d, i) => {
+                const ok = !!d.isCorrect;
                 const chosenText = d.options[d.chosen] !== undefined ? `${letters[d.chosen]}. ${d.options[d.chosen]}` : '-';
                 const correctText = `${letters[d.answer]}. ${d.options[d.answer]}`;
 
+                const box = document.createElement('div');
+                box.className = `rounded-2xl border bg-white dark:bg-slate-900 overflow-hidden ${ok ? 'border-slate-200 dark:border-slate-700' : 'border-rose-300 dark:border-rose-800'}`;
                 box.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-game font-bold text-slate-500">Soal #${i + 1}</span>
-                        <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                            d.isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
-                        }">
-                            ${d.isCorrect ? '✅ Jawaban Anak Benar' : '❌ Jawaban Anak Kurang Tepat'}
-                        </span>
-                    </div>
-                    <p class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-relaxed">${d.q}</p>
-                    <div class="text-[11px] space-y-1 pt-1">
-                        <div class="p-2 rounded-xl ${d.isCorrect ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200'} font-bold">
-                            Jawaban Anak: <strong>${chosenText}</strong>
+                    <button type="button" class="w-full flex items-center gap-2.5 p-3 text-left">
+                        <span class="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[11px] font-game font-bold ${ok ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${i + 1}</span>
+                        <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(plain(d.q))}</span>
+                        <i class="fa-solid ${ok ? 'fa-check text-emerald-500' : 'fa-xmark text-rose-500'} text-xs shrink-0"></i>
+                        <i class="rv-chev fa-solid fa-chevron-down text-slate-300 text-[10px] shrink-0 transition-transform"></i>
+                    </button>
+                    <div class="rv-panel hidden px-3 pb-3 space-y-2">
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-relaxed">${d.q}</p>
+                        <div class="text-[11px] space-y-1">
+                            <div class="p-2 rounded-xl ${ok ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200'} font-bold">
+                                Jawaban anak: <strong>${chosenText}</strong>
+                            </div>
+                            ${!ok ? `<div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 font-bold">Kunci jawaban: <strong>${correctText}</strong></div>` : ''}
+                            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">💡 <strong>Pembahasan:</strong> ${d.explanation}</div>
                         </div>
-                        ${!d.isCorrect ? `
-                        <div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 font-bold">
-                            Kunci Jawaban Benar: <strong>${correctText}</strong>
-                        </div>` : ''}
-                        <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
-                            💡 <strong>Pembahasan:</strong> ${d.explanation}
-                        </div>
-                    </div>
-                `;
-                body.appendChild(box);
+                    </div>`;
+                const it = { ok, box, open: false, panel: box.querySelector('.rv-panel'), chev: box.querySelector('.rv-chev') };
+                box.querySelector('button').onclick = () => { playSound('click'); setOpen(it, !it.open); };
+                items.push(it);
+                list.appendChild(box);
+
+                // tombol navigator
+                const nb = document.createElement('button');
+                nb.className = `w-8 h-8 rounded-lg text-[11px] font-game font-bold transition ${ok ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-500 text-white'}`;
+                nb.textContent = i + 1;
+                nb.onclick = () => {
+                    playSound('click');
+                    if (onlyWrong && ok) { onlyWrong = false; applyFilter(); }
+                    setOpen(it, true);
+                    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                };
+                head.querySelector('#rv-nav').appendChild(nb);
             });
 
+            const filterBtn = head.querySelector('#rv-filter-btn');
+            function applyFilter() {
+                items.forEach(it => it.box.classList.toggle('hidden', onlyWrong && it.ok));
+                filterBtn.textContent = onlyWrong ? 'Tampilkan semua' : 'Hanya yang salah';
+                filterBtn.className = filterBtn.className.replace(/bg-indigo-600 border-indigo-600 text-white/g, '').trim();
+                if (onlyWrong) filterBtn.classList.add('bg-indigo-600', 'border-indigo-600', 'text-white');
+            }
+            filterBtn.onclick = () => { playSound('click'); onlyWrong = !onlyWrong; applyFilter(); };
+
+            // Buka otomatis soal salah pertama agar langsung terlihat intinya
+            const firstWrong = items.find(it => !it.ok);
+            if (firstWrong) setOpen(firstWrong, true);
+
+            body.scrollTop = 0;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6057,7 +6538,9 @@ T([9], S_BE, CLOZE, [
         }
 
         function renderCurrentQuestion() {
+            if (activeQuiz.currentIndex === 0) resetQuizFocus();
             activeQuiz.answered = false;
+            setTimeout(() => pushPresence(), 0);
             const qObj = activeQuiz.questions[activeQuiz.currentIndex];
             const total = activeQuiz.questions.length; // mengikuti target orang tua (default 10)
             const num = activeQuiz.currentIndex + 1;
@@ -6212,7 +6695,8 @@ T([9], S_BE, CLOZE, [
 
         function finishQuiz() {
             document.getElementById('quiz-modal').classList.add('hidden');
-            document.getElementById('quiz-modal').classList.remove('flex');
+            document.getElementById('quiz-modal').classList.remove('flex', 'quiz-blur');
+            pushPresence();
 
             const child = getActiveChild();
             if (!child) return;
@@ -6278,7 +6762,8 @@ T([9], S_BE, CLOZE, [
                 score: scorePct,
                 correctCount: activeQuiz.correctCount,
                 totalQuestions: total,
-                details: activeQuiz.answerLog
+                details: activeQuiz.answerLog,
+                leaves: quizFocus.leaves, awaySecs: Math.round(quizFocus.awayMs / 1000)
             };
 
             lastCompletedQuizRecord = record;
@@ -6332,7 +6817,8 @@ T([9], S_BE, CLOZE, [
         function quitQuiz() {
             playSound('click');
             document.getElementById('quiz-modal').classList.add('hidden');
-            document.getElementById('quiz-modal').classList.remove('flex');
+            document.getElementById('quiz-modal').classList.remove('flex', 'quiz-blur');
+            pushPresence();
         }
 
         /* =========================================================================
@@ -7377,7 +7863,8 @@ T([9], S_BE, CLOZE, [
                 id: 'qz-' + Date.now(), date: now.toDateString(),
                 timeStr: now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ', ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
                 subject: activeQuiz.subjectName, grade: activeQuiz.grade, score: scorePct,
-                correctCount: activeQuiz.correctCount, totalQuestions: total, details: activeQuiz.answerLog, boss: true
+                correctCount: activeQuiz.correctCount, totalQuestions: total, details: activeQuiz.answerLog, boss: true,
+                leaves: quizFocus.leaves, awaySecs: Math.round(quizFocus.awayMs / 1000)
             };
             lastCompletedQuizRecord = record;
             child.quizHistory = child.quizHistory || [];
@@ -7490,9 +7977,9 @@ T([9], S_BE, CLOZE, [
             const fmt = (t) => new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
             const bars = r.days.map((d) => `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full h-14 flex items-end"><div class="w-full rounded-t-lg ${d.count ? 'bg-purple-500' : 'bg-slate-200 dark:bg-slate-700'}" style="height:${d.count ? Math.max(14, (d.count / maxDay) * 100) : 8}%"></div></div><span class="text-[9px] font-extrabold text-slate-500">${d.label}</span><span class="text-[10px] font-extrabold">${d.count}</span></div>`).join('');
             const subj = r.perSubject.map((s) => `<div><div class="flex justify-between text-[11px] font-bold"><span>${s.subject}</span><span>${s.avg === null ? 'belum dicoba' : `${s.avg}% · ${s.count} kuis`}</span></div><div class="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div class="h-full rounded-full ${s.avg !== null && s.avg < 70 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width:${s.avg || 0}%"></div></div></div>`).join('');
-            el.innerHTML = `<div class="rounded-3xl p-4 bg-white dark:bg-slate-900 border-2 border-purple-200 dark:border-purple-900 shadow-sm space-y-3">
+            el.innerHTML = `<div data-collapsible="p-weekly" class="rounded-3xl p-4 bg-white dark:bg-slate-900 border-2 border-purple-200 dark:border-purple-900 shadow-sm space-y-3">
                 <div class="flex items-center justify-between gap-2">
-                    <div><h3 class="font-game font-bold text-sm">📊 Laporan Mingguan ${esc(child.name)}</h3><p class="text-[10px] font-semibold text-slate-500">${fmt(r.start)} - ${fmt(Date.now())}</p></div>
+                    <div class="flex-1 min-w-0"><h3 class="font-game font-bold text-sm">📊 Laporan Mingguan ${esc(child.name)}</h3><p class="text-[10px] font-semibold text-slate-500">${fmt(r.start)} - ${fmt(Date.now())}</p></div>
                     <button onclick="copyWeeklyReport()" class="px-2.5 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[11px] font-extrabold shrink-0"><i class="fa-solid fa-copy mr-1"></i>Salin</button>
                 </div>
                 <div class="grid grid-cols-4 gap-2 text-center">
@@ -7545,9 +8032,9 @@ T([9], S_BE, CLOZE, [
                 const rows = items.filter((it) => !it.bossOnly).map((it) => row(kind, it.id, `${it.emoji || ''} ${it.name}`, it.price)).join('');
                 return `<div class="space-y-1.5"><p class="text-[11px] font-extrabold text-slate-500">${title}</p>${rows}</div>`;
             }).join('');
-            el.innerHTML = `<div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-pink-300 dark:border-pink-800 space-y-3">
-                <div><h3 class="font-game font-bold text-sm text-pink-700 dark:text-pink-300">🐾 Atur Harga Pet & Koin Boss</h3>
-                <p class="text-[11px] font-semibold text-slate-500 mt-0.5 leading-snug">Ubah harga makanan, obat, adopsi, penampilan, dan dekorasi. Harga baru langsung berlaku di toko pet anak.</p></div>
+            el.innerHTML = `<div data-collapsible="p-pet-prices" data-cc-default="collapsed" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-pink-300 dark:border-pink-800 space-y-3">
+                <div class="flex items-center gap-2"><div class="min-w-0"><h3 class="font-game font-bold text-sm text-pink-700 dark:text-pink-300">🐾 Atur Harga Pet & Koin Boss</h3>
+                <p class="text-[11px] font-semibold text-slate-500 mt-0.5 leading-snug">Ubah harga makanan, obat, adopsi, penampilan, dan dekorasi. Harga baru langsung berlaku di toko pet anak.</p></div></div>
                 <div class="space-y-1.5"><p class="text-[11px] font-extrabold text-slate-500">⚔️ BOSS & KEMATIAN PET</p>
                     ${row('misc', 'bossReward', '🪙 Koin hadiah mengalahkan boss', 80)}
                     ${row('misc', 'revive', '💫 Biaya menghidupkan pet yang mati', 300)}</div>
@@ -7557,6 +8044,7 @@ T([9], S_BE, CLOZE, [
                     <button onclick="resetPetPrices()" class="py-2.5 rounded-2xl font-game font-bold text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200">Kembalikan Bawaan</button>
                 </div>
             </div>`;
+            enhanceCollapsibleCards();
         }
 
         function savePetPrices() {
@@ -7911,6 +8399,7 @@ T([9], S_BE, CLOZE, [
             approveChildVoucher,
             redeemRealWorldReward,
             openQuizReviewByIndex,
+            togglePHistExpanded, setPHistDates, setPHistRange, resetPHistFilters,
             openLastQuizReview,
             closeReviewModal,
             playTargetMissionNow,
