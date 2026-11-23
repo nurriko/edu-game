@@ -142,6 +142,10 @@
             scrollbar-width: none;
         }
     </style>
+<style>
+@keyframes petfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.pet-float{animation:petfloat 2.4s ease-in-out infinite}
+</style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex justify-center">
 
@@ -390,6 +394,7 @@
 
                 <!-- TAB ORANG TUA 1: MONITORING & RIWAYAT JAWABAN ANAK -->
                 <div id="pview-monitor" class="space-y-4">
+                    <div id="p-weekly-report"></div>
                     <!-- Kartu Ringkasan Anak -->
                     <div id="parent-child-summary-card" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
                         <div class="flex items-center justify-between">
@@ -646,6 +651,7 @@
                             </div>
                         </div>
                     </div>
+                    <div id="p-pet-prices"></div>
                 </div>
 
                 <!-- TAB ORANG TUA 4: KELOLA AKUN & KELAS ANAK (KELAS 5 SD - 9 SMP) -->
@@ -858,6 +864,10 @@
                             <i id="icon-sound" class="fa-solid fa-volume-high text-xs"></i>
                         </button>
 
+                        <button id="btn-back-to-parent" onclick="openBackToParent()" class="hidden h-8 px-2.5 rounded-xl bg-purple-600 text-white items-center justify-center gap-1 text-[11px] font-extrabold" title="Kembali ke Mode Orang Tua">
+                            <i class="fa-solid fa-user-shield text-xs"></i> Ortu
+                        </button>
+
                         <button onclick="logoutSession()" class="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center" title="Keluar / Ganti Akun">
                             <i class="fa-solid fa-right-from-bracket text-xs"></i>
                         </button>
@@ -915,6 +925,8 @@
                             </button>
                         </div>
                     </div>
+
+                    <div id="home-extras" class="space-y-3"></div>
 
                     <!-- Info Kurikulum Kelas Anak & Roda Keberuntungan Harian -->
                     <div class="grid grid-cols-2 gap-2.5">
@@ -1079,23 +1091,30 @@
                     </div>
                 </section>
 
+                <section id="view-pet" class="hidden space-y-4">
+                    <div id="pet-view-content" class="space-y-3"></div>
+                </section>
             </main>
 
             <!-- BOTTOM NAVIGATION BAR ANAK -->
             <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex justify-around items-center z-30">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition">
                     <i class="fa-solid fa-gamepad text-lg"></i>
                     <span>Arena</span>
                 </button>
-                <button onclick="switchTab('shop')" id="nav-shop" class="nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-slate-400 font-bold text-xs transition">
+                <button onclick="switchTab('shop')" id="nav-shop" class="nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-slate-400 font-bold text-xs transition">
                     <i class="fa-solid fa-store text-lg"></i>
                     <span>Toko</span>
                 </button>
-                <button onclick="switchTab('badges')" id="nav-badges" class="nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-slate-400 font-bold text-xs transition">
+                <button onclick="switchTab('pet')" id="nav-pet" class="nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-slate-400 font-bold text-xs transition">
+                    <i class="fa-solid fa-paw text-lg"></i>
+                    <span>Pet</span>
+                </button>
+                <button onclick="switchTab('badges')" id="nav-badges" class="nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-slate-400 font-bold text-xs transition">
                     <i class="fa-solid fa-trophy text-lg"></i>
                     <span>Piala</span>
                 </button>
-                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-slate-400 font-bold text-xs transition">
+                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-slate-400 font-bold text-xs transition">
                     <i class="fa-solid fa-user-astronaut text-lg"></i>
                     <span>Profil</span>
                 </button>
@@ -1118,6 +1137,10 @@
                     </div>
                     <div class="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
                         <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                    <div id="quiz-boss-bar" class="hidden mt-1.5">
+                        <div class="flex justify-between text-[10px] font-extrabold text-rose-600"><span id="quiz-boss-label"></span><span id="quiz-boss-hp-text"></span></div>
+                        <div class="w-full h-2.5 bg-rose-100 dark:bg-rose-950 rounded-full overflow-hidden"><div id="quiz-boss-hp" class="h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-300" style="width:100%"></div></div>
                     </div>
                 </div>
                 <div id="quiz-combo-pill" class="hidden bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-1 rounded-xl font-game font-bold text-xs shadow animate-bounce">
@@ -1183,6 +1206,29 @@
              MODAL 2: HASIL UJIAN 10 SOAL (CELEBRATION MODAL)
              ===================================================================== -->
         <!-- MODAL KONFIRMASI BAWAAN APLIKASI (pengganti confirm() browser yang sering diblokir) -->
+        <div id="pet-play-modal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
+            <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-5 border-2 border-sky-400 shadow-2xl space-y-3 animate-pop max-h-[90vh] overflow-y-auto">
+                <div id="pet-play-body" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="parent-pin-modal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
+            <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-5 border-2 border-purple-400 shadow-2xl space-y-3 animate-pop">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <h3 class="font-game font-bold text-base">Kembali ke Mode Orang Tua</h3>
+                </div>
+                <p class="text-xs font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">Masukkan password akun Ayah/Bunda untuk membuka kembali Portal Orang Tua.</p>
+                <input id="parent-pin-input" type="password" autocomplete="current-password" placeholder="Password orang tua" onkeydown="if(event.key==='Enter')confirmBackToParent()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm focus:outline-none focus:border-purple-500">
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="closeBackToParent()" class="py-3 rounded-2xl font-game font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Batal</button>
+                    <button onclick="confirmBackToParent()" class="py-3 rounded-2xl font-game font-bold text-xs text-white btn-3d-purple">Buka Portal Ortu</button>
+                </div>
+            </div>
+        </div>
+
         <div id="app-confirm-modal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
             <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-5 border-2 border-rose-400 shadow-2xl space-y-3 animate-pop">
                 <div class="flex items-center gap-3">
@@ -4865,6 +4911,55 @@ T([9], S_BE, CLOZE, [
             showToast('👋 Berhasil keluar dari sesi.');
         }
 
+        // Kembali dari Mode Anak ke Mode Orang Tua (hanya jika sesi dimulai dari login orang tua), dilindungi password
+        function openBackToParent() {
+            if (!db.currentSession || !db.currentSession.fromParent) return;
+            if (!document.getElementById('quiz-modal').classList.contains('hidden')) {
+                playSound('wrong');
+                showToast('⚠️ Selesaikan atau tutup kuis dulu sebelum kembali ke Mode Orang Tua.');
+                return;
+            }
+            playSound('click');
+            const modal = document.getElementById('parent-pin-modal');
+            const input = document.getElementById('parent-pin-input');
+            input.value = '';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function closeBackToParent() {
+            const modal = document.getElementById('parent-pin-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmBackToParent() {
+            const fam = getActiveFamily();
+            const s = db.currentSession;
+            if (!fam || !s || !s.fromParent) { closeBackToParent(); return; }
+            const pw = document.getElementById('parent-pin-input').value;
+            const accUser = s.accountUsername || fam.parentUsername;
+            let expected = null;
+            if (accUser === fam.parentUsername) expected = fam.parentPassword;
+            else {
+                const co = (fam.coParents || []).find((c) => c.username === accUser);
+                expected = co ? co.password : null;
+            }
+            if (!pw || expected === null || pw !== expected) {
+                playSound('wrong');
+                showToast('❌ Password orang tua salah.');
+                return;
+            }
+            closeBackToParent();
+            s.role = 'parent';
+            delete s.fromParent;
+            saveDatabase(null, true);
+            playSound('correct');
+            routeAppView();
+            showToast('👨‍👩‍👧 Kembali ke Portal Orang Tua.');
+        }
+
         function switchToChildDirectly() {
             const child = getActiveChild();
             if (!child) {
@@ -4876,6 +4971,7 @@ T([9], S_BE, CLOZE, [
             playSound('correct');
             db.currentSession.role = 'child';
             db.currentSession.childUsername = child.username;
+            db.currentSession.fromParent = true;
             saveDatabase(null, true);
             routeAppView();
             showToast(`🎮 Beralih ke Mode Belajar Anak: ${child.name}`);
@@ -5460,6 +5556,8 @@ T([9], S_BE, CLOZE, [
             document.getElementById('p-target-desc').textContent = `Target: ${dt.targetCount} Kuis${getTargetSubjects(dt).length > 1 ? ' per mapel' : ''} × ${clampQuestionCount(dt.questionCount || 10)} Soal ${subjName} (Min. Skor ${dt.minScore}%)`;
             const pctTarget = Math.min(100, Math.round((getTargetDone(dt) / getTargetTotal(dt)) * 100));
             document.getElementById('p-target-bar').style.width = `${pctTarget}%`;
+            renderWeeklyReport(child);
+            renderPetPriceEditor();
             document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${getTargetDone(dt)} / ${getTargetTotal(dt)} Kuis (${clampQuestionCount(dt.questionCount || 10)} soal/kuis)${targetProgressDetail(dt)}`;
 
             const badgeEl = document.getElementById('p-target-status-badge');
@@ -5689,6 +5787,13 @@ T([9], S_BE, CLOZE, [
             const child = getActiveChild();
             if (!child) return;
 
+            const backBtn = document.getElementById('btn-back-to-parent');
+            if (backBtn) {
+                const fromParent = !!(db.currentSession && db.currentSession.fromParent);
+                backBtn.classList.toggle('hidden', !fromParent);
+                backBtn.classList.toggle('flex', fromParent);
+            }
+
             const lvl = getLevelInfo(child.xp);
             document.getElementById('header-avatar-emoji').textContent = child.equipped.avatar;
             document.getElementById('header-hat-emoji').textContent = child.equipped.hat;
@@ -5710,6 +5815,7 @@ T([9], S_BE, CLOZE, [
         function renderChildHomeView() {
             const child = getActiveChild();
             if (!child) return;
+            renderHomeExtras();
 
             // Update Misi dari Orang Tua
             if (refreshTargetForNewDay(child)) saveDatabase();
@@ -6046,6 +6152,7 @@ T([9], S_BE, CLOZE, [
                 playSound('correct');
                 fireConfetti(22);
                 activeQuiz.correctCount += 1;
+                if (activeQuiz.isBoss) updateBossBarUI();
                 activeQuiz.currentCombo += 1;
                 if (child && activeQuiz.currentCombo > child.maxCombo) {
                     child.maxCombo = activeQuiz.currentCombo;
@@ -6097,6 +6204,7 @@ T([9], S_BE, CLOZE, [
             if (activeQuiz.currentIndex < activeQuiz.questions.length - 1) {
                 activeQuiz.currentIndex += 1;
                 renderCurrentQuestion();
+                if (activeQuiz.isBoss) updateBossBarUI();
             } else {
                 finishQuiz();
             }
@@ -6111,6 +6219,8 @@ T([9], S_BE, CLOZE, [
 
             const total = activeQuiz.questions.length; // 10 soal
             const scorePct = Math.round((activeQuiz.correctCount / total) * 100);
+
+            if (activeQuiz.isBoss) { finishBossQuiz(child, total, scorePct); return; }
 
             child.xp += activeQuiz.earnedXp;
             // Koin dihitung di akhir kuis berdasarkan target orang tua
@@ -6177,6 +6287,8 @@ T([9], S_BE, CLOZE, [
             child.quizHistory.unshift(record);
             if (child.quizHistory.length > 25) child.quizHistory.pop();
 
+            pushStudyLog(child, activeQuiz.subjectName, scorePct, false, record.id);
+            petOnStudy(child, scorePct);
             checkAndUnlockBadges();
             saveDatabase();
             updateChildHeaderUI();
@@ -6500,21 +6612,1020 @@ T([9], S_BE, CLOZE, [
             document.getElementById('profile-stat-badges').textContent = `${child.unlockedBadges.length} / ${BADGES_LIST.length}`;
         }
 
+        /* =========================================================================
+           12B. PET TAMAGOTCHI, BOSS HARIAN, RUANGAN PET & LAPORAN MINGGUAN
+           ========================================================================= */
+        const PET_SPECIES = [
+            { id: 'cat', name: 'Kucing', emoji: '🐱', price: 200, starter: true },
+            { id: 'dog', name: 'Anjing', emoji: '🐶', price: 200, starter: true },
+            { id: 'rabbit', name: 'Kelinci', emoji: '🐰', price: 200, starter: true },
+            { id: 'fox', name: 'Rubah', emoji: '🦊', price: 300 },
+            { id: 'panda', name: 'Panda', emoji: '🐼', price: 400 },
+            { id: 'owl', name: 'Burung Hantu', emoji: '🦉', price: 500 },
+            { id: 'dragon', name: 'Naga', emoji: '🐲', price: 800 }
+        ];
+        const PET_STAGE_AT = [0, 30, 150, 400, 900];
+        const PET_STAGE_NAME = ['Telur', 'Bayi', 'Anak', 'Remaja', 'Dewasa'];
+        const PET_STAGE_PX = [64, 52, 66, 82, 98];
+        const PET_FOODS = {
+            apple: { emoji: '🍎', name: 'Apel', price: 12, full: 20, happy: 2, health: 0, growth: 3 },
+            meat: { emoji: '🍖', name: 'Daging', price: 25, full: 40, happy: 3, health: 3, growth: 4 },
+            cake: { emoji: '🍰', name: 'Kue Manis', price: 40, full: 25, happy: 25, health: 0, growth: 4 },
+            salad: { emoji: '🥗', name: 'Salad Sehat', price: 30, full: 30, happy: 0, health: 15, growth: 5 },
+            gold_meat: { emoji: '🍗', name: 'Daging Emas', price: 0, full: 100, happy: 30, health: 30, growth: 20, bossOnly: true }
+        };
+        const PET_SUPPLIES = {
+            soap: { emoji: '🧼', name: 'Sabun', price: 15, desc: 'Untuk memandikan pet' },
+            medicine: { emoji: '💊', name: 'Obat', price: 50, desc: 'Menyembuhkan pet yang sakit' }
+        };
+        const PET_COLORS = [
+            { id: 'normal', name: 'Warna Asli', price: 0, css: 'none' },
+            { id: 'blue', name: 'Biru Laut', price: 120, css: 'hue-rotate(170deg) saturate(1.4)' },
+            { id: 'green', name: 'Hijau Daun', price: 120, css: 'hue-rotate(80deg) saturate(1.4)' },
+            { id: 'purple', name: 'Ungu Galaksi', price: 150, css: 'hue-rotate(250deg) saturate(1.5)' },
+            { id: 'gold', name: 'Emas Berkilau', price: 250, css: 'sepia(1) saturate(4) hue-rotate(-12deg)' }
+        ];
+        const PET_ACCS = {
+            ribbon: { emoji: '🎀', name: 'Pita', price: 80, top: '-14%', size: '.42em' },
+            glasses: { emoji: '🕶️', name: 'Kacamata Keren', price: 120, top: '24%', size: '.5em' },
+            hat: { emoji: '🎩', name: 'Topi Sulap', price: 150, top: '-26%', size: '.5em' },
+            crown: { emoji: '👑', name: 'Mahkota', price: 400, top: '-28%', size: '.5em' },
+            medal: { emoji: '🏅', name: 'Medali Pemburu Boss', price: 0, top: '70%', size: '.4em', bossOnly: true }
+        };
+        const ROOM_WALLS = {
+            sky: { name: 'Langit Cerah', price: 0, css: 'linear-gradient(#bfe6ff,#e8f7ff)' },
+            garden: { name: 'Taman Bunga', price: 150, css: 'linear-gradient(#c9f5c0,#f4ffd9)' },
+            beach: { name: 'Pantai', price: 200, css: 'linear-gradient(#8fdcff,#fff1c9)' },
+            space: { name: 'Luar Angkasa', price: 250, css: 'linear-gradient(#1b1b4b,#4a2c7a)' },
+            castle: { name: 'Istana', price: 350, css: 'linear-gradient(#f9d6ff,#ffe8b8)' }
+        };
+        const ROOM_DECOR = {
+            frame: { slot: 'top', emoji: '🖼️', name: 'Lukisan', price: 70 },
+            clock: { slot: 'top', emoji: '🕰️', name: 'Jam Dinding', price: 90 },
+            lamp: { slot: 'top', emoji: '🪔', name: 'Lampu Hias', price: 100 },
+            trophy: { slot: 'top', emoji: '🏆', name: 'Piala Emas', price: 0, bossOnly: true },
+            plant: { slot: 'left', emoji: '🪴', name: 'Tanaman', price: 60 },
+            teddy: { slot: 'left', emoji: '🧸', name: 'Boneka Beruang', price: 80 },
+            bed: { slot: 'left', emoji: '🛏️', name: 'Tempat Tidur', price: 150 },
+            piano: { slot: 'left', emoji: '🎹', name: 'Piano', price: 200 },
+            books: { slot: 'right', emoji: '📚', name: 'Rak Buku', price: 100 },
+            sofa: { slot: 'right', emoji: '🛋️', name: 'Sofa', price: 120 },
+            fish: { slot: 'right', emoji: '🐠', name: 'Akuarium', price: 180 },
+            fountain: { slot: 'right', emoji: '⛲', name: 'Air Mancur', price: 250 },
+            statue: { slot: 'right', emoji: '🗿', name: 'Patung Penakluk Boss', price: 0, bossOnly: true }
+        };
+        const BOSS_BY_SUBJECT = {
+            'Matematika': { emoji: '👹', name: 'Raja Angka' },
+            'IPA Terpadu': { emoji: '🦖', name: 'Dino Sains' },
+            'IPS Terpadu': { emoji: '🐙', name: 'Gurita Peta' },
+            'Bahasa Indonesia': { emoji: '🧙', name: 'Penyihir Kata' },
+            'Bahasa Inggris': { emoji: '🐲', name: 'Naga Grammar' }
+        };
+        const BOSS_HP = 7; // jumlah jawaban benar (dari 10 soal) untuk mengalahkan boss
+
+        // Harga pet bisa diubah orang tua (fam.petPrices[kind][id]); bila tidak diubah memakai harga bawaan
+        function petPrice(kind, id, def) {
+            const fam = getActiveFamily();
+            const o = fam && fam.petPrices && fam.petPrices[kind];
+            const v = o ? o[id] : undefined;
+            return (Number.isSafeInteger(v) && v >= 0) ? v : def;
+        }
+
+        let petPanel = 'care';
+        let petFeedOpen = false;
+
+        function clampStat(v) { return Math.max(0, Math.min(100, v)); }
+
+        function ensurePetData(child) {
+            if (!child) return;
+            if (!Array.isArray(child.pets)) child.pets = [];
+            if (!child.petInv || typeof child.petInv !== 'object') child.petInv = {};
+            if (!child.petWardrobe) child.petWardrobe = { colors: ['normal'], accs: [] };
+            if (!child.room) child.room = { wall: 'sky', slots: { top: '', left: '', right: '' }, owned: ['sky'] };
+            if (!child.room.slots) child.room.slots = { top: '', left: '', right: '' };
+            if (!Array.isArray(child.room.owned)) child.room.owned = ['sky'];
+            if (!child.boss) child.boss = { date: '', defeated: false, attempts: 0 };
+            if (!Array.isArray(child.bossLog)) child.bossLog = [];
+            if (!Array.isArray(child.studyLog)) child.studyLog = [];
+            if (typeof child.activePetId !== 'string') child.activePetId = '';
+            if (!child.pets.some((p) => p.id === child.activePetId)) child.activePetId = child.pets[0] ? child.pets[0].id : '';
+        }
+
+        function getActivePet(child) {
+            ensurePetData(child);
+            return child.pets.find((p) => p.id === child.activePetId) || null;
+        }
+        function petSpecies(pet) { return PET_SPECIES.find((s) => s.id === pet.species) || PET_SPECIES[0]; }
+        function petStage(pet) {
+            let st = 0;
+            PET_STAGE_AT.forEach((t, i) => { if (pet.growth >= t) st = i; });
+            return st;
+        }
+
+        // Waktu berjalan: pet jadi lapar/kotor/bosan seiring waktu (maks 24 jam per kunjungan, pet tidak pernah mati)
+        function tickPet(pet) {
+            const now = Date.now();
+            const hrs = Math.min(72, Math.max(0, (now - (pet.lastTick || now)) / 3600000));
+            pet.lastTick = now;
+            if (pet.dead || petStage(pet) === 0) return false;
+            const wasSick = !!pet.sick;
+            pet.fullness = clampStat(pet.fullness - 5 * hrs);
+            pet.happy = clampStat(pet.happy - 3 * hrs);
+            pet.clean = clampStat(pet.clean - 3 * hrs);
+            if (pet.fullness < 20 || pet.clean < 20) pet.health = clampStat(pet.health - 4 * hrs);
+            else if (!pet.sick && pet.fullness > 50 && pet.clean > 50 && pet.happy > 40) pet.health = clampStat(pet.health + 3 * hrs);
+            if (pet.happy < 15) pet.health = clampStat(pet.health - 2 * hrs); // mood sangat rendah ikut melemahkan pet
+            if (pet.health < 35) pet.sick = true;
+            if (pet.health <= 0) {
+                pet.dead = true;
+                pet.sick = false;
+                pet.diedAt = now;
+                onPetDied(pet);
+                return true;
+            }
+            return pet.sick !== wasSick;
+        }
+
+        function onPetDied(pet) {
+            const child = getActiveChild();
+            playSound('wrong');
+            showToast(`🪦 ${pet.name} mati karena kurang dirawat...`);
+            if (child) logActivity(getActiveFamily(), `pet ${pet.name} mati karena kurang dirawat`, child.name, 'child');
+        }
+
+        function petDeadBlock(pet) {
+            if (!pet.dead) return false;
+            playSound('wrong');
+            showToast(`🪦 ${pet.name} sudah mati. Hidupkan kembali atau adopsi pet baru.`);
+            return true;
+        }
+
+        function tickAllPets(child) {
+            ensurePetData(child);
+            let changed = false;
+            child.pets.forEach((p) => { if (tickPet(p)) changed = true; });
+            return changed;
+        }
+
+        function growPet(child, pet, amount, free) {
+            if (!pet || pet.dead || amount <= 0) return;
+            const today = new Date().toDateString();
+            if (free) {
+                if (!pet.dayGrowth || pet.dayGrowth.date !== today) pet.dayGrowth = { date: today, n: 0 };
+                const room = Math.max(0, 80 - pet.dayGrowth.n);
+                amount = Math.min(amount, room);
+                pet.dayGrowth.n += amount;
+                if (amount <= 0) return;
+            }
+            const before = petStage(pet);
+            pet.growth += amount;
+            const after = petStage(pet);
+            if (after > before) {
+                playSound('fanfare');
+                fireConfetti(60);
+                showToast(after === 1 ? `🐣 Telur ${pet.name} menetas!` : `🎉 ${pet.name} tumbuh menjadi ${PET_STAGE_NAME[after]}!`);
+                logActivity(getActiveFamily(), `pet ${pet.name} tumbuh menjadi ${PET_STAGE_NAME[after]}`, child.name, 'child');
+            }
+        }
+
+        function petMoodText(pet) {
+            if (pet.dead) return `🪦 ${pet.name} telah mati karena kurang dirawat.`;
+            if (petStage(pet) > 0 && pet.health < 30 && !pet.sick) return `⚠️ Kondisi ${pet.name} kritis! Beri makan dan mandikan segera.`;
+            if (petStage(pet) > 0 && pet.sick && pet.health < 20) return `🚨 ${pet.name} sekarat! Beri obat SEKARANG atau pet akan mati.`;
+            if (petStage(pet) === 0) return '🥚 Telur hangat. Rawat dan temani supaya cepat menetas!';
+            if (pet.sick) return `🤒 ${pet.name} sakit! Beri obat dari Toko Pet.`;
+            if (pet.fullness < 30) return `🍽️ ${pet.name} lapar! Beri makanan ya.`;
+            if (pet.clean < 30) return `🫧 ${pet.name} kotor, ayo dimandikan.`;
+            if (pet.happy < 30) return `😢 ${pet.name} bosan, ajak bermain.`;
+            return `😊 ${pet.name} senang dan sehat!`;
+        }
+
+        function spendCoins(child, cost) {
+            if (child.coins < cost) {
+                playSound('wrong');
+                showToast(`⚠️ Koin belum cukup (butuh ${cost} 🪙)`);
+                return false;
+            }
+            child.coins -= cost;
+            return true;
+        }
+
+        function petPersist(rerenderHeader) {
+            saveDatabase();
+            if (rerenderHeader) updateChildHeaderUI();
+            renderPetView();
+        }
+
+        function petFaceHTML(pet, scale) {
+            const sp = petSpecies(pet);
+            const st = petStage(pet);
+            if (pet.dead) return `<div class="relative inline-block" style="font-size:${Math.round(60 * (scale || 1))}px;line-height:1">🪦</div>`;
+            const emoji = st === 0 ? '🥚' : sp.emoji;
+            const px = Math.round(PET_STAGE_PX[st] * (scale || 1));
+            const color = PET_COLORS.find((c) => c.id === pet.color) || PET_COLORS[0];
+            const acc = pet.acc && PET_ACCS[pet.acc] && st > 0 ? PET_ACCS[pet.acc] : null;
+            let overlay = '';
+            if (st > 0) {
+                if (pet.sick) overlay = '🤒';
+                else if (pet.fullness < 30) overlay = '🍽️';
+                else if (pet.clean < 30) overlay = '💨';
+                else if (pet.happy < 30) overlay = '💧';
+            }
+            return `<div class="relative inline-block ${pet.sick ? '' : 'pet-float'}" style="font-size:${px}px;line-height:1">
+                <span style="filter:${color.css}">${emoji}</span>
+                ${acc ? `<span style="position:absolute;left:50%;top:${acc.top};transform:translateX(-50%);font-size:${acc.size}">${acc.emoji}</span>` : ''}
+                ${overlay ? `<span style="position:absolute;right:-18%;top:-10%;font-size:.38em">${overlay}</span>` : ''}
+            </div>`;
+        }
+
+        function petRoomHTML(child, pet) {
+            const room = child.room;
+            const wall = ROOM_WALLS[room.wall] || ROOM_WALLS.sky;
+            const slot = (key) => (room.slots[key] && ROOM_DECOR[room.slots[key]]) ? ROOM_DECOR[room.slots[key]].emoji : '';
+            return `<div class="relative rounded-3xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-inner" style="height:230px;background:${wall.css}">
+                <div style="position:absolute;left:0;right:0;bottom:0;height:30%;background:rgba(120,72,30,.35)"></div>
+                <div style="position:absolute;left:50%;top:6%;transform:translateX(-50%);font-size:38px">${slot('top')}</div>
+                <div style="position:absolute;left:5%;bottom:22%;font-size:50px">${slot('left')}</div>
+                <div style="position:absolute;right:5%;bottom:22%;font-size:50px">${slot('right')}</div>
+                <button onclick="petTap()" class="absolute left-1/2 -translate-x-1/2" style="bottom:14%">${petFaceHTML(pet, 1)}</button>
+            </div>`;
+        }
+
+        function statBarHTML(label, icon, val, color) {
+            const v = Math.round(val);
+            return `<div>
+                <div class="flex justify-between text-[10px] font-extrabold text-slate-500 dark:text-slate-400"><span>${icon} ${label}</span><span>${v}%</span></div>
+                <div class="h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden"><div class="h-full rounded-full ${v < 30 ? 'bg-rose-500' : color}" style="width:${v}%"></div></div>
+            </div>`;
+        }
+
+        function btnCls(kind) {
+            const m = {
+                buy: 'bg-amber-400 text-slate-900',
+                use: 'bg-emerald-500 text-white',
+                on: 'bg-slate-200 dark:bg-slate-700 text-slate-500',
+                off: 'bg-indigo-500 text-white'
+            };
+            return `px-3 py-1.5 rounded-xl text-[11px] font-extrabold shrink-0 ${m[kind]}`;
+        }
+
+        function renderPetView() {
+            const el = document.getElementById('pet-view-content');
+            const child = getActiveChild();
+            if (!el || !child) return;
+            ensurePetData(child);
+            const pet = getActivePet(child);
+            const coinsHTML = `<div class="flex items-center justify-between"><h2 class="font-game font-bold text-lg">🐾 Pet Kamu</h2><span class="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-extrabold text-xs">🪙 ${child.coins}</span></div>`;
+
+            if (!pet || petPanel === 'adopt') {
+                const first = child.pets.length === 0 && !child.petAdoptedOnce;
+                const cards = PET_SPECIES.map((sp) => {
+                    const free = first && sp.starter;
+                    return `<div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <span class="text-4xl">${sp.emoji}</span>
+                        <div class="flex-1"><p class="font-game font-bold text-sm">${sp.name}</p><p class="text-[11px] font-semibold text-slate-500">${free ? 'Pet pertama GRATIS' : `${petPrice('species', sp.id, sp.price)} 🪙`}</p></div>
+                        <button onclick="petAdopt('${sp.id}')" class="${btnCls('buy')}">Adopsi</button>
+                    </div>`;
+                }).join('');
+                el.innerHTML = `${coinsHTML}
+                    <div class="p-4 rounded-3xl bg-gradient-to-br from-pink-100 to-amber-100 dark:from-pink-950/40 dark:to-amber-950/40 border border-pink-200 dark:border-pink-900 space-y-2">
+                        <p class="font-game font-bold text-sm">${first ? 'Adopsi pet pertamamu!' : 'Adopsi pet baru'}</p>
+                        <p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 leading-snug">Pet berawal dari telur. Beri makan, mainkan, mandikan, dan rawat supaya tumbuh. Jangan lupa belajar, karena belajar membuat pet tumbuh lebih cepat!</p>
+                        <input id="pet-name-input" maxlength="14" placeholder="Beri nama pet-mu (maks. 14 huruf)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-sm focus:outline-none focus:border-pink-400">
+                    </div>
+                    <div class="space-y-2">${cards}</div>
+                    ${pet ? `<button onclick="petSetPanel('care')" class="w-full py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">← Kembali ke pet-ku</button>` : ''}`;
+                return;
+            }
+
+            const st = petStage(pet);
+            const nextAt = PET_STAGE_AT[st + 1];
+            const gPct = nextAt ? Math.round(((pet.growth - PET_STAGE_AT[st]) / (nextAt - PET_STAGE_AT[st])) * 100) : 100;
+            const chips = child.pets.map((p) => `<button onclick="petSelect('${p.id}')" class="px-2.5 py-1.5 rounded-xl text-xs font-extrabold ${p.id === pet.id ? 'bg-pink-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}">${p.dead ? '🪦' : petSpecies(p).emoji} ${esc(p.name)}${p.sick ? ' 🤒' : ''}</button>`).join('');
+            const tabs = [['care', '❤️ Rawat'], ['shop', '🛒 Toko'], ['look', '🎀 Gaya'], ['room', '🏠 Ruangan'], ['adopt', '➕ Pet Baru']]
+                .map(([k, l]) => `<button onclick="petSetPanel('${k}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold whitespace-nowrap ${petPanel === k ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}">${l}</button>`).join('');
+
+            let panel = '';
+            if (pet.dead && ['care', 'shop', 'look'].includes(petPanel)) {
+                panel = `<div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 space-y-2 text-center">
+                    <p class="font-game font-bold text-sm">🪦 ${esc(pet.name)} telah mati</p>
+                    <p class="text-[11px] font-semibold text-slate-500 leading-snug">Pet tidak dirawat terlalu lama. Kamu bisa menghidupkannya kembali dengan koin, atau memakamkannya dan mengadopsi pet baru.</p>
+                    <button onclick="petRevive()" class="w-full py-2.5 rounded-2xl bg-emerald-500 text-white font-extrabold text-xs">💫 Hidupkan Kembali (${petPrice('misc', 'revive', 300)} 🪙)</button>
+                    <button onclick="petBury()" class="w-full py-2.5 rounded-2xl bg-slate-200 dark:bg-slate-700 font-extrabold text-xs">⚰️ Makamkan & Adopsi Pet Baru</button>
+                </div>`;
+            } else if (petPanel === 'care') {
+                const inv = child.petInv;
+                const foodRows = Object.keys(PET_FOODS).filter((k) => (inv[k] || 0) > 0).map((k) => {
+                    const f = PET_FOODS[k];
+                    return `<div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">${f.emoji} ${f.name} <span class="text-slate-400">x${inv[k]}</span></span><button onclick="petFeed('${k}')" class="${btnCls('use')}">Beri</button></div>`;
+                }).join('');
+                panel = `<div class="grid grid-cols-4 gap-2">
+                        <button onclick="petToggleFeed()" class="py-2.5 rounded-2xl bg-orange-100 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 font-extrabold text-[11px]"><div class="text-xl">🍽️</div>Makan</button>
+                        <button onclick="petPlay()" class="py-2.5 rounded-2xl bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-extrabold text-[11px]"><div class="text-xl">🎾</div>${st === 0 ? 'Hangatkan' : 'Main 🧠'}</button>
+                        <button onclick="petBath()" class="py-2.5 rounded-2xl bg-cyan-100 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 font-extrabold text-[11px]"><div class="text-xl">🛁</div>Mandi (${inv.soap || 0})</button>
+                        <button onclick="petMedicine()" class="py-2.5 rounded-2xl bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-extrabold text-[11px]"><div class="text-xl">💊</div>Obat (${inv.medicine || 0})</button>
+                    </div>
+                    ${petFeedOpen ? `<div class="space-y-1.5">${foodRows || '<p class="text-[11px] font-semibold text-slate-500 text-center py-2">Stok makanan kosong. Beli di tab 🛒 Toko.</p>'}</div>` : ''}
+                    <div class="flex gap-2"><input id="pet-rename-input" maxlength="14" value="${esc(pet.name)}" class="flex-1 min-w-0 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-pink-400"><button onclick="petRename()" class="${btnCls('use')}">✏️ Ganti Nama</button></div>
+                    <p class="text-[10px] font-semibold text-slate-400 text-center">Main (jawab 1 soal dulu), mandi, dan makan menambah pertumbuhan (maks. 80 poin/hari). Belajar & kalahkan boss menambah lebih banyak!</p>`;
+            } else if (petPanel === 'shop') {
+                const rows = (obj, kind) => Object.keys(obj).filter((k) => !obj[k].bossOnly).map((k) => {
+                    const it = obj[k];
+                    const extra = kind === 'food' ? `Kenyang +${it.full}${it.happy ? `, Senang +${it.happy}` : ''}${it.health ? `, Sehat +${it.health}` : ''}` : it.desc;
+                    return `<div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <span class="text-2xl">${it.emoji}</span>
+                        <div class="flex-1 min-w-0"><p class="font-bold text-xs">${it.name} <span class="text-slate-400">(punya ${child.petInv[k] || 0})</span></p><p class="text-[10px] font-semibold text-slate-500">${extra}</p></div>
+                        <button onclick="petBuy('${kind}','${k}')" class="${btnCls('buy')}">${petPrice(kind, k, it.price)} 🪙</button>
+                    </div>`;
+                }).join('');
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">MAKANAN</p><div class="space-y-1.5">${rows(PET_FOODS, 'food')}</div>
+                    <p class="text-[11px] font-extrabold text-slate-500 pt-1">PERLENGKAPAN</p><div class="space-y-1.5">${rows(PET_SUPPLIES, 'supply')}</div>
+                    ${(child.petInv.gold_meat || 0) > 0 ? `<p class="text-[11px] font-semibold text-amber-600">🍗 Daging Emas (hadiah boss) x${child.petInv.gold_meat} ada di tab Rawat.</p>` : ''}`;
+            } else if (petPanel === 'look') {
+                const w = child.petWardrobe;
+                const colorRows = PET_COLORS.map((c) => {
+                    const owned = w.colors.includes(c.id) || c.price === 0;
+                    const on = (pet.color || 'normal') === c.id;
+                    const btn = on ? `<span class="${btnCls('on')}">Dipakai</span>` : owned ? `<button onclick="petEquip('color','${c.id}')" class="${btnCls('use')}">Pakai</button>` : `<button onclick="petBuy('color','${c.id}')" class="${btnCls('buy')}">${petPrice('color', c.id, c.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">🎨 ${c.name}</span>${btn}</div>`;
+                }).join('');
+                const accRows = Object.keys(PET_ACCS).filter((k) => !PET_ACCS[k].bossOnly || w.accs.includes(k)).map((k) => {
+                    const a = PET_ACCS[k];
+                    const owned = w.accs.includes(k);
+                    const on = pet.acc === k;
+                    const btn = on ? `<button onclick="petEquip('acc','')" class="${btnCls('off')}">Lepas</button>` : owned ? `<button onclick="petEquip('acc','${k}')" class="${btnCls('use')}">Pakai</button>` : `<button onclick="petBuy('acc','${k}')" class="${btnCls('buy')}">${petPrice('acc', k, a.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">${a.emoji} ${a.name}</span>${btn}</div>`;
+                }).join('');
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">WARNA PET</p><div class="space-y-1.5">${colorRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">AKSESORIS</p><div class="space-y-1.5">${accRows}</div>`;
+            } else if (petPanel === 'room') {
+                const r = child.room;
+                const wallRows = Object.keys(ROOM_WALLS).map((k) => {
+                    const wl = ROOM_WALLS[k];
+                    const owned = r.owned.includes(k) || wl.price === 0;
+                    const btn = r.wall === k ? `<span class="${btnCls('on')}">Dipakai</span>` : owned ? `<button onclick="roomEquip('wall','${k}')" class="${btnCls('use')}">Pakai</button>` : `<button onclick="roomBuy('wall','${k}')" class="${btnCls('buy')}">${petPrice('wall', k, wl.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold flex items-center gap-2"><span class="w-5 h-5 rounded-md inline-block" style="background:${wl.css}"></span>${wl.name}</span>${btn}</div>`;
+                }).join('');
+                const slotName = { top: 'Dinding', left: 'Kiri', right: 'Kanan' };
+                const decorRows = Object.keys(ROOM_DECOR).filter((k) => !ROOM_DECOR[k].bossOnly || r.owned.includes(k)).map((k) => {
+                    const d = ROOM_DECOR[k];
+                    const owned = r.owned.includes(k);
+                    const on = r.slots[d.slot] === k;
+                    const btn = on ? `<button onclick="roomEquip('decor','${k}')" class="${btnCls('off')}">Copot</button>` : owned ? `<button onclick="roomEquip('decor','${k}')" class="${btnCls('use')}">Pasang</button>` : `<button onclick="roomBuy('decor','${k}')" class="${btnCls('buy')}">${petPrice('decor', k, d.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">${d.emoji} ${d.name} <span class="text-slate-400">(${slotName[d.slot]})</span></span>${btn}</div>`;
+                }).join('');
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">WALLPAPER</p><div class="space-y-1.5">${wallRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">DEKORASI</p><div class="space-y-1.5">${decorRows}</div>`;
+            }
+
+            el.innerHTML = `${coinsHTML}
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar">${chips}</div>
+                ${petRoomHTML(child, pet)}
+                <div class="p-3.5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-game font-bold text-base">${petSpecies(pet).emoji} ${esc(pet.name)} <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-pink-100 text-pink-600 align-middle">${PET_STAGE_NAME[st]}</span></h3>
+                        <span class="text-[10px] font-extrabold text-slate-400">${pet.growth} poin tumbuh</span>
+                    </div>
+                    <div><div class="flex justify-between text-[10px] font-extrabold text-slate-500"><span>🌱 Pertumbuhan</span><span>${nextAt ? `${pet.growth}/${nextAt} menuju ${PET_STAGE_NAME[st + 1]}` : 'Sudah dewasa!'}</span></div>
+                    <div class="h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-pink-400 to-fuchsia-500" style="width:${gPct}%"></div></div></div>
+                    ${st > 0 && !pet.dead ? `<div class="grid grid-cols-2 gap-x-3 gap-y-2">${statBarHTML('Kenyang', '🍽️', pet.fullness, 'bg-orange-400')}${statBarHTML('Mood', pet.happy >= 60 ? '😄' : pet.happy >= 30 ? '😐' : '😢', pet.happy, 'bg-yellow-400')}${statBarHTML('Sehat', '❤️', pet.health, 'bg-emerald-500')}${statBarHTML('Bersih', '🫧', pet.clean, 'bg-cyan-400')}</div>` : ''}
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">${petMoodText(pet)}</p>
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar">${tabs}</div>
+                <div class="space-y-2">${panel}</div>`;
+        }
+
+        function petSetPanel(p) { playSound('click'); petPanel = p; renderPetView(); }
+        function petToggleFeed() { playSound('click'); petFeedOpen = !petFeedOpen; renderPetView(); }
+        function petSelect(id) {
+            const child = getActiveChild(); if (!child) return;
+            playSound('click');
+            child.activePetId = id;
+            saveDatabase();
+            renderPetView();
+        }
+        function petTap() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            playSound('click');
+            const lines = ['Hehe, geli!', 'Aku sayang kamu!', 'Ayo belajar bareng!', 'Kamu pintar!', 'Aku senang hari ini!'];
+            const st = petStage(pet);
+            showToast(st === 0 ? '🥚 Telur bergerak pelan...' : `${petSpecies(pet).emoji} ${pet.name}: "${pet.sick ? 'Aku tidak enak badan...' : lines[Math.floor(Math.random() * lines.length)]}"`);
+        }
+
+        function petRevive() {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            if (!pet || !pet.dead) return;
+            if (!spendCoins(child, petPrice('misc', 'revive', 300))) return;
+            pet.dead = false; pet.sick = false; pet.diedAt = 0;
+            pet.health = 40; pet.fullness = 50; pet.happy = 40; pet.clean = 50;
+            pet.lastTick = Date.now();
+            logActivity(getActiveFamily(), `menghidupkan kembali pet ${pet.name}`, child.name, 'child');
+            playSound('fanfare'); fireConfetti(50);
+            showToast(`💫 ${pet.name} hidup kembali! Rawat dengan baik ya.`);
+            petPersist(true);
+        }
+
+        async function petBury() {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            if (!pet || !pet.dead) return;
+            const ok = await appConfirm(`Makamkan ${pet.name}? Pet akan dihapus dan kamu bisa adopsi pet baru. Tindakan ini tidak bisa dibatalkan.`, { title: 'Makamkan Pet', okText: 'Ya, Makamkan' });
+            if (!ok) return;
+            child.pets = child.pets.filter((p) => p.id !== pet.id);
+            child.activePetId = child.pets[0] ? child.pets[0].id : '';
+            petPanel = child.pets.length ? 'care' : 'adopt';
+            logActivity(getActiveFamily(), `memakamkan pet ${pet.name}`, child.name, 'child');
+            saveDatabase();
+            renderPetView();
+        }
+
+        function petRename() {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            const input = document.getElementById('pet-rename-input');
+            if (!pet || !input) return;
+            const name = input.value.trim().slice(0, 14);
+            if (!name) { playSound('wrong'); showToast('⚠️ Ketik nama pet dulu ya.'); return; }
+            pet.name = name;
+            playSound('correct');
+            showToast(`✏️ Nama pet sekarang ${name}!`);
+            petPersist(false);
+        }
+
+        // ===== Main dengan pet: jawab 1 soal acak dulu =====
+        const PET_GAMES = [
+            { id: 'chase', emoji: '🏃', name: 'Kejar-kejaran', win: 'berlari kencang mengejarmu keliling taman' },
+            { id: 'ball', emoji: '🎾', name: 'Lempar Bola', win: 'menangkap bola dan membawanya kembali' },
+            { id: 'hide', emoji: '🙈', name: 'Petak Umpet', win: 'bersembunyi, lalu kamu menemukannya' },
+            { id: 'dance', emoji: '🎵', name: 'Menari Bersama', win: 'menari lucu mengikuti musik' }
+        ];
+        let petPlayGame = null;
+        let petPlayQ = null;
+
+        function openPetPlay() {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            if (!pet || petDeadBlock(pet) || petBlockedIfEgg(pet, 'diajak bermain')) return;
+            if (pet.sick) { playSound('wrong'); showToast(`🤒 ${pet.name} sedang sakit, obati dulu.`); return; }
+            if (pet.fullness < 15) { playSound('wrong'); showToast(`🍽️ ${pet.name} terlalu lapar untuk bermain.`); return; }
+            if (pet.happy >= 98) { playSound('wrong'); showToast(`😄 Mood ${pet.name} sudah penuh!`); return; }
+            playSound('click');
+            const modal = document.getElementById('pet-play-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            renderPetPlayPick();
+        }
+
+        function closePetPlay() {
+            const modal = document.getElementById('pet-play-modal');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+            petPlayGame = null; petPlayQ = null;
+            renderPetView();
+        }
+
+        function renderPetPlayPick() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            document.getElementById('pet-play-body').innerHTML = `
+                <p class="font-game font-bold text-base text-center">Main apa dengan ${esc(pet.name)}?</p>
+                <p class="text-[11px] font-semibold text-slate-500 text-center">Jawab 1 soal pelajaran dulu supaya ${esc(pet.name)} mau bermain 🧠</p>
+                <div class="grid grid-cols-2 gap-2">${PET_GAMES.map((g) => `<button onclick="petPlayStart('${g.id}')" class="py-3 rounded-2xl bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-extrabold text-xs"><div class="text-2xl">${g.emoji}</div>${g.name}</button>`).join('')}</div>
+                <button onclick="closePetPlay()" class="w-full py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">Batal</button>`;
+        }
+
+        function petPlayStart(gameId) {
+            const child = getActiveChild(); if (!child) return;
+            petPlayGame = PET_GAMES.find((g) => g.id === gameId) || PET_GAMES[0];
+            const subj = SUBJECT_META[Math.floor(Math.random() * SUBJECT_META.length)].subject;
+            const qs = buildTenQuestionQuiz(child.grade, subj, child.recentQuestionHashes || [], 1);
+            if (!qs.length) { showToast('⚠️ Soal belum tersedia.'); return; }
+            petPlayQ = qs[0];
+            playSound('click');
+            const letters = ['A', 'B', 'C', 'D'];
+            document.getElementById('pet-play-body').innerHTML = `
+                <p class="text-[10px] font-extrabold uppercase text-indigo-500">${petPlayGame.emoji} ${petPlayGame.name} · soal ${esc(subj)}</p>
+                <p class="font-bold text-sm leading-snug">${esc(petPlayQ.q)}</p>
+                <div class="space-y-2">${petPlayQ.options.map((o, i) => `<button onclick="petPlayAnswer(${i})" class="w-full text-left p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-sm flex items-center gap-2.5"><span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-game shrink-0">${letters[i]}</span><span class="flex-1">${o}</span></button>`).join('')}</div>`;
+        }
+
+        function petPlayAnswer(idx) {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            if (!pet || !petPlayQ || !petPlayGame) return;
+            const ok = idx === petPlayQ.answer;
+            let html;
+            if (ok) {
+                pet.happy = clampStat(pet.happy + 25);
+                pet.fullness = clampStat(pet.fullness - 8);
+                pet.clean = clampStat(pet.clean - 5);
+                growPet(child, pet, 8, true);
+                playSound('correct'); fireConfetti(25);
+                html = `<div class="text-center space-y-1"><div class="text-5xl">${petPlayGame.emoji}</div><p class="font-game font-bold text-base text-emerald-600">Jawaban benar!</p>
+                    <p class="text-xs font-semibold">${esc(pet.name)} ${petPlayGame.win}. Mood +25 😄</p></div>`;
+            } else {
+                pet.happy = clampStat(pet.happy + 5);
+                playSound('wrong');
+                html = `<div class="text-center space-y-1"><div class="text-5xl">😿</div><p class="font-game font-bold text-base text-rose-600">Belum tepat...</p>
+                    <p class="text-xs font-semibold">${esc(pet.name)} menunggu kamu belajar dulu. Mood +5.</p></div>
+                    <p class="text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 rounded-xl p-2.5 leading-snug">${esc(petPlayQ.explanation || '')}</p>`;
+            }
+            petPlayQ = null;
+            saveDatabase();
+            document.getElementById('pet-play-body').innerHTML = html + `
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="petPlayAgain()" class="py-2.5 rounded-2xl bg-sky-500 text-white font-extrabold text-xs">Main Lagi</button>
+                    <button onclick="closePetPlay()" class="py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 font-extrabold text-xs">Selesai</button>
+                </div>`;
+        }
+
+        function petPlayAgain() {
+            const child = getActiveChild(); const pet = child && getActivePet(child);
+            if (!pet) return;
+            if (pet.fullness < 15) { showToast(`🍽️ ${pet.name} terlalu lapar untuk bermain.`); closePetPlay(); return; }
+            if (pet.happy >= 98) { showToast(`😄 Mood ${pet.name} sudah penuh!`); closePetPlay(); return; }
+            renderPetPlayPick();
+        }
+
+        function petAdopt(speciesId) {
+            const child = getActiveChild(); if (!child) return;
+            ensurePetData(child);
+            const sp = PET_SPECIES.find((s) => s.id === speciesId); if (!sp) return;
+            if (child.pets.length >= 4) { playSound('wrong'); showToast('⚠️ Maksimal 4 pet yang bisa dipelihara.'); return; }
+            const free = child.pets.length === 0 && !child.petAdoptedOnce && sp.starter;
+            if (!free && !spendCoins(child, petPrice('species', sp.id, sp.price))) return;
+            child.petAdoptedOnce = true;
+            const input = document.getElementById('pet-name-input');
+            const name = ((input && input.value.trim()) || sp.name).slice(0, 14);
+            const pet = { id: 'pet_' + Date.now(), species: sp.id, name: name, growth: 0, fullness: 80, happy: 80, health: 100, clean: 80, sick: false, color: 'normal', acc: '', lastTick: Date.now(), born: Date.now() };
+            child.pets.push(pet);
+            child.activePetId = pet.id;
+            petPanel = 'care';
+            logActivity(getActiveFamily(), `mengadopsi pet ${sp.name} bernama ${name}`, child.name, 'child');
+            playSound('fanfare'); fireConfetti(50);
+            showToast(`🥚 Telur ${name} siap dirawat!`);
+            petPersist(true);
+        }
+
+        function petBlockedIfEgg(pet, what) {
+            if (petStage(pet) === 0) { playSound('wrong'); showToast(`🥚 Telur belum bisa ${what}. Hangatkan dulu sampai menetas!`); return true; }
+            return false;
+        }
+
+        function petFeed(foodId) {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            const f = PET_FOODS[foodId];
+            if (petDeadBlock(pet)) return;
+            if (petBlockedIfEgg(pet, 'makan')) return;
+            if ((child.petInv[foodId] || 0) < 1) { playSound('wrong'); showToast('⚠️ Stok makanan habis, beli dulu di Toko Pet.'); return; }
+            if (pet.fullness >= 95 && !f.bossOnly) { playSound('wrong'); showToast(`😋 ${pet.name} masih kenyang!`); return; }
+            child.petInv[foodId] -= 1;
+            pet.fullness = clampStat(pet.fullness + f.full);
+            pet.happy = clampStat(pet.happy + f.happy);
+            pet.health = clampStat(pet.health + f.health);
+            if (!pet.sick) growPet(child, pet, f.growth, !f.bossOnly);
+            playSound('correct');
+            showToast(`${f.emoji} ${pet.name} makan dengan lahap!`);
+            petPersist(false);
+        }
+
+        function petPlay() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            if (petDeadBlock(pet)) return;
+            if (petStage(pet) === 0) {
+                growPet(child, pet, 6, true);
+                playSound('click'); showToast('🥚 Telur terasa hangat...');
+                petPersist(false); return;
+            }
+            openPetPlay();
+        }
+
+        function petBath() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            if (petDeadBlock(pet)) return;
+            if (petBlockedIfEgg(pet, 'mandi')) return;
+            if ((child.petInv.soap || 0) < 1) { playSound('wrong'); showToast('⚠️ Sabun habis, beli di Toko Pet.'); return; }
+            if (pet.clean >= 90) { playSound('wrong'); showToast(`✨ ${pet.name} sudah bersih.`); return; }
+            child.petInv.soap -= 1;
+            pet.clean = clampStat(pet.clean + 60);
+            pet.happy = clampStat(pet.happy - 3);
+            if (!pet.sick) growPet(child, pet, 3, true);
+            playSound('correct');
+            showToast(`🛁 ${pet.name} bersih dan wangi!`);
+            petPersist(false);
+        }
+
+        function petMedicine() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            if (petDeadBlock(pet)) return;
+            if (petBlockedIfEgg(pet, 'diobati')) return;
+            if (!pet.sick && pet.health >= 80) { playSound('wrong'); showToast(`💪 ${pet.name} sehat, tidak perlu obat.`); return; }
+            if ((child.petInv.medicine || 0) < 1) { playSound('wrong'); showToast('⚠️ Obat habis, beli di Toko Pet.'); return; }
+            child.petInv.medicine -= 1;
+            pet.sick = false;
+            pet.health = clampStat(Math.max(pet.health, 40) + 35);
+            playSound('fanfare');
+            showToast(`💊 ${pet.name} sudah sembuh!`);
+            petPersist(false);
+        }
+
+        function petBuy(kind, id) {
+            const child = getActiveChild(); if (!child) return;
+            ensurePetData(child);
+            if (kind === 'food' || kind === 'supply') {
+                const it = (kind === 'food' ? PET_FOODS : PET_SUPPLIES)[id];
+                if (!it || it.bossOnly || !spendCoins(child, petPrice(kind, id, it.price))) return;
+                child.petInv[id] = (child.petInv[id] || 0) + 1;
+                playSound('correct'); showToast(`✅ Membeli ${it.emoji} ${it.name}`);
+            } else if (kind === 'color') {
+                const c = PET_COLORS.find((x) => x.id === id);
+                if (!c || child.petWardrobe.colors.includes(id) || !spendCoins(child, petPrice('color', id, c.price))) return;
+                child.petWardrobe.colors.push(id);
+                const pet = getActivePet(child); if (pet) pet.color = id;
+                playSound('correct'); showToast(`🎨 Warna ${c.name} dibeli & dipakai!`);
+            } else if (kind === 'acc') {
+                const a = PET_ACCS[id];
+                if (!a || a.bossOnly || child.petWardrobe.accs.includes(id) || !spendCoins(child, petPrice('acc', id, a.price))) return;
+                child.petWardrobe.accs.push(id);
+                const pet = getActivePet(child); if (pet) pet.acc = id;
+                playSound('correct'); showToast(`${a.emoji} ${a.name} dibeli & dipakai!`);
+            }
+            petPersist(true);
+        }
+
+        function petEquip(kind, id) {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            playSound('click');
+            if (kind === 'color') pet.color = id;
+            if (kind === 'acc') pet.acc = id;
+            petPersist(false);
+        }
+
+        function roomBuy(kind, id) {
+            const child = getActiveChild(); if (!child) return;
+            ensurePetData(child);
+            const it = kind === 'wall' ? ROOM_WALLS[id] : ROOM_DECOR[id];
+            if (!it || it.bossOnly || child.room.owned.includes(id) || !spendCoins(child, petPrice(kind, id, it.price))) return;
+            child.room.owned.push(id);
+            if (kind === 'wall') child.room.wall = id; else child.room.slots[it.slot] = id;
+            playSound('correct'); showToast(`🏠 ${it.name} dibeli & dipasang!`);
+            petPersist(true);
+        }
+
+        function roomEquip(kind, id) {
+            const child = getActiveChild(); if (!child) return;
+            ensurePetData(child);
+            playSound('click');
+            if (kind === 'wall') child.room.wall = id;
+            else {
+                const d = ROOM_DECOR[id]; if (!d) return;
+                child.room.slots[d.slot] = child.room.slots[d.slot] === id ? '' : id;
+            }
+            petPersist(false);
+        }
+
+        // ===== Catatan belajar ringkas (untuk laporan mingguan) =====
+        function pushStudyLog(child, subject, score, isBoss, id) {
+            ensurePetData(child);
+            child.studyLog.push({ id: id, ts: Date.now(), subject: subject, score: score, boss: !!isBoss });
+            if (child.studyLog.length > 150) child.studyLog.splice(0, child.studyLog.length - 150);
+        }
+
+        // Belajar membuat pet tumbuh lebih cepat
+        function petOnStudy(child, scorePct) {
+            const pet = getActivePet(child);
+            if (!pet || pet.dead) return;
+            tickPet(pet);
+            if (pet.dead) return;
+            if (petStage(pet) === 0) { growPet(child, pet, 12, false); return; }
+            pet.happy = clampStat(pet.happy + 8);
+            if (!pet.sick) growPet(child, pet, 8 + (scorePct >= 70 ? 8 : 0) + (scorePct === 100 ? 8 : 0), false);
+        }
+
+        // ===== BOSS HARIAN =====
+        function getTodayBoss(child) {
+            const dayNum = Math.floor(new Date(new Date().toDateString()).getTime() / 86400000);
+            const subject = SUBJECT_META[dayNum % SUBJECT_META.length].subject;
+            const b = BOSS_BY_SUBJECT[subject] || { emoji: '👹', name: 'Boss Misterius' };
+            return { subject: subject, emoji: b.emoji, name: b.name };
+        }
+
+        function bossStateToday(child) {
+            ensurePetData(child);
+            const today = new Date().toDateString();
+            if (child.boss.date !== today) child.boss = { date: today, defeated: false, attempts: 0 };
+            return child.boss;
+        }
+
+        function startBossQuiz() {
+            const child = getActiveChild(); if (!child) return;
+            const st = bossStateToday(child);
+            if (st.defeated) { playSound('wrong'); showToast('🏆 Boss hari ini sudah kamu kalahkan. Kembali lagi besok!'); return; }
+            const boss = getTodayBoss(child);
+            const qs = buildTenQuestionQuiz(child.grade, boss.subject, child.recentQuestionHashes || [], 10);
+            if (!qs.length) { showToast('⚠️ Bank soal belum tersedia.'); return; }
+            playSound('click');
+            st.attempts += 1;
+            activeQuiz = {
+                subjectName: boss.subject, grade: child.grade, questions: qs, currentIndex: 0, correctCount: 0,
+                currentCombo: 0, earnedXp: 0, earnedCoins: 0, answered: false, lifeline5050Left: 1, lifelineHintLeft: 1,
+                answerLog: [], isBoss: true, bossHp: BOSS_HP, bossName: boss.name, bossEmoji: boss.emoji
+            };
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+            renderCurrentQuestion();
+            updateBossBarUI();
+            showToast(`${boss.emoji} ${boss.name} muncul! Jawab benar minimal ${BOSS_HP} dari ${qs.length} soal.`);
+        }
+
+        function updateBossBarUI() {
+            const bar = document.getElementById('quiz-boss-bar');
+            if (!bar) return;
+            if (!activeQuiz.isBoss) { bar.classList.add('hidden'); return; }
+            const left = Math.max(0, BOSS_HP - activeQuiz.correctCount);
+            bar.classList.remove('hidden');
+            document.getElementById('quiz-boss-label').textContent = `${activeQuiz.bossEmoji} ${activeQuiz.bossName}`;
+            document.getElementById('quiz-boss-hp-text').textContent = left === 0 ? 'KO!' : `HP ${left}/${BOSS_HP}`;
+            document.getElementById('quiz-boss-hp').style.width = `${Math.round((left / BOSS_HP) * 100)}%`;
+            const title = document.getElementById('quiz-subject-title');
+            if (title) title.textContent = `⚔️ Boss ${activeQuiz.subjectName} - ${formatGradeLabel(activeQuiz.grade)}`;
+        }
+
+        function finishBossQuiz(child, total, scorePct) {
+            ensurePetData(child);
+            const st = bossStateToday(child);
+            const defeated = activeQuiz.correctCount >= BOSS_HP;
+            child.xp += activeQuiz.earnedXp;
+            child.quizzesCompleted += 1;
+            let coins = 0; let dropText = '';
+            if (defeated && !st.defeated) {
+                st.defeated = true;
+                const baseReward = petPrice('misc', 'bossReward', 80);
+                coins = baseReward + (scorePct === 100 ? Math.round(baseReward * 0.25) : 0);
+                child.coins += coins;
+                child.xp += 100;
+                child.bossLog.push({ ts: Date.now(), subject: activeQuiz.subjectName, boss: activeQuiz.bossName });
+                if (child.bossLog.length > 100) child.bossLog.shift();
+                const rares = [];
+                if (!child.petWardrobe.accs.includes('medal')) rares.push(['acc', 'medal']);
+                if (!child.room.owned.includes('statue')) rares.push(['decor', 'statue']);
+                if (!child.room.owned.includes('trophy')) rares.push(['decor', 'trophy']);
+                if (rares.length && Math.random() < 0.6) {
+                    const [k, id] = rares[Math.floor(Math.random() * rares.length)];
+                    if (k === 'acc') { child.petWardrobe.accs.push(id); dropText = `Item langka: ${PET_ACCS[id].emoji} ${PET_ACCS[id].name}!`; }
+                    else { child.room.owned.push(id); dropText = `Item langka: ${ROOM_DECOR[id].emoji} ${ROOM_DECOR[id].name}!`; }
+                } else {
+                    child.petInv.gold_meat = (child.petInv.gold_meat || 0) + 1;
+                    dropText = 'Hadiah: 🍗 Daging Emas untuk pet!';
+                }
+                const pet = getActivePet(child);
+                if (pet) { tickPet(pet); if (!pet.sick) growPet(child, pet, 30, false); }
+            }
+            const now = new Date();
+            const record = {
+                id: 'qz-' + Date.now(), date: now.toDateString(),
+                timeStr: now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ', ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                subject: activeQuiz.subjectName, grade: activeQuiz.grade, score: scorePct,
+                correctCount: activeQuiz.correctCount, totalQuestions: total, details: activeQuiz.answerLog, boss: true
+            };
+            lastCompletedQuizRecord = record;
+            child.quizHistory = child.quizHistory || [];
+            child.quizHistory.unshift(record);
+            if (child.quizHistory.length > 25) child.quizHistory.pop();
+            pushStudyLog(child, activeQuiz.subjectName, scorePct, true, record.id);
+            logActivity(getActiveFamily(), `${defeated ? 'mengalahkan' : 'melawan'} boss ${activeQuiz.bossName} (${activeQuiz.subjectName}) skor ${scorePct}%`, child.name, 'child');
+            checkAndUnlockBadges();
+            saveDatabase();
+            updateChildHeaderUI();
+            renderChildHomeView();
+            playSound('fanfare'); fireConfetti(defeated ? 100 : 30);
+
+            document.getElementById('result-badge-tag').textContent = 'Pertarungan Boss';
+            document.getElementById('result-score').textContent = `${scorePct}%`;
+            document.getElementById('result-xp').textContent = `+${activeQuiz.earnedXp + (coins ? 100 : 0)}`;
+            document.getElementById('result-coins').textContent = `+${coins}`;
+            document.getElementById('result-emoji').textContent = defeated ? '🏆' : activeQuiz.bossEmoji;
+            document.getElementById('result-title').textContent = defeated ? `${activeQuiz.bossName} Dikalahkan!` : `${activeQuiz.bossName} Masih Berdiri`;
+            document.getElementById('result-subtitle').textContent = defeated
+                ? (dropText || 'Boss hari ini sudah pernah kamu kalahkan.')
+                : `Butuh ${BOSS_HP} jawaban benar, kamu dapat ${activeQuiz.correctCount}. Coba lagi, boss ini belum kabur!`;
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('result-modal').classList.add('flex');
+        }
+
+        // ===== Kartu Boss & Pet di beranda anak =====
+        function renderHomeExtras() {
+            const el = document.getElementById('home-extras');
+            const child = getActiveChild();
+            if (!el || !child) return;
+            ensurePetData(child);
+            const boss = getTodayBoss(child);
+            const st = bossStateToday(child);
+            const pet = getActivePet(child);
+            if (pet && tickPet(pet)) saveDatabase();
+            const bossCard = `<div class="rounded-3xl p-3.5 bg-gradient-to-br from-slate-800 to-rose-900 text-white shadow-lg flex items-center gap-3">
+                <div class="text-5xl ${st.defeated ? 'opacity-40 grayscale' : 'pet-float'}">${boss.emoji}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-200">⚔️ Boss Harian</p>
+                    <p class="font-game font-bold text-sm leading-tight">${boss.name}</p>
+                    <p class="text-[11px] font-semibold text-rose-100">${boss.subject} · ${BOSS_HP} benar dari 10 soal · 🪙 ${petPrice('misc', 'bossReward', 80)}+ & item langka</p>
+                </div>
+                ${st.defeated
+                    ? '<span class="px-2.5 py-1.5 rounded-xl bg-emerald-400 text-slate-900 text-[11px] font-extrabold shrink-0">✅ Kalah</span>'
+                    : '<button onclick="startBossQuiz()" class="px-3 py-2 rounded-xl bg-amber-400 text-slate-900 text-xs font-extrabold shrink-0">Lawan!</button>'}
+            </div>`;
+            const petCard = pet
+                ? `<button onclick="switchTab('pet')" class="w-full text-left rounded-3xl p-3.5 bg-white dark:bg-slate-900 border-2 ${pet.sick ? 'border-rose-400' : 'border-pink-200 dark:border-pink-900'} shadow-sm flex items-center gap-3">
+                    <div class="w-14 flex justify-center">${petFaceHTML(pet, 0.55)}</div>
+                    <div class="flex-1 min-w-0"><p class="font-game font-bold text-sm">${esc(pet.name)} · ${PET_STAGE_NAME[petStage(pet)]}</p><p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">${petMoodText(pet)}</p></div>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i></button>`
+                : `<button onclick="switchTab('pet')" class="w-full text-left rounded-3xl p-3.5 bg-gradient-to-r from-pink-100 to-amber-100 dark:from-pink-950/40 dark:to-amber-950/40 border border-pink-200 dark:border-pink-900 flex items-center gap-3"><span class="text-4xl">🥚</span><div class="flex-1"><p class="font-game font-bold text-sm">Adopsi pet pertamamu!</p><p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Gratis! Rawat sampai tumbuh besar.</p></div></button>`;
+            el.innerHTML = bossCard + petCard;
+        }
+
+        // ===== LAPORAN MINGGUAN UNTUK ORANG TUA =====
+        function collectWeekEntries(child) {
+            ensurePetData(child);
+            const map = {};
+            (child.quizHistory || []).forEach((h) => {
+                let ts = parseInt(String(h.id || '').split('-')[1], 10);
+                if (!Number.isFinite(ts) || ts < 1e12) ts = Date.parse(h.date);
+                if (Number.isFinite(ts)) map[h.id] = { id: h.id, ts: ts, subject: h.subject, score: h.score, boss: !!h.boss };
+            });
+            child.studyLog.forEach((e) => { map[e.id] = e; });
+            return Object.keys(map).map((k) => map[k]);
+        }
+
+        function buildWeeklyReport(child) {
+            const today = new Date(new Date().toDateString()).getTime();
+            const start = today - 6 * 86400000;
+            const entries = collectWeekEntries(child).filter((e) => e.ts >= start);
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                const t = start + i * 86400000;
+                const d = new Date(t);
+                const count = entries.filter((e) => new Date(e.ts).toDateString() === d.toDateString()).length;
+                days.push({ label: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][d.getDay()], count: count });
+            }
+            const perSubject = SUBJECT_META.map((m) => {
+                const list = entries.filter((e) => e.subject === m.subject);
+                return { subject: m.subject, count: list.length, avg: list.length ? Math.round(list.reduce((a, e) => a + e.score, 0) / list.length) : null };
+            });
+            const tried = perSubject.filter((s) => s.count > 0);
+            const strongest = tried.length ? tried.reduce((a, b) => (b.avg > a.avg ? b : a)) : null;
+            const weakest = tried.length > 1 ? tried.reduce((a, b) => (b.avg < a.avg ? b : a)) : null;
+            const avg = entries.length ? Math.round(entries.reduce((a, e) => a + e.score, 0) / entries.length) : 0;
+            const bossWins = child.bossLog.filter((b) => b.ts >= start).length;
+            const pet = getActivePet(child);
+            const advice = [];
+            if (!entries.length) advice.push('Belum ada kuis dalam 7 hari terakhir. Ajak anak mulai dari 1 kuis singkat hari ini.');
+            else {
+                const activeDays = days.filter((d) => d.count > 0).length;
+                if (activeDays < 4) advice.push(`Anak belajar ${activeDays} dari 7 hari. Coba target belajar minimal 4 hari per minggu.`);
+                else advice.push(`Konsisten! Anak belajar ${activeDays} dari 7 hari.`);
+                if (weakest && weakest.avg < 70) advice.push(`Perlu latihan tambahan di ${weakest.subject} (rata-rata ${weakest.avg}%). Pasang target khusus mapel ini.`);
+                if (strongest && strongest.avg >= 85) advice.push(`${strongest.subject} sudah sangat baik (rata-rata ${strongest.avg}%).`);
+                const untried = perSubject.filter((s) => s.count === 0).map((s) => s.subject);
+                if (untried.length) advice.push(`Belum dicoba minggu ini: ${untried.join(', ')}.`);
+            }
+            return { start: start, entries: entries, days: days, perSubject: perSubject, strongest: strongest, weakest: weakest, avg: avg, bossWins: bossWins, pet: pet, advice: advice, activeDays: days.filter((d) => d.count > 0).length, perfect: entries.filter((e) => e.score === 100).length };
+        }
+
+        function renderWeeklyReport(child) {
+            const el = document.getElementById('p-weekly-report');
+            if (!el || !child) return;
+            const r = buildWeeklyReport(child);
+            const maxDay = Math.max(1, ...r.days.map((d) => d.count));
+            const fmt = (t) => new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            const bars = r.days.map((d) => `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full h-14 flex items-end"><div class="w-full rounded-t-lg ${d.count ? 'bg-purple-500' : 'bg-slate-200 dark:bg-slate-700'}" style="height:${d.count ? Math.max(14, (d.count / maxDay) * 100) : 8}%"></div></div><span class="text-[9px] font-extrabold text-slate-500">${d.label}</span><span class="text-[10px] font-extrabold">${d.count}</span></div>`).join('');
+            const subj = r.perSubject.map((s) => `<div><div class="flex justify-between text-[11px] font-bold"><span>${s.subject}</span><span>${s.avg === null ? 'belum dicoba' : `${s.avg}% · ${s.count} kuis`}</span></div><div class="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div class="h-full rounded-full ${s.avg !== null && s.avg < 70 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width:${s.avg || 0}%"></div></div></div>`).join('');
+            el.innerHTML = `<div class="rounded-3xl p-4 bg-white dark:bg-slate-900 border-2 border-purple-200 dark:border-purple-900 shadow-sm space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <div><h3 class="font-game font-bold text-sm">📊 Laporan Mingguan ${esc(child.name)}</h3><p class="text-[10px] font-semibold text-slate-500">${fmt(r.start)} - ${fmt(Date.now())}</p></div>
+                    <button onclick="copyWeeklyReport()" class="px-2.5 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[11px] font-extrabold shrink-0"><i class="fa-solid fa-copy mr-1"></i>Salin</button>
+                </div>
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800"><p class="font-game font-bold text-base">${r.entries.length}</p><p class="text-[9px] font-extrabold text-slate-500">KUIS</p></div>
+                    <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800"><p class="font-game font-bold text-base">${r.avg}%</p><p class="text-[9px] font-extrabold text-slate-500">RATA2</p></div>
+                    <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800"><p class="font-game font-bold text-base">${r.activeDays}/7</p><p class="text-[9px] font-extrabold text-slate-500">HARI</p></div>
+                    <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800"><p class="font-game font-bold text-base">${r.perfect}</p><p class="text-[9px] font-extrabold text-slate-500">SKOR 100</p></div>
+                </div>
+                <div><p class="text-[11px] font-extrabold text-slate-500 mb-1">KUIS PER HARI</p><div class="flex gap-1.5">${bars}</div></div>
+                <div class="space-y-1.5"><p class="text-[11px] font-extrabold text-slate-500">RATA-RATA PER MAPEL</p>${subj}</div>
+                <div class="grid grid-cols-2 gap-2 text-[11px] font-bold">
+                    <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30">⚔️ Boss dikalahkan: ${r.bossWins}x</div>
+                    <div class="p-2.5 rounded-xl bg-pink-50 dark:bg-pink-950/30">${r.pet ? `${petSpecies(r.pet).emoji} ${esc(r.pet.name)}: ${PET_STAGE_NAME[petStage(r.pet)]}${r.pet.dead ? ' (mati)' : r.pet.sick ? ' (sakit)' : ''}` : '🐾 Belum punya pet'}</div>
+                </div>
+                <div class="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/30 space-y-1"><p class="text-[11px] font-extrabold text-purple-700 dark:text-purple-300">💡 SARAN UNTUK ORANG TUA</p>${r.advice.map((a) => `<p class="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-snug">• ${esc(a)}</p>`).join('')}</div>
+            </div>`;
+        }
+
+        function weeklyReportText(child) {
+            const r = buildWeeklyReport(child);
+            const lines = [`Laporan Mingguan ${child.name} (EduQuest)`, `Kuis: ${r.entries.length} | Rata-rata: ${r.avg}% | Hari belajar: ${r.activeDays}/7 | Skor 100%: ${r.perfect}`];
+            r.perSubject.forEach((s) => lines.push(`- ${s.subject}: ${s.avg === null ? 'belum dicoba' : `${s.avg}% (${s.count} kuis)`}`));
+            lines.push(`Boss dikalahkan: ${r.bossWins}x`);
+            r.advice.forEach((a) => lines.push(`* ${a}`));
+            return lines.join('\n');
+        }
+
+        function copyWeeklyReport() {
+            const child = getActiveChild(); if (!child) return;
+            const text = weeklyReportText(child);
+            playSound('click');
+            try {
+                navigator.clipboard.writeText(text).then(() => showToast('📋 Laporan disalin, siap ditempel ke WhatsApp.'), () => showToast('⚠️ Gagal menyalin laporan.'));
+            } catch (e) { showToast('⚠️ Gagal menyalin laporan.'); }
+        }
+
+        // ===== Orang tua: atur harga koin untuk pet & sekitarnya =====
+        function renderPetPriceEditor() {
+            const el = document.getElementById('p-pet-prices');
+            if (!el) return;
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const groups = [
+                ['food', '🍎 Makanan', PET_FOODS], ['supply', '🧼 Perlengkapan', PET_SUPPLIES], ['color', '🎨 Warna Pet', PET_COLORS.filter((c) => c.price > 0)],
+                ['acc', '🎀 Aksesoris', PET_ACCS], ['species', '🐾 Adopsi Pet', PET_SPECIES], ['wall', '🏠 Wallpaper', ROOM_WALLS], ['decor', '🪑 Dekorasi Ruangan', ROOM_DECOR]
+            ];
+            const row = (kind, id, label, def) => `<label class="flex items-center justify-between gap-2 text-xs font-bold"><span class="truncate">${label}</span><span class="flex items-center gap-1 shrink-0"><input type="number" min="0" step="1" inputmode="numeric" data-pp-kind="${kind}" data-pp-id="${id}" data-pp-def="${def}" value="${petPrice(kind, id, def)}" class="w-20 px-2 py-1 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold text-xs text-right focus:outline-none focus:border-purple-500">🪙</span></label>`;
+            const body = groups.map(([kind, title, obj]) => {
+                const items = Array.isArray(obj) ? obj : Object.keys(obj).map((k) => Object.assign({ id: k }, obj[k]));
+                const rows = items.filter((it) => !it.bossOnly).map((it) => row(kind, it.id, `${it.emoji || ''} ${it.name}`, it.price)).join('');
+                return `<div class="space-y-1.5"><p class="text-[11px] font-extrabold text-slate-500">${title}</p>${rows}</div>`;
+            }).join('');
+            el.innerHTML = `<div class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-pink-300 dark:border-pink-800 space-y-3">
+                <div><h3 class="font-game font-bold text-sm text-pink-700 dark:text-pink-300">🐾 Atur Harga Pet & Koin Boss</h3>
+                <p class="text-[11px] font-semibold text-slate-500 mt-0.5 leading-snug">Ubah harga makanan, obat, adopsi, penampilan, dan dekorasi. Harga baru langsung berlaku di toko pet anak.</p></div>
+                <div class="space-y-1.5"><p class="text-[11px] font-extrabold text-slate-500">⚔️ BOSS & KEMATIAN PET</p>
+                    ${row('misc', 'bossReward', '🪙 Koin hadiah mengalahkan boss', 80)}
+                    ${row('misc', 'revive', '💫 Biaya menghidupkan pet yang mati', 300)}</div>
+                ${body}
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="savePetPrices()" class="py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-purple">Simpan Harga</button>
+                    <button onclick="resetPetPrices()" class="py-2.5 rounded-2xl font-game font-bold text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200">Kembalikan Bawaan</button>
+                </div>
+            </div>`;
+        }
+
+        function savePetPrices() {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const out = {};
+            let bad = false;
+            document.querySelectorAll('#p-pet-prices input[data-pp-kind]').forEach((inp) => {
+                const v = parseInt(String(inp.value).replace(/[.\s,]/g, ''), 10);
+                if (!Number.isSafeInteger(v) || v < 0) { bad = true; return; }
+                if (v === parseInt(inp.dataset.ppDef, 10)) return;
+                const k = inp.dataset.ppKind;
+                out[k] = out[k] || {};
+                out[k][inp.dataset.ppId] = v;
+            });
+            if (bad) { playSound('wrong'); showToast('⚠️ Semua harga harus berupa angka 0 atau lebih.'); return; }
+            fam.petPrices = out;
+            logActivity(fam, 'mengubah pengaturan harga pet & koin boss');
+            saveDatabase(fam.parentUsername);
+            playSound('correct');
+            renderPetPriceEditor();
+            showToast('✅ Harga pet disimpan dan langsung berlaku di toko anak.');
+        }
+
+        async function resetPetPrices() {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const ok = await appConfirm('Kembalikan semua harga pet dan koin boss ke nilai bawaan?', { title: 'Kembalikan Harga Bawaan', okText: 'Ya, Kembalikan' });
+            if (!ok) return;
+            fam.petPrices = {};
+            logActivity(fam, 'mengembalikan harga pet ke bawaan');
+            saveDatabase(fam.parentUsername);
+            renderPetPriceEditor();
+            showToast('↩️ Harga pet dikembalikan ke bawaan.');
+        }
+
+        // Pet menua mengikuti waktu selagi aplikasi terbuka
+        setInterval(() => {
+            try {
+                if (!db.currentSession || db.currentSession.role !== 'child') return;
+                const child = getActiveChild();
+                if (!child) return;
+                const changed = tickAllPets(child);
+                const petTabOpen = !document.getElementById('view-pet').classList.contains('hidden');
+                if (changed) saveDatabase();
+                const ae = document.activeElement;
+                const typing = ae && ae.tagName === 'INPUT' && document.getElementById('view-pet').contains(ae);
+                const playOpen = !document.getElementById('pet-play-modal').classList.contains('hidden');
+                if (petTabOpen && petPanel !== 'adopt' && !typing && !playOpen) renderPetView();
+                else if (!document.getElementById('view-home').classList.contains('hidden')) renderHomeExtras();
+            } catch (e) {}
+        }, 60000);
+
         function switchTab(tabName) {
             playSound('click');
-            const tabs = ['home', 'shop', 'badges', 'profile'];
+            const tabs = ['home', 'shop', 'pet', 'badges', 'profile'];
             tabs.forEach((t) => {
                 document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tabName);
                 const navBtn = document.getElementById(`nav-${t}`);
                 if (t === tabName) {
-                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition';
+                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 font-extrabold text-xs transition';
                 } else {
-                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-4 rounded-2xl text-slate-400 font-bold text-xs transition';
+                    navBtn.className = 'nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-2xl text-slate-400 font-bold text-xs transition';
                 }
             });
 
             if (tabName === 'home') renderChildHomeView();
             if (tabName === 'shop') renderShop();
+            if (tabName === 'pet') { const c = getActiveChild(); if (c && tickAllPets(c)) saveDatabase(); renderPetView(); }
             if (tabName === 'badges') renderBadges();
             if (tabName === 'profile') renderProfile();
         }
@@ -6761,6 +7872,9 @@ T([9], S_BE, CLOZE, [
 
         // Ekspos seluruh handler ke global window karena script bertipe module
         Object.assign(window, {
+            petRevive, petBury, petRename, closePetPlay, petPlayStart, petPlayAnswer, petPlayAgain, savePetPrices, resetPetPrices,
+            petSetPanel, petToggleFeed, petSelect, petTap, petAdopt, petFeed, petPlay, petBath, petMedicine, petBuy, petEquip,
+            roomBuy, roomEquip, startBossQuiz, copyWeeklyReport,
             switchAuthRole,
             toggleParentRegisterMode,
             toggleParentJoinMode,
@@ -6779,6 +7893,9 @@ T([9], S_BE, CLOZE, [
             handleChildLogin,
             quickDemoLogin,
             logoutSession,
+            openBackToParent,
+            closeBackToParent,
+            confirmBackToParent,
             switchToChildDirectly,
             switchParentTab,
             selectConfigChildGrade,
