@@ -5117,6 +5117,40 @@ T([9], S_BE, CLOZE, [
             if (el) { el.value = String(value); playSound('click'); }
         }
 
+        let editingRewardId = null;
+        function startEditCustomReward(rewardId) {
+            playSound('click');
+            editingRewardId = rewardId;
+            renderParentDashboard();
+            const el = document.getElementById('edit-reward-cost-' + rewardId);
+            if (el) { el.focus(); el.select(); }
+        }
+        function cancelEditCustomReward() {
+            editingRewardId = null;
+            renderParentDashboard();
+        }
+        function saveEditCustomReward(rewardId) {
+            const fam = getActiveFamily();
+            if (!fam) return;
+            const rw = (fam.customRewards || []).find(r => r.id === rewardId);
+            const el = document.getElementById('edit-reward-cost-' + rewardId);
+            if (!rw || !el) return;
+            const cost = parseInt(String(el.value).replace(/[.\s,]/g, ''), 10);
+            if (!Number.isSafeInteger(cost) || cost < 1) {
+                playSound('wrong');
+                showToast('⚠️ Ketik harga koin dengan angka, minimal 1 koin.');
+                return;
+            }
+            const old = rw.cost;
+            rw.cost = cost;
+            editingRewardId = null;
+            logActivity(fam, `mengubah harga voucher "${rw.title}" dari ${old} menjadi ${cost} koin`);
+            saveDatabase(fam.parentUsername);
+            playSound('correct');
+            renderParentDashboard();
+            showToast(`✅ Harga voucher diubah menjadi ${cost} koin. Toko anak ikut diperbarui.`);
+        }
+
         function deleteCustomParentReward(rewardId) {
             playSound('click');
             const fam = getActiveFamily();
@@ -5556,10 +5590,25 @@ T([9], S_BE, CLOZE, [
                 (fam.customRewards || []).forEach(rw => {
                     const item = document.createElement('div');
                     item.className = 'p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs';
-                    item.innerHTML = `
-                        <span class="font-bold">${esc(rw.title)} <strong class="text-amber-500 ml-1">(${rw.cost} 🪙)</strong></span>
-                        <button onclick="deleteCustomParentReward('${rw.id}')" class="text-rose-500 hover:text-rose-700 px-2 py-0.5"><i class="fa-solid fa-trash"></i></button>
-                    `;
+                    if (editingRewardId === rw.id) {
+                        item.innerHTML = `
+                            <span class="font-bold truncate mr-2">${esc(rw.title)}</span>
+                            <span class="flex items-center gap-1 shrink-0">
+                                <input id="edit-reward-cost-${rw.id}" type="number" min="1" step="1" inputmode="numeric" value="${rw.cost}" onkeydown="if(event.key==='Enter')saveEditCustomReward('${rw.id}')" class="w-20 px-2 py-1 rounded-lg border-2 border-purple-400 bg-white dark:bg-slate-800 font-bold text-xs focus:outline-none">
+                                <span>🪙</span>
+                                <button onclick="saveEditCustomReward('${rw.id}')" class="text-emerald-600 hover:text-emerald-800 px-1.5 py-0.5" title="Simpan"><i class="fa-solid fa-check"></i></button>
+                                <button onclick="cancelEditCustomReward()" class="text-slate-500 hover:text-slate-700 px-1.5 py-0.5" title="Batal"><i class="fa-solid fa-xmark"></i></button>
+                            </span>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <span class="font-bold">${esc(rw.title)} <strong class="text-amber-500 ml-1">(${rw.cost} 🪙)</strong></span>
+                            <span class="flex items-center shrink-0">
+                                <button onclick="startEditCustomReward('${rw.id}')" class="text-indigo-500 hover:text-indigo-700 px-2 py-0.5" title="Ubah harga koin"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteCustomParentReward('${rw.id}')" class="text-rose-500 hover:text-rose-700 px-2 py-0.5"><i class="fa-solid fa-trash"></i></button>
+                            </span>
+                        `;
+                    }
                     catalogEl.appendChild(item);
                 });
             }
@@ -6739,6 +6788,9 @@ T([9], S_BE, CLOZE, [
             prepareNewChildForm,
             addCustomParentReward,
             deleteCustomParentReward,
+            startEditCustomReward,
+            saveEditCustomReward,
+            cancelEditCustomReward,
             approveChildVoucher,
             redeemRealWorldReward,
             openQuizReviewByIndex,
