@@ -1321,6 +1321,25 @@
             </div>
         </div>
 
+        <div id="sheet-modal" class="fixed inset-0 z-[75] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
+            <div class="bg-white dark:bg-slate-900 w-full max-h-[88vh] rounded-3xl border-2 border-indigo-400 shadow-2xl flex flex-col overflow-hidden">
+                <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <h3 id="sheet-title" class="flex-1 font-game font-bold text-sm"></h3>
+                    <button onclick="sheetClose()" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="sheet-body" class="p-4 overflow-y-auto space-y-3"></div>
+            </div>
+        </div>
+        <div id="live-quiz-modal" class="fixed inset-0 z-[90] bg-slate-900/85 backdrop-blur-sm hidden items-center justify-center p-3 max-w-md mx-auto">
+            <div class="bg-white dark:bg-slate-900 w-full max-h-[94vh] rounded-3xl border-2 border-emerald-400 shadow-2xl flex flex-col overflow-hidden">
+                <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                    <h3 id="live-title" class="flex-1 font-game font-bold text-sm">Pantau Langsung</h3>
+                    <button onclick="closeLiveView()" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="live-body" class="p-4 overflow-y-auto space-y-3"></div>
+            </div>
+        </div>
         <div id="boss-fx-modal" class="fixed inset-0 z-[80] hidden flex-col max-w-md mx-auto overflow-hidden"></div>
         <div id="result-modal" class="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 max-w-md mx-auto">
             <div class="bg-white dark:bg-slate-900 w-full rounded-3xl p-6 text-center border-2 border-indigo-500 shadow-2xl space-y-4 animate-pop">
@@ -4164,6 +4183,10 @@ T([9], S_BE, CLOZE, [
             { id: 'b_rich', name: 'Sultan Koin', icon: '💰', desc: 'Mengumpulkan minimal 350 koin emas', check: (c) => c.coins >= 350 },
             { id: 'b_quiz5', name: 'Pejuang 50 Soal', icon: '🛡️', desc: 'Menyelesaikan 5 paket kuis (50 soal)', check: (c) => c.quizzesCompleted >= 5 },
             { id: 'b_lvl3', name: 'Kenaikan Level 3', icon: '🚀', desc: 'Mencapai karakter Level 3', check: (c) => getLevelInfo(c.xp).level >= 3 },
+            { id: 'b_boss1', name: 'Pemburu Boss', icon: '⚔️', desc: 'Mengalahkan boss harian 1 kali', check: (c) => (c.bossLog || []).length >= 1 },
+            { id: 'b_review10', name: 'Penakluk Kesalahan', icon: '🔁', desc: 'Memperbaiki 10 soal yang pernah salah', check: (c) => (c.reviewFixed || 0) >= 10 },
+            { id: 'b_island1', name: 'Penjelajah Pulau', icon: '🏝️', desc: 'Menaklukkan 1 pulau di Peta Petualangan', check: (c) => Object.keys((c.adv && c.adv.islands) || {}).length >= 1 },
+            { id: 'b_cert1', name: 'Pemilik Sertifikat', icon: '📜', desc: 'Meraih sertifikat pertamamu', check: (c) => (c.certs || []).length >= 1 },
             { id: 'b_collector', name: 'Kolektor Item', icon: '👑', desc: 'Membeli minimal 3 item di Toko', check: (c) => c.ownedItems.length >= 7 }
         ];
 
@@ -5075,9 +5098,32 @@ T([9], S_BE, CLOZE, [
                     qNum: inQuiz ? activeQuiz.currentIndex + 1 : 0,
                     total: inQuiz ? activeQuiz.questions.length : 0,
                     elapsedSec: inQuiz ? Math.round((Date.now() - presQuizSince) / 1000) : 0,
+                    live: buildLivePayload(inQuiz),
                     ts: serverTimestamp()
                 }
             };
+        }
+
+        // Isi soal yang sedang dikerjakan anak, supaya orang tua bisa memantau langsung
+        function buildLivePayload(inQuiz) {
+            try {
+                if (!inQuiz || !activeQuiz || !activeQuiz.questions) return null;
+                const qObj = activeQuiz.questions[activeQuiz.currentIndex];
+                if (!qObj) return null;
+                const ans = !!activeQuiz.answered;
+                return {
+                    q: String(qObj.q || '').slice(0, 600),
+                    opts: (qObj.options || []).map((o) => String(o).slice(0, 200)),
+                    answered: ans,
+                    chosen: ans && Number.isInteger(activeQuiz.lastChosen) ? activeQuiz.lastChosen : -1,
+                    answer: ans ? qObj.answer : -1,
+                    expl: ans ? String(qObj.explanation || '').slice(0, 400) : '',
+                    log: (activeQuiz.answerLog || []).map((a) => (a.isCorrect ? 1 : 0)).join(''),
+                    correct: activeQuiz.correctCount || 0,
+                    mode: activeQuiz.isBoss ? 'boss' : activeQuiz.isReview ? 'review' : activeQuiz.adv ? 'adv' : 'normal',
+                    bossName: activeQuiz.bossName || ''
+                };
+            } catch (e) { return null; }
         }
 
         async function pushPresence(forceStatus) {
@@ -5158,9 +5204,70 @@ T([9], S_BE, CLOZE, [
                 }
                 const row = document.createElement('div');
                 row.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border text-[11px] font-semibold leading-snug ${tone}`;
-                row.innerHTML = dot + `<span class="min-w-0">${html}</span>`;
+                const liveBtn = (p && p.inQuiz && p.live && age <= PRESENCE_AWAY_MS)
+                    ? `<button onclick="openLiveView('${presKey(ch.username)}')" class="ml-auto shrink-0 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-[10px] font-extrabold">👁 Pantau</button>` : '';
+                row.innerHTML = dot + `<span class="min-w-0">${html}</span>` + liveBtn;
                 el.appendChild(row);
             });
+            renderLiveView();
+        }
+
+        // ---- Pantau langsung (orang tua) ----
+        let liveKey = null;
+        function liveSafe(t) {
+            return esc(String(t == null ? '' : t)).replace(/&lt;(\/?)(sup|sub|b|i)&gt;/g, '<$1$2>');
+        }
+        function openLiveView(key) {
+            liveKey = key;
+            playSound('click');
+            const m = document.getElementById('live-quiz-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+            renderLiveView();
+        }
+        function closeLiveView() {
+            liveKey = null;
+            const m = document.getElementById('live-quiz-modal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        }
+        function renderLiveView() {
+            if (!liveKey) return;
+            const sess = db.currentSession;
+            const body = document.getElementById('live-body');
+            if (!sess || sess.role !== 'parent' || !body) { closeLiveView(); return; }
+            const fam = getActiveFamily();
+            const ch = (fam && fam.children || []).find((c) => presKey(c.username) === liveKey);
+            const p = (presenceCache[sess.parentUsername] || {})[liveKey];
+            document.getElementById('live-title').textContent = `Pantau ${ch ? ch.name : 'Anak'}`;
+            const ts = p && p.ts ? (typeof p.ts.toMillis === 'function' ? p.ts.toMillis() : Number(p.ts)) : 0;
+            const age = ts ? Math.max(0, Date.now() - ts) : Infinity;
+            const L = p && p.inQuiz ? p.live : null;
+            if (!L) {
+                body.innerHTML = `<div class="text-center py-8 space-y-2"><div class="text-5xl">😴</div><p class="font-game font-bold text-sm">${esc(ch ? ch.name : 'Anak')} tidak sedang mengerjakan soal</p><p class="text-[11px] font-semibold text-slate-500">Jendela ini akan otomatis terisi begitu anak memulai kuis.</p></div>`;
+                return;
+            }
+            const letters = ['A', 'B', 'C', 'D'];
+            const modeLabel = { boss: `⚔️ Boss ${esc(L.bossName || '')}`, review: '🔁 Ulangi Soal Salah', adv: '🗺️ Peta Petualangan', normal: '📘 Kuis' }[L.mode] || '📘 Kuis';
+            const dots = String(L.log || '').split('').map((c) => `<span class="w-5 h-5 rounded-md text-[11px] flex items-center justify-center ${c === '1' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}">${c === '1' ? '✓' : '✗'}</span>`).join('');
+            const opts = (L.opts || []).map((o, i) => {
+                let cls = 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900';
+                let mark = '';
+                if (L.answered) {
+                    if (i === L.answer) { cls = 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/60'; mark = '✅'; }
+                    if (i === L.chosen && i !== L.answer) { cls = 'border-rose-500 bg-rose-50 dark:bg-rose-950/60'; mark = '❌'; }
+                }
+                const chosenTag = (L.answered && i === L.chosen) ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0">JAWABAN ANAK</span>' : '';
+                return `<div class="p-3 rounded-2xl border-2 ${cls} font-bold text-sm flex items-center gap-2.5"><span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-game shrink-0">${letters[i] || i + 1}</span><span class="flex-1">${liveSafe(o)}</span>${chosenTag}<span>${mark}</span></div>`;
+            }).join('');
+            const verdict = L.answered
+                ? `<div class="rounded-2xl p-3 text-xs font-semibold ${L.chosen === L.answer ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200'}"><b>${L.chosen === L.answer ? '🎉 Anak menjawab benar.' : '💡 Anak menjawab salah.'}</b><br>${liveSafe(L.expl)}</div>`
+                : '<div class="rounded-2xl p-3 text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-center">🤔 Anak sedang berpikir...</div>';
+            body.innerHTML = `
+                <div class="flex items-center justify-between text-[11px] font-extrabold"><span class="text-indigo-600">${modeLabel} · ${esc(p.subject || '')}</span><span class="text-slate-500">Soal ${p.qNum}/${p.total}</span></div>
+                <div class="flex flex-wrap gap-1">${dots || '<span class="text-[10px] font-semibold text-slate-400">Belum ada soal yang dijawab</span>'}</div>
+                <div class="rounded-2xl p-4 bg-slate-50 dark:bg-slate-800 font-bold text-sm leading-snug">${liveSafe(L.q)}</div>
+                <div class="space-y-2">${opts}</div>
+                ${verdict}
+                <p class="text-[10px] font-semibold text-slate-400 text-center">Benar sejauh ini: ${L.correct} · diperbarui ${agoText(age)}</p>`;
         }
 
         // ---- Mode fokus: hitung berapa kali anak meninggalkan layar kuis ----
@@ -5205,6 +5312,7 @@ T([9], S_BE, CLOZE, [
             pushPresence('offline');
             playSound('click');
             bossTimerStop();
+            petRemindShown = false;
             db.currentSession = null;
             if (wasDemoChild) resetDemoFamily(); // keluar dari demo anak -> semua progres dibuang
             saveDatabase(null, true);
@@ -6646,6 +6754,7 @@ T([9], S_BE, CLOZE, [
         function selectAnswer(selectedIdx) {
             if (activeQuiz.answered) return;
             activeQuiz.answered = true;
+            activeQuiz.lastChosen = selectedIdx;
 
             const child = getActiveChild();
             const qObj = activeQuiz.questions[activeQuiz.currentIndex];
@@ -6662,6 +6771,7 @@ T([9], S_BE, CLOZE, [
                 explanation: qObj.explanation
             });
 
+            if (child) recordWrongBank(child, qObj, isCorrect, activeQuiz);
             // Catat hash soal agar tidak berulang di sesi berikutnya
             if (child) {
                 child.recentQuestionHashes = child.recentQuestionHashes || [];
@@ -6738,6 +6848,7 @@ T([9], S_BE, CLOZE, [
             } else {
                 nextBtn.innerHTML = `Lanjut Soal ${activeQuiz.currentIndex + 2}/${totalQ} <i class="fa-solid fa-arrow-right ml-1"></i>`;
             }
+            pushPresence();
         }
 
         function nextQuestion() {
@@ -6764,6 +6875,7 @@ T([9], S_BE, CLOZE, [
             const scorePct = Math.round((activeQuiz.correctCount / total) * 100);
 
             if (activeQuiz.isBoss) { finishBossQuiz(child, total, scorePct); return; }
+            if (activeQuiz.isReview) { finishReviewQuiz(child, total, scorePct); return; }
 
             child.xp += activeQuiz.earnedXp;
             // Koin dihitung di akhir kuis berdasarkan target orang tua
@@ -6833,6 +6945,8 @@ T([9], S_BE, CLOZE, [
 
             pushStudyLog(child, activeQuiz.subjectName, scorePct, false, record.id);
             petOnStudy(child, scorePct);
+            advNoteGlobal = advAfterQuiz(child, scorePct) || '';
+            checkCertificates(child);
             checkAndUnlockBadges();
             saveDatabase();
             updateChildHeaderUI();
@@ -6863,6 +6977,7 @@ T([9], S_BE, CLOZE, [
                 document.getElementById('result-subtitle').textContent = coinNote + 'Klik "Lihat Koreksi" untuk mempelajari pembahasan soalnya ya!';
             }
 
+            if (advNoteGlobal) { const sub = document.getElementById('result-subtitle'); sub.textContent += ' ' + advNoteGlobal; advNoteGlobal = ''; }
             document.getElementById('result-modal').classList.remove('hidden');
             document.getElementById('result-modal').classList.add('flex');
         }
@@ -7173,7 +7288,9 @@ T([9], S_BE, CLOZE, [
             { id: 'fox', name: 'Rubah', emoji: '🦊', price: 300 },
             { id: 'panda', name: 'Panda', emoji: '🐼', price: 400 },
             { id: 'owl', name: 'Burung Hantu', emoji: '🦉', price: 500 },
-            { id: 'dragon', name: 'Naga', emoji: '🐲', price: 800 }
+            { id: 'dragon', name: 'Naga', emoji: '🐲', price: 800 },
+            { id: 'unicorn', name: 'Unicorn Legenda', emoji: '🦄', price: 500, legend: true, need: 'Kalahkan boss harian 10x', ok: (c) => (c.bossLog || []).length >= 10 },
+            { id: 'skydrake', name: 'Naga Langit', emoji: '🐉', price: 500, legend: true, need: 'Raih 3 sertifikat', ok: (c) => (c.certs || []).length >= 3 }
         ];
         const PET_STAGE_AT = [0, 30, 150, 400, 900];
         const PET_STAGE_NAME = ['Telur', 'Bayi', 'Anak', 'Remaja', 'Dewasa'];
@@ -7335,6 +7452,7 @@ T([9], S_BE, CLOZE, [
                 playSound('fanfare');
                 fireConfetti(60);
                 showToast(after === 1 ? `🐣 Telur ${pet.name} menetas!` : `🎉 ${pet.name} tumbuh menjadi ${PET_STAGE_NAME[after]}!`);
+                petStoryEnqueue(pet.id, after);
                 logActivity(getActiveFamily(), `pet ${pet.name} tumbuh menjadi ${PET_STAGE_NAME[after]}`, child.name, 'child');
             }
         }
@@ -7439,8 +7557,8 @@ T([9], S_BE, CLOZE, [
                     const free = first && sp.starter;
                     return `<div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                         <span class="text-4xl">${sp.emoji}</span>
-                        <div class="flex-1"><p class="font-game font-bold text-sm">${sp.name}</p><p class="text-[11px] font-semibold text-slate-500">${free ? 'Pet pertama GRATIS' : `${petPrice('species', sp.id, sp.price)} 🪙`}</p></div>
-                        <button onclick="petAdopt('${sp.id}')" class="${btnCls('buy')}">Adopsi</button>
+                        <div class="flex-1"><p class="font-game font-bold text-sm">${sp.name}</p><p class="text-[11px] font-semibold text-slate-500">${(sp.legend && !sp.ok(child)) ? `🔒 Syarat: ${sp.need}` : free ? 'Pet pertama GRATIS' : `${petPrice('species', sp.id, sp.price)} 🪙`}</p></div>
+                        ${(sp.legend && !sp.ok(child)) ? `<span class="${btnCls('on')}">🔒</span>` : `<button onclick="petAdopt('${sp.id}')" class="${btnCls('buy')}">Adopsi</button>`}
                     </div>`;
                 }).join('');
                 el.innerHTML = `${coinsHTML}
@@ -7482,6 +7600,7 @@ T([9], S_BE, CLOZE, [
                         <button onclick="petMedicine()" class="py-2.5 rounded-2xl bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-extrabold text-[11px]"><div class="text-xl">💊</div>Obat (${inv.medicine || 0})</button>
                     </div>
                     ${petFeedOpen ? `<div class="space-y-1.5">${foodRows || '<p class="text-[11px] font-semibold text-slate-500 text-center py-2">Stok makanan kosong. Beli di tab 🛒 Toko.</p>'}</div>` : ''}
+                    <button onclick="petStoriesOpen()" class="w-full py-2 rounded-2xl bg-violet-100 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 font-extrabold text-[11px]">📖 Baca Cerita ${esc(pet.name)}</button>
                     <div class="flex gap-2"><input id="pet-rename-input" maxlength="14" value="${esc(pet.name)}" class="flex-1 min-w-0 px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs focus:outline-none focus:border-pink-400"><button onclick="petRename()" class="${btnCls('use')}">✏️ Ganti Nama</button></div>
                     <p class="text-[10px] font-semibold text-slate-400 text-center">Main (jawab 1 soal dulu), mandi, dan makan menambah pertumbuhan (maks. 80 poin/hari). Belajar & kalahkan boss menambah lebih banyak!</p>`;
             } else if (petPanel === 'shop') {
@@ -7706,6 +7825,7 @@ T([9], S_BE, CLOZE, [
             const child = getActiveChild(); if (!child) return;
             ensurePetData(child);
             const sp = PET_SPECIES.find((s) => s.id === speciesId); if (!sp) return;
+            if (sp.legend && !sp.ok(child)) { playSound('wrong'); showToast(`🔒 ${sp.name} terkunci. Syarat: ${sp.need}`); return; }
             if (child.pets.length >= 4) { playSound('wrong'); showToast('⚠️ Maksimal 4 pet yang bisa dipelihara.'); return; }
             const free = child.pets.length === 0 && !child.petAdoptedOnce && sp.starter;
             if (!free && !spendCoins(child, petPrice('species', sp.id, sp.price))) return;
@@ -8165,6 +8285,7 @@ T([9], S_BE, CLOZE, [
             child.quizHistory.unshift(record);
             if (child.quizHistory.length > 25) child.quizHistory.pop();
             pushStudyLog(child, activeQuiz.subjectName, scorePct, true, record.id);
+            checkCertificates(child);
             logActivity(getActiveFamily(), `${defeated ? 'mengalahkan' : 'melawan'} boss ${activeQuiz.bossName} (${activeQuiz.subjectName}) skor ${scorePct}%`, child.name, 'child');
             checkAndUnlockBadges();
             saveDatabase();
@@ -8277,6 +8398,292 @@ T([9], S_BE, CLOZE, [
             if (fn) fn();
         }
 
+
+        // ===== Lembar modal serbaguna =====
+        function sheetOpen(title, html) {
+            document.getElementById('sheet-title').textContent = title;
+            document.getElementById('sheet-body').innerHTML = html;
+            const m = document.getElementById('sheet-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function sheetClose() {
+            const m = document.getElementById('sheet-modal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        }
+
+        // ===== Pesan semangat dari pet =====
+        let petRemindShown = false;
+        function petReminderText(child, pet) {
+            if (!pet || pet.dead) return '';
+            const today = new Date().toDateString();
+            const studied = (child.studyLog || []).some((e) => new Date(e.ts).toDateString() === today);
+            const n = pet.name;
+            if (petStage(pet) === 0) return studied ? '' : `${n} (telur): "Hangatkan aku dan belajar yuk, biar cepat menetas!"`;
+            if (pet.sick) return `${n}: "Badanku panas... belajar dulu biar dapat koin beli obat ya."`;
+            if (pet.fullness < 30) return `${n}: "Perutku keroncongan! Belajar 1 kuis biar dapat koin beli makanan."`;
+            if (pet.clean < 30) return `${n}: "Aku bau nih... Ayo belajar, koinnya buat beli sabun!"`;
+            if (!studied) return `${n}: "Kamu belum belajar hari ini. Satu kuis saja, aku semangat lihatnya!"`;
+            if ((child.streak || 0) >= 3) return `${n}: "Streak ${child.streak} hari! Kamu hebat, jangan putus ya!"`;
+            return '';
+        }
+
+        // ===== Cerita pet (muncul tiap naik tahap) =====
+        function petStoryText(pet, stage, who) {
+            const sp = petSpecies(pet); const n = esc(pet.name); const k = esc(who || 'sahabat');
+            const t = [
+                '',
+                `Krek... krek... Cangkang telur itu retak pelan. ${sp.emoji} ${n} membuka mata dan hal pertama yang ia lihat adalah wajah ${k}. "Kamu yang menghangatkanku?" bisiknya. Sejak hari itu ${n} yakin: ${k} adalah sahabat terbaiknya.`,
+                `${n} mulai berlari dan penasaran dengan semuanya. Suatu malam ia melihat ${k} belajar sampai larut. "Kalau ${k} rajin, aku juga mau rajin berlatih!" Ia pun belajar melompat setinggi-tingginya, walau jatuh berkali-kali.`,
+                `Di hutan dekat rumah, ${n} bertemu hewan-hewan yang kesulitan menghitung buah. ${n} mengingat pelajaran ${k} dan membantu mereka. "Ilmu itu tumbuh saat dibagi," katanya. Para hewan pun bersorak untuk ${n}.`,
+                `Kini ${n} dewasa, kuat, dan bijaksana. Ia ingat betul awalnya: sebutir telur kecil yang dijaga ${k}. "Terima kasih sudah tak pernah menyerah belajar," ucap ${n}. Dan petualangan mereka baru saja dimulai ${sp.emoji}✨`
+            ];
+            return t[stage] || '';
+        }
+        const petStoryQ = []; let petStoryTimer = null;
+        function petStoryEnqueue(petId, stage) {
+            petStoryQ.push({ petId: petId, stage: stage });
+            if (!petStoryTimer) petStoryTimer = setInterval(petStoryPump, 1200);
+        }
+        function petStoryPump() {
+            if (!petStoryQ.length) { clearInterval(petStoryTimer); petStoryTimer = null; return; }
+            const blocked = ['quiz-modal', 'result-modal', 'boss-fx-modal', 'review-modal', 'sheet-modal', 'pet-play-modal'].some((id) => { const e = document.getElementById(id); return e && !e.classList.contains('hidden'); });
+            if (blocked) return;
+            const it = petStoryQ.shift();
+            const child = getActiveChild(); const pet = child && child.pets && child.pets.find((x) => x.id === it.petId);
+            if (!pet) return;
+            playSound('fanfare');
+            sheetOpen(`📖 Cerita ${pet.name}: ${PET_STAGE_NAME[it.stage]}`, `<div class="text-center text-6xl">${petSpecies(pet).emoji}</div><p class="text-sm font-semibold leading-relaxed">${petStoryText(pet, it.stage, child.name)}</p>`);
+        }
+        function petStoriesOpen() {
+            const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
+            playSound('click');
+            const st = petStage(pet);
+            if (st < 1) { showToast('🥚 Cerita pertama muncul setelah telur menetas.'); return; }
+            let html = '';
+            for (let i = 1; i <= 4; i++) {
+                html += i <= st
+                    ? `<div class="rounded-2xl p-3 bg-violet-50 dark:bg-violet-950/40 space-y-1"><p class="text-[10px] font-extrabold uppercase text-violet-600">Bab ${i} · ${PET_STAGE_NAME[i]}</p><p class="text-xs font-semibold leading-relaxed">${petStoryText(pet, i, child.name)}</p></div>`
+                    : `<div class="rounded-2xl p-3 bg-slate-100 dark:bg-slate-800 opacity-60 text-xs font-bold">🔒 Bab ${i} terbuka saat ${esc(pet.name)} menjadi ${PET_STAGE_NAME[i]}</div>`;
+            }
+            sheetOpen(`📖 Cerita ${pet.name}`, html);
+        }
+
+        // ===== Ulangi soal yang pernah salah =====
+        function recordWrongBank(child, qObj, ok, aq) {
+            child.wrongBank = child.wrongBank || [];
+            const i = child.wrongBank.findIndex((x) => x.q === qObj.q);
+            if (!ok) {
+                if (i < 0) {
+                    child.wrongBank.push({ q: qObj.q, options: qObj.options.slice(), answer: qObj.answer, explanation: qObj.explanation || '', subject: aq.subjectName, grade: aq.grade });
+                    if (child.wrongBank.length > 60) child.wrongBank.shift();
+                }
+            } else if (aq.isReview && i >= 0) {
+                child.wrongBank.splice(i, 1);
+                child.reviewFixed = (child.reviewFixed || 0) + 1;
+                aq.fixed = (aq.fixed || 0) + 1;
+            }
+        }
+        function startReviewQuiz() {
+            const child = getActiveChild(); if (!child) return;
+            const bank = (child.wrongBank || []).filter((x) => x.grade === child.grade);
+            if (!bank.length) { playSound('wrong'); showToast('🎉 Belum ada soal salah untuk diulang. Hebat!'); return; }
+            const pick = bank.slice().sort(() => Math.random() - 0.5).slice(0, 10)
+                .map((x) => ({ q: x.q, options: x.options.slice(), answer: x.answer, explanation: x.explanation }));
+            playSound('click');
+            activeQuiz = { subjectName: 'Ulangi Soal Salah', grade: child.grade, questions: pick, currentIndex: 0, correctCount: 0, currentCombo: 0, earnedXp: 0, earnedCoins: 0, answered: false, lifeline5050Left: 1, lifelineHintLeft: 1, answerLog: [], isReview: true };
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+            renderCurrentQuestion();
+            showToast(`🔁 ${pick.length} soal yang pernah salah. Jawab benar untuk menghapusnya dari daftar!`);
+        }
+        function finishReviewQuiz(child, total, scorePct) {
+            const fixed = activeQuiz.fixed || 0;
+            const coins = fixed * 5;
+            child.xp += activeQuiz.earnedXp;
+            child.coins += coins;
+            const now = new Date();
+            lastCompletedQuizRecord = {
+                id: 'rv-' + Date.now(), date: now.toDateString(), timeStr: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                subject: 'Ulangi Soal Salah', grade: activeQuiz.grade, score: scorePct, correctCount: activeQuiz.correctCount, totalQuestions: total,
+                details: activeQuiz.answerLog, leaves: quizFocus.leaves, awaySecs: Math.round(quizFocus.awayMs / 1000)
+            };
+            logActivity(getActiveFamily(), `mengulang soal yang salah (${fixed} diperbaiki)`, child.name, 'child');
+            checkCertificates(child);
+            checkAndUnlockBadges();
+            saveDatabase();
+            updateChildHeaderUI();
+            renderChildHomeView();
+            playSound('fanfare'); fireConfetti(fixed ? 60 : 15);
+            document.getElementById('result-badge-tag').textContent = 'Ulangi Soal Salah';
+            document.getElementById('result-score').textContent = `${scorePct}%`;
+            document.getElementById('result-xp').textContent = `+${activeQuiz.earnedXp}`;
+            document.getElementById('result-coins').textContent = `+${coins}`;
+            document.getElementById('result-emoji').textContent = fixed === total ? '🌟' : '🔁';
+            document.getElementById('result-title').textContent = `${fixed} dari ${total} soal berhasil diperbaiki`;
+            document.getElementById('result-subtitle').textContent = fixed === total ? 'Semua kesalahanmu sudah kamu taklukkan!' : 'Soal yang masih salah tetap ada di daftar, ulangi lagi nanti ya.';
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('result-modal').classList.add('flex');
+        }
+
+        // ===== Peta Petualangan =====
+        let advNoteGlobal = '';
+        const ADV_ISLAND_EMOJI = ['🏝️', '🌋', '🏔️', '🏜️', '🌴', '🏰', '🗻'];
+        const ADV_NODES = [
+            { n: 5, pass: 60, name: 'Latihan', icon: '📘', coin: 20, xp: 20 },
+            { n: 8, pass: 70, name: 'Tantangan', icon: '⚔️', coin: 40, xp: 40 },
+            { n: 10, pass: 80, name: 'Boss Pulau', icon: '👹', coin: 80, xp: 80 }
+        ];
+        function advState(child) {
+            if (!child.adv || typeof child.adv !== 'object') child.adv = { nodes: {}, islands: {} };
+            if (!child.adv.nodes) child.adv.nodes = {};
+            if (!child.adv.islands) child.adv.islands = {};
+            return child.adv;
+        }
+        const advKey = (subject, grade, idx) => `${subject}|${grade}|${idx}`;
+        function advStars(score, pass) { return score >= 100 ? 3 : score >= 90 ? 2 : score >= pass ? 1 : 0; }
+        function topicShort(meta, grade) { return String((meta.topics && meta.topics[grade]) || meta.subject).split(/,|&/)[0].trim(); }
+
+        function openAdvMap() {
+            const child = getActiveChild(); if (!child) return;
+            playSound('click');
+            const adv = advState(child);
+            const html = SUBJECT_META.map((m, si) => {
+                const emoji = ADV_ISLAND_EMOJI[si % ADV_ISLAND_EMOJI.length];
+                const done = adv.islands[advKey(m.subject, child.grade, 'i')];
+                const clears = ADV_NODES.filter((_, i) => (adv.nodes[advKey(m.subject, child.grade, i)] || {}).stars >= 1).length;
+                const nodes = ADV_NODES.map((nd, i) => {
+                    const st = (adv.nodes[advKey(m.subject, child.grade, i)] || {}).stars || 0;
+                    const open = i === 0 || ((adv.nodes[advKey(m.subject, child.grade, i - 1)] || {}).stars || 0) >= 1;
+                    return `<button ${open ? '' : 'disabled'} onclick="startAdvQuiz(${si},${i})" class="flex-1 rounded-xl py-2 px-1 text-center border-2 ${open ? (st ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/30' : 'border-indigo-300 bg-white dark:bg-slate-900') : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 opacity-50'}">
+                        <div class="text-xl">${open ? nd.icon : '🔒'}</div><div class="text-[10px] font-extrabold leading-tight">${nd.name}</div>
+                        <div class="text-[9px] font-semibold text-slate-500">${nd.n} soal · ≥${nd.pass}%</div>
+                        <div class="text-[11px]">${'⭐'.repeat(st)}${'☆'.repeat(3 - st)}</div></button>`;
+                }).join('<span class="text-slate-300 self-center">➜</span>');
+                return `<div class="rounded-2xl p-3 border-2 ${done ? 'border-amber-400' : 'border-slate-200 dark:border-slate-700'} bg-gradient-to-br from-sky-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800 space-y-2">
+                    <div class="flex items-center gap-2"><span class="text-2xl">${done ? '🏆' : emoji}</span><div class="min-w-0"><p class="font-game font-bold text-xs">Pulau ${esc(m.subject)}</p><p class="text-[10px] font-semibold text-slate-500 truncate">${esc(topicShort(m, child.grade))}</p></div><span class="ml-auto text-[10px] font-extrabold ${done ? 'text-amber-600' : 'text-slate-500'}">${done ? 'Ditaklukkan!' : clears + '/3'}</span></div>
+                    <div class="flex items-stretch gap-1">${nodes}</div></div>`;
+            }).join('');
+            sheetOpen('🗺️ Peta Petualangan', `<p class="text-[11px] font-semibold text-slate-500 leading-snug">Selesaikan level berurutan di tiap pulau. Hadiah koin & XP didapat saat pertama kali lulus, dan Boss Pulau memberi bonus 100 koin + sertifikat!</p>${html}`);
+        }
+        function startAdvQuiz(si, idx) {
+            const child = getActiveChild(); if (!child) return;
+            const m = SUBJECT_META[si]; const nd = ADV_NODES[idx]; if (!m || !nd) return;
+            const adv = advState(child);
+            if (idx > 0 && !((adv.nodes[advKey(m.subject, child.grade, idx - 1)] || {}).stars >= 1)) { playSound('wrong'); showToast('🔒 Selesaikan level sebelumnya dulu.'); return; }
+            const qs = buildTenQuestionQuiz(child.grade, m.subject, child.recentQuestionHashes || [], nd.n);
+            if (!qs.length) { showToast('⚠️ Bank soal belum tersedia.'); return; }
+            sheetClose(); playSound('click');
+            activeQuiz = { subjectName: m.subject, grade: child.grade, questions: qs, currentIndex: 0, correctCount: 0, currentCombo: 0, earnedXp: 0, earnedCoins: 0, answered: false, lifeline5050Left: 1, lifelineHintLeft: 1, answerLog: [], adv: { si: si, idx: idx } };
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+            renderCurrentQuestion();
+            showToast(`🗺️ ${nd.name} Pulau ${m.subject}: butuh skor ≥${nd.pass}%`);
+        }
+        function advAfterQuiz(child, scorePct) {
+            if (!activeQuiz || !activeQuiz.adv) return '';
+            const m = SUBJECT_META[activeQuiz.adv.si]; const idx = activeQuiz.adv.idx; const nd = ADV_NODES[idx];
+            if (!m || !nd) return '';
+            const adv = advState(child);
+            const k = advKey(m.subject, child.grade, idx);
+            const stars = advStars(scorePct, nd.pass);
+            if (stars < 1) return `🗺️ Level belum lulus (butuh ≥${nd.pass}%). Coba lagi ya!`;
+            const first = !(adv.nodes[k] && adv.nodes[k].stars >= 1);
+            adv.nodes[k] = { stars: Math.max(stars, (adv.nodes[k] || {}).stars || 0) };
+            let note = `🗺️ Level lulus ${'⭐'.repeat(stars)}!`;
+            if (first) {
+                child.coins += nd.coin; child.xp += nd.xp;
+                note += ` Hadiah +${nd.coin} 🪙 +${nd.xp} XP.`;
+                if (idx === ADV_NODES.length - 1 && !adv.islands[advKey(m.subject, child.grade, 'i')]) {
+                    adv.islands[advKey(m.subject, child.grade, 'i')] = Date.now();
+                    child.coins += 100;
+                    note += ` 🏆 Pulau ${m.subject} ditaklukkan! Bonus +100 🪙 dan sertifikat baru.`;
+                    addCertificate(child, { id: `island|${m.subject}|${child.grade}`, kind: 'island', title: `Penakluk Pulau ${m.subject}`, subject: m.subject, avg: scorePct });
+                }
+            }
+            return note;
+        }
+
+        // ===== Sertifikat =====
+        function addCertificate(child, c) {
+            child.certs = child.certs || [];
+            if (child.certs.some((x) => x.id === c.id)) return;
+            child.certs.push(Object.assign({ ts: Date.now(), grade: child.grade }, c));
+            showToast(`📜 Sertifikat baru: ${c.title}!`);
+        }
+        function checkCertificates(child) {
+            if (!child) return;
+            child.certs = child.certs || [];
+            SUBJECT_META.forEach((m) => {
+                const id = `mastery|${m.subject}|${child.grade}`;
+                if (child.certs.some((c) => c.id === id)) return;
+                const rows = (child.studyLog || []).filter((e) => e.subject === m.subject && !e.boss).slice(-3);
+                if (rows.length < 3) return;
+                const avg = Math.round(rows.reduce((a, e) => a + (e.score || 0), 0) / rows.length);
+                if (avg >= 85) addCertificate(child, { id: id, kind: 'mastery', title: 'Juara ' + topicShort(m, child.grade), subject: m.subject, avg: avg });
+            });
+            if ((child.bossLog || []).length >= 10) addCertificate(child, { id: 'boss10', kind: 'boss', title: 'Pemburu Boss Sejati', subject: 'Boss Harian', avg: 0 });
+        }
+        function openCerts() {
+            const child = getActiveChild(); if (!child) return;
+            playSound('click');
+            checkCertificates(child);
+            const list = child.certs || [];
+            if (!list.length) {
+                sheetOpen('📜 Sertifikat Saya', `<div class="text-center py-6 space-y-2"><div class="text-5xl">📜</div><p class="font-game font-bold text-sm">Belum ada sertifikat</p><p class="text-[11px] font-semibold text-slate-500 leading-snug">Dapatkan dengan: rata-rata ≥85% di 3 kuis terakhir satu mapel, menaklukkan Boss Pulau, atau mengalahkan boss harian 10x.</p></div>`);
+                return;
+            }
+            sheetOpen('📜 Sertifikat Saya', list.map((c, i) => `<button onclick="viewCert(${i})" class="w-full text-left p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 dark:bg-amber-950/30 flex items-center gap-3"><span class="text-3xl">${c.kind === 'island' ? '🏝️' : c.kind === 'boss' ? '⚔️' : '🎓'}</span><span class="min-w-0"><span class="block font-game font-bold text-sm">${esc(c.title)}</span><span class="block text-[10px] font-semibold text-slate-500">${esc(c.subject)} · Kelas ${c.grade} · ${new Date(c.ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span></button>`).join(''));
+        }
+        let certCanvas = null, certName = 'sertifikat';
+        function drawCertificate(c, who) {
+            const cv = document.createElement('canvas'); cv.width = 900; cv.height = 640;
+            const g = cv.getContext('2d');
+            const bg = g.createLinearGradient(0, 0, 900, 640); bg.addColorStop(0, '#fffbeb'); bg.addColorStop(1, '#fef3c7');
+            g.fillStyle = bg; g.fillRect(0, 0, 900, 640);
+            g.strokeStyle = '#b45309'; g.lineWidth = 10; g.strokeRect(24, 24, 852, 592);
+            g.strokeStyle = '#f59e0b'; g.lineWidth = 3; g.strokeRect(42, 42, 816, 556);
+            g.textAlign = 'center'; g.fillStyle = '#92400e';
+            g.font = 'bold 26px Fredoka, Nunito, sans-serif'; g.fillText('EDUQUEST', 450, 100);
+            g.font = 'bold 54px Fredoka, Nunito, sans-serif'; g.fillStyle = '#b45309'; g.fillText('SERTIFIKAT', 450, 170);
+            g.font = '22px Nunito, sans-serif'; g.fillStyle = '#78350f'; g.fillText('Dengan bangga diberikan kepada', 450, 230);
+            g.font = 'bold 56px Fredoka, Nunito, sans-serif'; g.fillStyle = '#1e3a8a'; g.fillText(String(who).slice(0, 22), 450, 310);
+            g.fillStyle = '#b45309'; g.fillRect(250, 330, 400, 3);
+            g.font = '22px Nunito, sans-serif'; g.fillStyle = '#78350f'; g.fillText('atas prestasinya meraih gelar', 450, 380);
+            g.font = 'bold 44px Fredoka, Nunito, sans-serif'; g.fillStyle = '#047857'; g.fillText(String(c.title).slice(0, 30), 450, 450);
+            g.font = '20px Nunito, sans-serif'; g.fillStyle = '#78350f';
+            g.fillText(`${c.subject} · Kelas ${c.grade}${c.avg ? ' · Nilai rata-rata ' + c.avg + '%' : ''}`, 450, 495);
+            g.fillText(new Date(c.ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), 450, 560);
+            g.font = '60px sans-serif'; g.fillText('🏅', 120, 120); g.fillText('⭐', 780, 120); g.fillText('🌟', 130, 560); g.fillText('🏅', 770, 560);
+            return cv;
+        }
+        function viewCert(i) {
+            const child = getActiveChild(); const c = child && (child.certs || [])[i]; if (!c) return;
+            playSound('click');
+            certCanvas = drawCertificate(c, child.name);
+            certName = 'sertifikat-' + c.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            sheetOpen('📜 ' + c.title, `<img src="${certCanvas.toDataURL('image/png')}" class="w-full rounded-xl border-2 border-amber-300" alt="Sertifikat">
+                <div class="grid grid-cols-2 gap-2"><button onclick="shareCert()" class="py-2.5 rounded-2xl bg-emerald-500 text-white font-extrabold text-xs">📤 Bagikan</button>
+                <button onclick="downloadCert()" class="py-2.5 rounded-2xl bg-indigo-500 text-white font-extrabold text-xs">⬇️ Unduh</button></div>
+                <button onclick="openCerts()" class="w-full py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">← Semua Sertifikat</button>`);
+        }
+        function downloadCert() {
+            if (!certCanvas) return;
+            certCanvas.toBlob((b) => {
+                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = certName + '.png';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            }, 'image/png');
+        }
+        function shareCert() {
+            if (!certCanvas) return;
+            certCanvas.toBlob((b) => {
+                const file = new File([b], certName + '.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({ files: [file], title: 'Sertifikat EduQuest' }).catch(() => {});
+                } else { downloadCert(); showToast('⬇️ Sertifikat diunduh, silakan bagikan dari galeri.'); }
+            }, 'image/png');
+        }
+
         // ===== Kartu Boss & Pet di beranda anak =====
         function renderHomeExtras() {
             const el = document.getElementById('home-extras');
@@ -8287,6 +8694,8 @@ T([9], S_BE, CLOZE, [
             const st = bossStateToday(child);
             const bcfg = getBossCfg();
             const pet = getActivePet(child);
+            const rem = petReminderText(child, pet);
+            if (rem && !petRemindShown) { petRemindShown = true; setTimeout(() => showToast(rem), 900); }
             if (pet && tickPet(pet)) saveDatabase();
             const bossCard = `<div class="rounded-3xl p-3.5 bg-gradient-to-br from-slate-800 to-rose-900 text-white shadow-lg flex items-center gap-3">
                 <div class="text-5xl ${(st.defeated || st.failed) ? 'opacity-40 grayscale' : 'pet-float'}">${boss.emoji}</div>
@@ -8303,10 +8712,20 @@ T([9], S_BE, CLOZE, [
             const petCard = pet
                 ? `<button onclick="switchTab('pet')" class="w-full text-left rounded-3xl p-3.5 bg-white dark:bg-slate-900 border-2 ${pet.sick ? 'border-rose-400' : 'border-pink-200 dark:border-pink-900'} shadow-sm flex items-center gap-3">
                     <div class="w-14 flex justify-center">${petFaceHTML(pet, 0.55)}</div>
-                    <div class="flex-1 min-w-0"><p class="font-game font-bold text-sm">${esc(pet.name)} · ${PET_STAGE_NAME[petStage(pet)]}</p><p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">${petMoodText(pet)}</p></div>
+                    <div class="flex-1 min-w-0"><p class="font-game font-bold text-sm">${esc(pet.name)} · ${PET_STAGE_NAME[petStage(pet)]}</p><p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">${petMoodText(pet)}</p>${rem ? `<p class="text-[11px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">💬 ${esc(rem)}</p>` : ''}</div>
                     <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i></button>`
                 : `<button onclick="switchTab('pet')" class="w-full text-left rounded-3xl p-3.5 bg-gradient-to-r from-pink-100 to-amber-100 dark:from-pink-950/40 dark:to-amber-950/40 border border-pink-200 dark:border-pink-900 flex items-center gap-3"><span class="text-4xl">🥚</span><div class="flex-1"><p class="font-game font-bold text-sm">Adopsi pet pertamamu!</p><p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Gratis! Rawat sampai tumbuh besar.</p></div></button>`;
-            el.innerHTML = bossCard + petCard;
+            const adv = advState(child);
+            const advDone = Object.keys(adv.nodes).filter((k) => adv.nodes[k].stars >= 1).length;
+            const wrongN = (child.wrongBank || []).filter((x) => x.grade === child.grade).length;
+            const certN = (child.certs || []).length;
+            const qbtn = (fn, icon, label, sub, tone) => `<button onclick="${fn}" class="rounded-2xl p-2.5 text-center border-2 ${tone} font-extrabold"><div class="text-2xl">${icon}</div><div class="text-[11px] leading-tight">${label}</div><div class="text-[10px] font-semibold opacity-70">${sub}</div></button>`;
+            const quick = `<div class="grid grid-cols-3 gap-2">
+                ${qbtn('openAdvMap()', '🗺️', 'Peta Petualangan', `${advDone}/${SUBJECT_META.length * ADV_NODES.length} level`, 'bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-900 text-sky-700 dark:text-sky-300')}
+                ${qbtn('startReviewQuiz()', '🔁', 'Ulangi yang Salah', wrongN ? `${wrongN} soal` : 'belum ada', 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300')}
+                ${qbtn('openCerts()', '📜', 'Sertifikat', `${certN} dimiliki`, 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900 text-amber-700 dark:text-amber-300')}
+            </div>`;
+            el.innerHTML = bossCard + petCard + quick;
         }
 
         // ===== LAPORAN MINGGUAN UNTUK ORANG TUA =====
@@ -8803,7 +9222,7 @@ T([9], S_BE, CLOZE, [
         Object.assign(window, {
             petRevive, petBury, petRename, closePetPlay, petPlayStart, petPlayAnswer, petPlayAgain, savePetPrices, resetPetPrices,
             petSetPanel, petToggleFeed, petSelect, petTap, petAdopt, petFeed, petPlay, petWarmOpen, petWarmAnswer, petBath, petMedicine, petBuy, petEquip,
-            roomBuy, roomEquip, startBossQuiz, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
+            roomBuy, roomEquip, startBossQuiz, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
             switchAuthRole,
             toggleParentRegisterMode,
             toggleParentJoinMode,
