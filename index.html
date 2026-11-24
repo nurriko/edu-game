@@ -725,6 +725,7 @@
                         </div>
                     </div>
                     <div id="p-boss-settings"></div>
+                    <div id="p-duel-settings"></div>
                     <div id="p-pet-prices"></div>
                 </div>
 
@@ -4187,6 +4188,7 @@ T([9], S_BE, CLOZE, [
             { id: 'b_review10', name: 'Penakluk Kesalahan', icon: '🔁', desc: 'Memperbaiki 10 soal yang pernah salah', check: (c) => (c.reviewFixed || 0) >= 10 },
             { id: 'b_island1', name: 'Penjelajah Pulau', icon: '🏝️', desc: 'Menaklukkan 1 pulau di Peta Petualangan', check: (c) => Object.keys((c.adv && c.adv.islands) || {}).length >= 1 },
             { id: 'b_cert1', name: 'Pemilik Sertifikat', icon: '📜', desc: 'Meraih sertifikat pertamamu', check: (c) => (c.certs || []).length >= 1 },
+            { id: 'b_duel3', name: 'Jagoan Duel', icon: '🤝', desc: 'Menang 3 kali bermain bersama saudara', check: (c) => (c.duelWins || 0) >= 3 },
             { id: 'b_collector', name: 'Kolektor Item', icon: '👑', desc: 'Membeli minimal 3 item di Toko', check: (c) => c.ownedItems.length >= 7 }
         ];
 
@@ -5120,7 +5122,7 @@ T([9], S_BE, CLOZE, [
                     expl: ans ? String(qObj.explanation || '').slice(0, 400) : '',
                     log: (activeQuiz.answerLog || []).map((a) => (a.isCorrect ? 1 : 0)).join(''),
                     correct: activeQuiz.correctCount || 0,
-                    mode: activeQuiz.isBoss ? 'boss' : activeQuiz.isReview ? 'review' : activeQuiz.adv ? 'adv' : 'normal',
+                    mode: activeQuiz.isBoss ? 'boss' : activeQuiz.isReview ? 'review' : activeQuiz.isDuel ? 'duel' : activeQuiz.adv ? 'adv' : 'normal',
                     bossName: activeQuiz.bossName || ''
                 };
             } catch (e) { return null; }
@@ -5246,7 +5248,7 @@ T([9], S_BE, CLOZE, [
                 return;
             }
             const letters = ['A', 'B', 'C', 'D'];
-            const modeLabel = { boss: `⚔️ Boss ${esc(L.bossName || '')}`, review: '🔁 Ulangi Soal Salah', adv: '🗺️ Peta Petualangan', normal: '📘 Kuis' }[L.mode] || '📘 Kuis';
+            const modeLabel = { boss: `⚔️ Boss ${esc(L.bossName || '')}`, review: '🔁 Ulangi Soal Salah', duel: '🤝 Duel dengan saudara', adv: '🗺️ Peta Petualangan', normal: '📘 Kuis' }[L.mode] || '📘 Kuis';
             const dots = String(L.log || '').split('').map((c) => `<span class="w-5 h-5 rounded-md text-[11px] flex items-center justify-center ${c === '1' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}">${c === '1' ? '✓' : '✗'}</span>`).join('');
             const opts = (L.opts || []).map((o, i) => {
                 let cls = 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900';
@@ -5969,6 +5971,7 @@ T([9], S_BE, CLOZE, [
             renderWeeklyReport(child);
             renderPetPriceEditor();
             renderBossSettingsEditor();
+            renderDuelSettingsEditor();
             document.getElementById('p-target-progress-txt').textContent = `Progres Hari Ini: ${getTargetDone(dt)} / ${getTargetTotal(dt)} Kuis (${clampQuestionCount(dt.questionCount || 10)} soal/kuis)${targetProgressDetail(dt)}`;
 
             const badgeEl = document.getElementById('p-target-status-badge');
@@ -6641,6 +6644,7 @@ T([9], S_BE, CLOZE, [
         }
 
         function useLifeline5050() {
+            if (activeQuiz.isDuel) { showToast('🤝 Bantuan tidak berlaku saat duel.'); return; }
             if (activeQuiz.answered || activeQuiz.lifeline5050Left <= 0) {
                 playSound('wrong');
                 showToast('⚠️ Bantuan 50:50 sudah digunakan di paket kuis ini!');
@@ -6666,6 +6670,7 @@ T([9], S_BE, CLOZE, [
         }
 
         function useLifelineHint() {
+            if (activeQuiz.isDuel) { showToast('🤝 Bantuan tidak berlaku saat duel.'); return; }
             if (activeQuiz.answered || activeQuiz.lifelineHintLeft <= 0) {
                 playSound('wrong');
                 showToast('⚠️ Bantuan Petunjuk sudah digunakan di paket kuis ini!');
@@ -6876,6 +6881,7 @@ T([9], S_BE, CLOZE, [
 
             if (activeQuiz.isBoss) { finishBossQuiz(child, total, scorePct); return; }
             if (activeQuiz.isReview) { finishReviewQuiz(child, total, scorePct); return; }
+            if (activeQuiz.isDuel) { finishDuelQuiz(child, total, scorePct); return; }
 
             child.xp += activeQuiz.earnedXp;
             // Koin dihitung di akhir kuis berdasarkan target orang tua
@@ -6990,6 +6996,10 @@ T([9], S_BE, CLOZE, [
 
         function quitQuiz() {
             playSound('click');
+            if (activeQuiz && activeQuiz.isDuel && !document.getElementById('quiz-modal').classList.contains('hidden')) {
+                appConfirm(dlDraft && activeQuiz.duel === dlDraft ? 'Batalkan tantangan? Tantangan belum dikirim ke saudaramu.' : 'Keluar dari duel? Kamu dianggap kalah dan taruhan jadi milik lawan.', { title: 'Keluar dari Duel', okText: 'Ya, Keluar' }).then((ok) => { if (ok && activeQuiz && activeQuiz.isDuel) dlForfeit(); });
+                return;
+            }
             if (activeQuiz && activeQuiz.isBoss && !activeQuiz.timedOut && !document.getElementById('quiz-modal').classList.contains('hidden')) {
                 appConfirm('Kabur dari boss? Boss akan dianggap menang dan kamu baru bisa melawannya lagi besok.', { title: 'Kabur dari Boss', okText: 'Ya, Kabur' }).then((ok) => {
                     if (ok && activeQuiz && activeQuiz.isBoss) { activeQuiz.timedOut = true; activeQuiz.fled = true; finishQuiz(); }
@@ -8684,6 +8694,451 @@ T([9], S_BE, CLOZE, [
             }, 'image/png');
         }
 
+
+        // ===== MAIN BERSAMA SAUDARA: kunjungan, duel, adu pet, balapan, tebak kata =====
+        const DL_GAMES = {
+            duel: { icon: '⚡', name: 'Duel Kilat', desc: '5 soal sama mapel. Skor tertinggi menang, seri dilihat dari kecepatan.', pets: false },
+            petbattle: { icon: '🐾', name: 'Adu Pet', desc: '3 ronde soal. Pet yang lebih kuat (rawat petmu!) menang bila keduanya benar.', pets: true },
+            race: { icon: '🏁', name: 'Balapan Pet', desc: 'Tiap jawaban benar membuat petmu melangkah. Yang paling jauh menang.', pets: true },
+            word: { icon: '🔤', name: 'Tebak Kata', desc: 'Tebak kata rahasia dari petunjuk. Makin sedikit petunjuk, makin menang.', pets: false }
+        };
+        let dlDraft = null;
+        let wordState = null;
+
+        function famSiblings(child) {
+            const fam = getActiveFamily();
+            return ((fam && fam.children) || []).filter((c) => c.username !== child.username);
+        }
+        function dlChild(un) { const fam = getActiveFamily(); return ((fam && fam.children) || []).find((c) => c.username === un); }
+        function duelCfg() {
+            const fam = getActiveFamily(); const o = (fam && fam.duelSettings) || {};
+            const num = (v, d, lo, hi) => (Number.isFinite(v) ? Math.max(lo, Math.min(hi, Math.round(v))) : d);
+            return { enabled: o.enabled !== false, maxWager: num(o.maxWager, 100, 0, 1000), lossCap: num(o.lossCap, 150, 0, 5000) };
+        }
+        function dlLossToday(c) { const t = new Date().toDateString(); return (c.duelLoss && c.duelLoss.date === t) ? c.duelLoss.n : 0; }
+        function dlMaxWager(a, b) {
+            const cfg = duelCfg();
+            let m = Math.min(cfg.maxWager, a.coins, b.coins);
+            if (cfg.lossCap > 0) m = Math.min(m, cfg.lossCap - dlLossToday(a), cfg.lossCap - dlLossToday(b));
+            return Math.max(0, m);
+        }
+        function petPower(pet) {
+            return petStage(pet) * 20 + Math.round(pet.happy / 5) + Math.round(pet.health / 10) + Math.round(pet.clean / 10);
+        }
+        function dlPetOk(c) { const p = getActivePet(c); return !!(p && !p.dead && petStage(p) >= 1); }
+        function dlName(un) { const c = dlChild(un); return c ? c.name : un; }
+        function dlAvatar(un) { const c = dlChild(un); return (c && c.equipped && c.equipped.avatar) || '🧒'; }
+
+        // Bersihkan tantangan basi: diterima tapi tak diselesaikan 30 menit = kalah; menunggu >3 hari = hangus
+        function dlSweep(fam) {
+            if (!fam || !Array.isArray(fam.duels)) return false;
+            let changed = false;
+            const now = Date.now();
+            fam.duels.slice().forEach((d) => {
+                if (d.type !== 'gift' && d.status === 'accepted' && now - (d.acceptedAt || now) > 30 * 60000 && !(d.res && d.res[d.to])) {
+                    d.res[d.to] = { score: -1, forfeit: true, hints: 4, timeMs: 1e9, answers: '', total: 0 };
+                    settleDuel(d); changed = true;
+                } else if (d.status === 'pending' && now - d.ts > 3 * 86400000) {
+                    fam.duels = fam.duels.filter((x) => x.id !== d.id); changed = true;
+                }
+            });
+            if (fam.duels.length > 60) { fam.duels = fam.duels.slice(-60); changed = true; }
+            return changed;
+        }
+
+        function dlInbox(me) {
+            const fam = getActiveFamily(); const list = (fam && fam.duels) || [];
+            const invites = list.filter((d) => d.type !== 'gift' && d.status === 'pending' && d.to === me.username && d.res && d.res[d.from]);
+            const resume = list.filter((d) => d.type !== 'gift' && d.status === 'accepted' && d.to === me.username && !(d.res && d.res[d.to]));
+            const unseen = list.filter((d) => ['done', 'declined'].includes(d.status) && (d.from === me.username || d.to === me.username) && !(d.seen && d.seen[me.username]) && !(d.status === 'declined' && d.to === me.username));
+            const waiting = list.filter((d) => d.type !== 'gift' && ['pending', 'accepted'].includes(d.status) && d.from === me.username);
+            const history = list.filter((d) => d.type !== 'gift' && d.status === 'done' && (d.from === me.username || d.to === me.username) && (d.seen && d.seen[me.username])).slice(-5).reverse();
+            return { invites, resume, unseen, waiting, history, count: invites.length + unseen.length + resume.length };
+        }
+
+        function openTogether() {
+            const me = getActiveChild(); if (!me) return;
+            const fam = getActiveFamily();
+            if (dlSweep(fam)) saveDatabase();
+            playSound('click');
+            const cfg = duelCfg();
+            if (!cfg.enabled) { sheetOpen('🤝 Main Bersama', '<p class="text-xs font-semibold text-slate-500 text-center py-6">Fitur ini sedang dimatikan oleh orang tua.</p>'); return; }
+            const ib = dlInbox(me);
+            const sec = (title, rows) => rows ? `<div class="space-y-2"><p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">${title}</p>${rows}</div>` : '';
+            const card = (inner) => `<div class="rounded-2xl p-3 border-2 border-fuchsia-200 dark:border-fuchsia-900 bg-fuchsia-50/60 dark:bg-fuchsia-950/30 space-y-2">${inner}</div>`;
+            const gname = (d) => `${DL_GAMES[d.type].icon} ${DL_GAMES[d.type].name}`;
+            const invitesH = ib.invites.map((d) => card(`<p class="text-xs font-bold leading-snug">${dlAvatar(d.from)} <b>${esc(dlName(d.from))}</b> menantangmu <b>${gname(d)}</b>${d.wager ? ` dengan taruhan <b>${d.wager} 🪙</b>` : ' (tanpa taruhan)'}!</p>
+                <div class="grid grid-cols-2 gap-2"><button onclick="acceptDuel('${d.id}')" class="py-2 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px]">⚔️ Terima</button><button onclick="declineDuel('${d.id}')" class="py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-extrabold text-[11px]">Tolak</button></div>`)).join('');
+            const resumeH = ib.resume.map((d) => card(`<p class="text-xs font-bold">${gname(d)} melawan ${esc(dlName(d.from))} sedang berlangsung.</p><button onclick="resumeDuel('${d.id}')" class="w-full py-2 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-[11px]">Lanjutkan</button>`)).join('');
+            const unseenH = ib.unseen.map((d) => {
+                if (d.type === 'gift') return card(`<p class="text-xs font-bold">🎁 ${esc(dlName(d.from))} mengunjungi petmu dan memberi ${d.item}! Mood petmu naik.</p><button onclick="dlSeen('${d.id}')" class="w-full py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 font-extrabold text-[11px]">Terima kasih 💕</button>`);
+                if (d.status === 'declined') return card(`<p class="text-xs font-bold">${esc(dlName(d.to))} menolak tantangan ${gname(d)}.</p><button onclick="dlSeen('${d.id}')" class="w-full py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 font-extrabold text-[11px]">OK</button>`);
+                const won = d.winner === me.username;
+                return card(`<p class="text-xs font-bold">${gname(d)} melawan ${esc(dlName(d.from === me.username ? d.to : d.from))} selesai: ${d.winner === 'draw' ? '🤝 seri' : won ? '🏆 kamu menang!' : '😢 kamu kalah'}</p><button onclick="showDuelResult('${d.id}')" class="w-full py-2 rounded-xl bg-fuchsia-500 text-white font-extrabold text-[11px]">▶️ Lihat Hasil</button>`);
+            }).join('');
+            const waitH = ib.waiting.map((d) => `<p class="text-[11px] font-semibold text-slate-500">⏳ ${gname(d)} menunggu ${esc(dlName(d.to))}${d.wager ? ` · ${d.wager} 🪙` : ''}</p>`).join('');
+            const histH = ib.history.map((d) => `<button onclick="showDuelResult('${d.id}')" class="w-full text-left text-[11px] font-semibold p-2 rounded-xl bg-slate-100 dark:bg-slate-800">${gname(d)} · ${esc(dlName(d.from))} vs ${esc(dlName(d.to))} · ${d.winner === 'draw' ? 'seri' : '🏆 ' + esc(dlName(d.winner))}</button>`).join('');
+            const sibs = famSiblings(me).map((c) => {
+                const pet = getActivePet(c);
+                return `<button onclick="visitSibling('${c.username}')" class="w-full text-left p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center gap-3"><span class="text-3xl">${(c.equipped && c.equipped.avatar) || '🧒'}</span><span class="flex-1 min-w-0"><span class="block font-game font-bold text-sm">${esc(c.name)}</span><span class="block text-[10px] font-semibold text-slate-500">${pet ? `${petSpecies(pet).emoji} ${esc(pet.name)} · ${PET_STAGE_NAME[petStage(pet)]}` : 'Belum punya pet'} · Kelas ${c.grade}</span></span><span class="text-xs font-extrabold text-fuchsia-600">Kunjungi ➜</span></button>`;
+            }).join('');
+            sheetOpen('🤝 Main Bersama', sec('Perlu perhatianmu', invitesH + resumeH + unseenH) + sec('Menunggu lawan', waitH) + sec('Kunjungi saudara', sibs) + sec('Riwayat terakhir', histH));
+        }
+        function dlSeen(id) {
+            const me = getActiveChild(); const fam = getActiveFamily();
+            const d = (fam.duels || []).find((x) => x.id === id); if (!d) return;
+            d.seen = d.seen || {}; d.seen[me.username] = true;
+            saveDatabase(); renderChildHomeView(); openTogether();
+        }
+
+        // ----- Kunjungan -----
+        function visitSibling(un) {
+            const me = getActiveChild(); const sib = dlChild(un); if (!me || !sib) return;
+            ensurePetData(sib);
+            playSound('click');
+            const pet = getActivePet(sib);
+            let room = '<div class="text-center text-xs font-semibold text-slate-500 py-6">Saudaramu belum punya pet untuk dikunjungi.</div>';
+            if (pet) {
+                tickPet(pet);
+                room = petRoomHTML(sib, pet).replace('id="pet-room"', '').replace('id="pet-room-anim"', '').replace('onclick="petTap()"', 'onclick="showToast(\'😊 Pet ini malu-malu, tapi senang kamu datang!\')"');
+            }
+            const cfg = duelCfg();
+            const maxW = dlMaxWager(me, sib);
+            const games = Object.keys(DL_GAMES).map((k) => {
+                const g = DL_GAMES[k];
+                const needPet = g.pets && !(dlPetOk(me) && dlPetOk(sib));
+                return `<button ${needPet ? 'disabled' : ''} onclick="dlWagerMenu('${k}','${un}')" class="p-2.5 rounded-2xl border-2 text-left ${needPet ? 'opacity-50 border-slate-200 dark:border-slate-700' : 'border-fuchsia-200 dark:border-fuchsia-900 bg-fuchsia-50 dark:bg-fuchsia-950/30'}"><div class="text-xl">${g.icon}</div><div class="font-extrabold text-[11px] leading-tight">${g.name}</div><div class="text-[9px] font-semibold text-slate-500 leading-snug">${needPet ? 'Butuh pet yang sudah menetas di kedua anak' : g.desc}</div></button>`;
+            }).join('');
+            const today = new Date().toDateString();
+            const gifted = me.giftDay && me.giftDay[un] === today;
+            sheetOpen(`🏠 Ruangan ${sib.name}`, `${room}
+                <p class="text-xs font-semibold text-center">${pet ? petMoodText(pet) : ''}</p>
+                <button ${(!pet || gifted) ? 'disabled' : ''} onclick="visitGift('${un}')" class="w-full py-2.5 rounded-2xl ${(!pet || gifted) ? 'bg-slate-200 dark:bg-slate-700 text-slate-400' : 'bg-pink-500 text-white'} font-extrabold text-xs">${gifted ? '🎁 Hadiah hari ini sudah diberikan' : '🎁 Beri hadiah untuk pet (mood +10)'}</button>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 pt-1">Ajak bermain</p>
+                <div class="grid grid-cols-2 gap-2">${games}</div>
+                <p class="text-[10px] font-semibold text-slate-400 text-center">Taruhan maksimal kalian sekarang: ${maxW} 🪙 (batas orang tua ${cfg.maxWager}${cfg.lossCap ? `, kalah maks. ${cfg.lossCap}/hari` : ''})</p>
+                <button onclick="openTogether()" class="w-full py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">← Kembali</button>`);
+        }
+        function visitGift(un) {
+            const me = getActiveChild(); const sib = dlChild(un); const fam = getActiveFamily(); if (!me || !sib) return;
+            const pet = getActivePet(sib); if (!pet || pet.dead) return;
+            const today = new Date().toDateString();
+            me.giftDay = me.giftDay || {};
+            if (me.giftDay[un] === today) { showToast('🎁 Kamu sudah memberi hadiah hari ini.'); return; }
+            me.giftDay[un] = today;
+            pet.happy = clampStat(pet.happy + 10);
+            const item = ['🍎', '🧸', '🌸', '🎈', '🍪'][Math.floor(Math.random() * 5)];
+            fam.duels = fam.duels || [];
+            fam.duels.push({ id: 'gf_' + Date.now(), type: 'gift', from: me.username, to: un, status: 'done', winner: 'draw', item: item, ts: Date.now(), res: {}, seen: { [me.username]: true } });
+            logActivity(fam, `mengunjungi pet ${sib.name} dan memberi hadiah`, me.name, 'child');
+            playSound('correct'); fireConfetti(30);
+            showToast(`${item} Hadiah diterima ${pet.name}! Mood naik.`);
+            saveDatabase(); visitSibling(un);
+        }
+
+        // ----- Membuat tantangan -----
+        function dlWagerMenu(type, un) {
+            const me = getActiveChild(); const sib = dlChild(un); if (!me || !sib) return;
+            const g = DL_GAMES[type];
+            const fam = getActiveFamily();
+            if ((fam.duels || []).some((d) => d.type !== 'gift' && d.from === me.username && d.to === un && ['pending', 'accepted'].includes(d.status))) { playSound('wrong'); showToast('⏳ Tantanganmu sebelumnya belum dijawab.'); return; }
+            const maxW = dlMaxWager(me, sib);
+            const opts = [0, 10, 25, 50, 100, 200, 500].filter((v) => v <= maxW);
+            if (!opts.includes(0)) opts.unshift(0);
+            playSound('click');
+            sheetOpen(`${g.icon} ${g.name} vs ${sib.name}`, `<p class="text-xs font-semibold leading-snug">${g.desc}</p>
+                <p class="text-xs font-bold">Berapa koin yang dipertaruhkan? Yang kalah kehilangan koin sebanyak itu, pemenang mendapatkannya. Seri = koin kembali.</p>
+                <div class="grid grid-cols-3 gap-2">${opts.map((v) => `<button onclick="createChallenge('${type}','${un}',${v})" class="py-3 rounded-2xl ${v ? 'bg-amber-400 text-slate-900' : 'bg-slate-200 dark:bg-slate-700'} font-extrabold text-sm">${v ? v + ' 🪙' : 'Tanpa taruhan'}</button>`).join('')}</div>
+                <p class="text-[10px] font-semibold text-slate-400 text-center">Kamu bermain lebih dulu. ${esc(sib.name)} bisa menerima atau menolak, dan koin baru dipotong setelah tantangan diterima.</p>
+                <button onclick="visitSibling('${un}')" class="w-full py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">← Kembali</button>`);
+        }
+        function dlGenQuestions(type, ch, subject) {
+            if (type === 'petbattle') {
+                const out = [];
+                for (let i = 0; i < 3; i++) {
+                    const sj = SUBJECT_META[Math.floor(Math.random() * SUBJECT_META.length)].subject;
+                    const q = buildTenQuestionQuiz(ch.grade, sj, ch.recentQuestionHashes || [], 1);
+                    if (q.length) out.push(q[0]);
+                }
+                return out;
+            }
+            return buildTenQuestionQuiz(ch.grade, subject, ch.recentQuestionHashes || [], 5);
+        }
+        function dlPickWord(grade) {
+            const cands = [];
+            FACT_TABLES.forEach((t) => {
+                if (!t.grades.includes(grade) || !t.forms || !t.forms[1] || t.forms[1].indexOf('{v}') < 0) return;
+                t.rows.forEach((r) => {
+                    const k = String(r[0]); const v = String(r[1]);
+                    if (!/^[A-Za-z]{4,10}$/.test(k)) return;
+                    const hint = t.forms[1].replace('{v}', v);
+                    if (hint.indexOf('{') >= 0 || hint.toLowerCase().indexOf(k.toLowerCase()) >= 0) return;
+                    cands.push({ k: k.toUpperCase(), hint: hint.replace(/\.\.\.$/, '').trim() + ' ... ?' });
+                });
+            });
+            return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
+        }
+        function createChallenge(type, un, wager) {
+            const me = getActiveChild(); const sib = dlChild(un); const fam = getActiveFamily(); if (!me || !sib) return;
+            const cfg = duelCfg();
+            if (!cfg.enabled) return;
+            if (wager > dlMaxWager(me, sib)) { playSound('wrong'); showToast('⚠️ Taruhan melebihi batas yang diperbolehkan.'); return; }
+            if (DL_GAMES[type].pets && !(dlPetOk(me) && dlPetOk(sib))) { playSound('wrong'); showToast('🐾 Kedua anak butuh pet yang sudah menetas.'); return; }
+            const subject = SUBJECT_META[Math.floor(Math.random() * SUBJECT_META.length)].subject;
+            const d = { id: 'dl_' + Date.now(), type: type, from: me.username, to: un, wager: wager, status: 'pending', ts: Date.now(), subject: subject, qs: {}, res: {}, seen: {} };
+            if (type === 'word') {
+                d.word = dlPickWord(Math.min(me.grade, sib.grade));
+                if (!d.word) { showToast('⚠️ Kata belum tersedia untuk kelas ini.'); return; }
+            } else {
+                d.qs[me.username] = dlGenQuestions(type, me, subject);
+                if (d.qs[me.username].length < (type === 'petbattle' ? 3 : 5)) { showToast('⚠️ Bank soal belum cukup.'); return; }
+            }
+            dlDraft = d;
+            sheetClose();
+            dlPlay(d);
+        }
+        function dlPlay(d) {
+            const me = getActiveChild(); if (!me) return;
+            playSound('click');
+            if (d.type === 'word') { wordState = { d: d, stage: 1, t0: Date.now() }; wordRender(); return; }
+            const qs = d.qs[me.username];
+            activeQuiz = { subjectName: d.type === 'petbattle' ? 'Adu Pet' : d.subject, grade: me.grade, questions: qs, currentIndex: 0, correctCount: 0, currentCombo: 0, earnedXp: 0, earnedCoins: 0, answered: false, lifeline5050Left: 0, lifelineHintLeft: 0, answerLog: [], isDuel: true, duel: d, duelStart: Date.now() };
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+            renderCurrentQuestion();
+            showToast(`${DL_GAMES[d.type].icon} ${DL_GAMES[d.type].name}! Tidak ada bantuan, jawab sebaik mungkin.`);
+        }
+        function acceptDuel(id) {
+            const me = getActiveChild(); const fam = getActiveFamily();
+            const d = (fam.duels || []).find((x) => x.id === id); if (!d || d.status !== 'pending') return;
+            const opp = dlChild(d.from); if (!opp) return;
+            if (d.wager > dlMaxWager(me, opp)) { playSound('wrong'); showToast('⚠️ Koin atau batas kalah harian belum cukup untuk taruhan ini.'); return; }
+            if (DL_GAMES[d.type].pets && !(dlPetOk(me) && dlPetOk(opp))) { playSound('wrong'); showToast('🐾 Pet kalian belum siap bertanding.'); return; }
+            if (d.type !== 'word') {
+                d.qs = d.qs || {};
+                d.qs[me.username] = dlGenQuestions(d.type, me, d.subject);
+                if (d.qs[me.username].length < (d.type === 'petbattle' ? 3 : 5)) { showToast('⚠️ Bank soal belum cukup.'); return; }
+            }
+            d.status = 'accepted'; d.acceptedAt = Date.now();
+            saveDatabase();
+            sheetClose();
+            dlPlay(d);
+        }
+        function resumeDuel(id) {
+            const fam = getActiveFamily(); const d = (fam.duels || []).find((x) => x.id === id); if (!d) return;
+            sheetClose(); dlPlay(d);
+        }
+        function declineDuel(id) {
+            const me = getActiveChild(); const fam = getActiveFamily();
+            const d = (fam.duels || []).find((x) => x.id === id); if (!d) return;
+            d.status = 'declined'; d.seen = d.seen || {}; d.seen[me.username] = true;
+            logActivity(fam, `menolak tantangan ${DL_GAMES[d.type].name} dari ${dlName(d.from)}`, me.name, 'child');
+            saveDatabase(); playSound('click'); renderChildHomeView(); openTogether();
+        }
+
+        // ----- Selesai bermain -----
+        function dlPetSnap(c) {
+            const p = getActivePet(c);
+            return p ? { emoji: petSpecies(p).emoji, name: p.name, power: petPower(p) } : { emoji: '🐾', name: 'Pet', power: 0 };
+        }
+        function finishDuelQuiz(child, total, scorePct) {
+            const d = activeQuiz.duel;
+            const payload = { score: activeQuiz.correctCount, total: total, timeMs: Date.now() - activeQuiz.duelStart, answers: activeQuiz.answerLog.map((a) => (a.isCorrect ? 1 : 0)).join(''), pet: dlPetSnap(child) };
+            child.xp += activeQuiz.earnedXp;
+            activeQuiz.isDuel = false;
+            dlFinish(d, child, payload);
+        }
+        function dlForfeit() {
+            const me = getActiveChild(); const d = activeQuiz && activeQuiz.duel;
+            document.getElementById('quiz-modal').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('flex', 'quiz-blur');
+            pushPresence();
+            if (!me || !d) return;
+            if (d === dlDraft) { dlDraft = null; activeQuiz.isDuel = false; showToast('Tantangan dibatalkan.'); return; }
+            activeQuiz.isDuel = false;
+            dlFinish(d, me, { score: -1, forfeit: true, hints: 4, timeMs: 1e9, answers: '', total: 0, pet: dlPetSnap(me) });
+        }
+        function dlFinish(d, me, payload) {
+            const fam = getActiveFamily();
+            fam.duels = fam.duels || [];
+            if (d === dlDraft) { fam.duels.push(d); dlDraft = null; }
+            d.res = d.res || {}; d.res[me.username] = payload;
+            d.seen = d.seen || {};
+            let settled = false;
+            if (d.res[d.from] && d.res[d.to]) { settleDuel(d); settled = true; }
+            logActivity(fam, `bermain ${DL_GAMES[d.type].name} dengan ${dlName(d.from === me.username ? d.to : d.from)}`, me.name, 'child');
+            checkAndUnlockBadges();
+            saveDatabase(); updateChildHeaderUI(); renderChildHomeView();
+            if (settled) { d.seen[me.username] = true; saveDatabase(); showDuelResult(d.id); }
+            else {
+                playSound('fanfare');
+                sheetOpen('📨 Tantangan Terkirim!', `<div class="text-center space-y-2 py-4"><div class="text-5xl">${DL_GAMES[d.type].icon}</div><p class="font-game font-bold text-sm">Skormu sudah tersimpan</p><p class="text-xs font-semibold text-slate-500">${esc(dlName(d.to))} akan melihat tantanganmu${d.wager ? ` dengan taruhan ${d.wager} 🪙` : ''}. Hasilnya muncul di menu Main Bersama.</p></div>`);
+            }
+        }
+        function dlWinnerOf(d) {
+            const A = d.from, B = d.to; const ra = d.res[A], rb = d.res[B];
+            if (d.type === 'word') {
+                if (ra.hints !== rb.hints) return ra.hints < rb.hints ? A : B;
+                return ra.timeMs === rb.timeMs ? 'draw' : (ra.timeMs < rb.timeMs ? A : B);
+            }
+            if (d.type === 'petbattle') {
+                const pa = (ra.pet && ra.pet.power) || 0, pb = (rb.pet && rb.pet.power) || 0;
+                d.rounds = [];
+                for (let i = 0; i < 3; i++) {
+                    const ca = ra.answers[i] === '1', cb = rb.answers[i] === '1';
+                    d.rounds.push(ca && cb ? (pa === pb ? 'D' : pa > pb ? 'A' : 'B') : ca ? 'A' : cb ? 'B' : 'D');
+                }
+                const wa = d.rounds.filter((x) => x === 'A').length, wb = d.rounds.filter((x) => x === 'B').length;
+                return wa === wb ? 'draw' : (wa > wb ? A : B);
+            }
+            if (ra.score !== rb.score) return ra.score > rb.score ? A : B;
+            return ra.timeMs === rb.timeMs ? 'draw' : (ra.timeMs < rb.timeMs ? A : B);
+        }
+        function settleDuel(d) {
+            const fam = getActiveFamily();
+            const A = dlChild(d.from), B = dlChild(d.to);
+            d.winner = dlWinnerOf(d); d.status = 'done'; d.settledAt = Date.now(); d.paid = 0;
+            if (A && B && d.winner !== 'draw') {
+                const win = d.winner === A.username ? A : B; const lose = win === A ? B : A;
+                win.duelWins = (win.duelWins || 0) + 1;
+                const amt = Math.max(0, Math.min(d.wager || 0, lose.coins));
+                lose.coins -= amt; win.coins += amt; d.paid = amt;
+                const t = new Date().toDateString();
+                if (!lose.duelLoss || lose.duelLoss.date !== t) lose.duelLoss = { date: t, n: 0 };
+                lose.duelLoss.n += amt;
+                logActivity(fam, `${win.name} menang ${DL_GAMES[d.type].name} melawan ${lose.name}${amt ? ` (+${amt} koin)` : ''}`, win.name, 'child');
+            } else {
+                logActivity(fam, `${DL_GAMES[d.type].name} ${dlName(d.from)} vs ${dlName(d.to)} berakhir seri`, dlName(d.from), 'child');
+            }
+        }
+
+        // ----- Tebak Kata -----
+        function wordRender() {
+            const st = wordState; if (!st) return;
+            const k = st.d.word.k;
+            const hints = [`💡 Petunjuk 1: ${st.d.word.hint}`];
+            if (st.stage >= 2) hints.push(`💡 Petunjuk 2: kata ini terdiri dari ${k.length} huruf dan diawali huruf "${k[0]}".`);
+            if (st.stage >= 3) hints.push(`💡 Petunjuk 3: ${k.slice(0, 2)}${' _'.repeat(k.length - 2)}`);
+            sheetOpen(`🔤 Tebak Kata (tebakan ${st.stage}/3)`, `${hints.map((h) => `<div class="rounded-2xl p-3 bg-amber-50 dark:bg-amber-950/30 text-sm font-bold leading-snug">${esc(h)}</div>`).join('')}
+                <input id="word-input" maxlength="12" autocomplete="off" placeholder="Ketik tebakanmu" class="w-full px-3 py-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-center uppercase focus:outline-none focus:border-fuchsia-400">
+                <button onclick="wordGuess()" class="w-full py-3 rounded-2xl bg-fuchsia-500 text-white font-extrabold text-sm">Tebak!</button>
+                <p class="text-[10px] font-semibold text-slate-400 text-center">Makin sedikit petunjuk yang kamu butuhkan, makin besar peluang menang.</p>`);
+            setTimeout(() => { const i = document.getElementById('word-input'); if (i) i.focus(); }, 50);
+        }
+        function wordGuess() {
+            const st = wordState; const me = getActiveChild(); if (!st || !me) return;
+            const v = String((document.getElementById('word-input') || {}).value || '').trim().toUpperCase();
+            if (!v) return;
+            const ok = v === st.d.word.k;
+            if (ok || st.stage >= 3) {
+                const d = st.d; const tm = Date.now() - st.t0; wordState = null;
+                sheetClose();
+                playSound(ok ? 'correct' : 'wrong');
+                if (!ok) showToast(`❌ Kata yang benar: ${d.word.k}`); else fireConfetti(40);
+                dlFinish(d, me, { hints: ok ? st.stage : 4, timeMs: tm, score: ok ? 4 - st.stage : 0, total: 3, answers: '' });
+            } else {
+                playSound('wrong'); showToast('❌ Belum tepat, ini petunjuk berikutnya.');
+                st.stage += 1; wordRender();
+            }
+        }
+
+        // ----- Animasi hasil -----
+        function showDuelResult(id) {
+            const me = getActiveChild(); const fam = getActiveFamily();
+            const d = (fam.duels || []).find((x) => x.id === id); if (!d || d.status !== 'done') return;
+            d.seen = d.seen || {};
+            if (!d.seen[me.username]) { d.seen[me.username] = true; saveDatabase(); renderChildHomeView(); }
+            const A = d.from, B = d.to; const ra = d.res[A], rb = d.res[B]; const g = DL_GAMES[d.type];
+            const nm = (u) => esc(dlName(u));
+            const winTxt = d.winner === 'draw' ? '🤝 Seri! Koin kembali ke pemiliknya.' : `🏆 ${nm(d.winner)} menang${d.paid ? ` dan mendapat ${d.paid} 🪙` : ''}!`;
+            const head = `<p class="text-center text-[11px] font-extrabold text-slate-500">${g.icon} ${g.name} · ${dlAvatar(A)} ${nm(A)} vs ${dlAvatar(B)} ${nm(B)}${d.wager ? ` · taruhan ${d.wager} 🪙` : ''}</p>`;
+            let stage = '';
+            if (d.type === 'duel') {
+                const bar = (u, r) => `<div class="space-y-0.5"><div class="flex justify-between text-[11px] font-extrabold"><span>${dlAvatar(u)} ${nm(u)}</span><span>${r.forfeit ? 'menyerah' : r.score + '/' + r.total + ' · ' + (r.timeMs / 1000).toFixed(1) + ' dtk'}</span></div><div class="h-5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div class="dl-bar h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" data-w="${r.forfeit || !r.total ? 0 : Math.round(r.score / r.total * 100)}" style="width:0;transition:width 1.6s ease-out"></div></div></div>`;
+                stage = `<div class="space-y-3 py-2">${bar(A, ra)}${bar(B, rb)}</div>`;
+            } else if (d.type === 'race') {
+                const lane = (u, r) => `<div class="relative h-14 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 overflow-hidden"><span class="absolute right-2 top-2 text-2xl">🏁</span><span class="dl-run absolute top-2 text-3xl" data-w="${r.forfeit || !r.total ? 0 : Math.round(r.score / r.total * 78)}" style="left:2%;transition:left 2.6s cubic-bezier(.3,.7,.3,1)">${(r.pet && r.pet.emoji) || '🐾'}</span><span class="absolute left-2 bottom-0.5 text-[9px] font-extrabold text-emerald-800 dark:text-emerald-200">${nm(u)} · ${r.forfeit ? 'menyerah' : r.score + '/' + r.total}</span></div>`;
+                stage = `<div class="space-y-2 py-2">${lane(A, ra)}${lane(B, rb)}</div>`;
+            } else if (d.type === 'petbattle') {
+                stage = `<div class="relative rounded-2xl py-4 px-3 bg-gradient-to-b from-sky-100 to-emerald-100 dark:from-slate-800 dark:to-slate-800">
+                    <div class="flex items-end justify-between px-4"><div class="text-center"><div id="dl-pa" class="text-6xl transition-transform duration-300">${(ra.pet && ra.pet.emoji) || '🐾'}</div><div class="text-[10px] font-extrabold">${esc((ra.pet && ra.pet.name) || '')} · ⚡${(ra.pet && ra.pet.power) || 0}</div></div><div class="text-3xl">⚔️</div><div class="text-center"><div id="dl-pb" class="text-6xl transition-transform duration-300" style="transform:scaleX(-1)">${(rb.pet && rb.pet.emoji) || '🐾'}</div><div class="text-[10px] font-extrabold">${esc((rb.pet && rb.pet.name) || '')} · ⚡${(rb.pet && rb.pet.power) || 0}</div></div></div>
+                    <div id="dl-rounds" class="mt-3 space-y-1"></div></div>`;
+            } else {
+                const row = (u, r) => `<div class="flex justify-between text-xs font-extrabold p-2 rounded-xl bg-slate-100 dark:bg-slate-800"><span>${dlAvatar(u)} ${nm(u)}</span><span>${r.hints >= 4 ? '❌ tidak berhasil' : `✅ petunjuk ke-${r.hints} · ${(r.timeMs / 1000).toFixed(0)} dtk`}</span></div>`;
+                stage = `<div class="text-center text-3xl font-game font-bold tracking-[.3em] py-3" id="dl-word">${'_ '.repeat(d.word.k.length)}</div><div class="space-y-1.5">${row(A, ra)}${row(B, rb)}</div>`;
+            }
+            sheetOpen(`${g.icon} Hasil ${g.name}`, `${head}${stage}<div id="dl-win" class="rounded-2xl p-3 text-center font-game font-bold text-sm bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200" style="opacity:0;transition:opacity .6s">${winTxt}</div>
+                <button onclick="openTogether()" class="w-full py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 font-bold text-xs">← Main Bersama</button>`);
+            const alive = () => !!document.getElementById('dl-win');
+            const finishUp = (delay) => setTimeout(() => {
+                if (!alive()) return;
+                document.getElementById('dl-win').style.opacity = 1;
+                if (d.winner === me.username) { playSound('fanfare'); fireConfetti(80); } else if (d.winner !== 'draw') playSound('wrong');
+            }, delay);
+            setTimeout(() => {
+                if (!alive()) return;
+                document.querySelectorAll('.dl-bar').forEach((e) => { e.style.width = e.dataset.w + '%'; });
+                document.querySelectorAll('.dl-run').forEach((e) => { e.style.left = e.dataset.w + '%'; });
+            }, 80);
+            if (d.type === 'petbattle') {
+                const box = document.getElementById('dl-rounds');
+                (d.rounds || []).forEach((r, i) => setTimeout(() => {
+                    if (!alive()) return;
+                    const pa = document.getElementById('dl-pa'), pb = document.getElementById('dl-pb');
+                    if (r === 'A') { pa.style.transform = 'translateX(60px) scale(1.2)'; setTimeout(() => { pa.style.transform = ''; }, 450); }
+                    if (r === 'B') { pb.style.transform = 'scaleX(-1) translateX(60px) scale(1.2)'; setTimeout(() => { pb.style.transform = 'scaleX(-1)'; }, 450); }
+                    const ca = ra.answers[i] === '1', cb = rb.answers[i] === '1';
+                    const row = document.createElement('div');
+                    row.className = 'text-[11px] font-extrabold text-center rounded-lg bg-white/80 dark:bg-slate-900/80 py-1';
+                    row.style.animation = 'bf-reward .5s ease-out';
+                    row.textContent = `Ronde ${i + 1}: ${ca ? '✅' : '❌'} vs ${cb ? '✅' : '❌'} → ${r === 'A' ? nm0(A) + ' menang 💥' : r === 'B' ? nm0(B) + ' menang 💥' : 'seri'}`;
+                    box.appendChild(row); playSound(r === 'D' ? 'click' : 'correct');
+                }, 900 + i * 1400));
+                finishUp(900 + 3 * 1400);
+            } else if (d.type === 'word') {
+                setTimeout(() => { const w = document.getElementById('dl-word'); if (w) w.textContent = d.word.k.split('').join(' '); }, 1200);
+                finishUp(1800);
+            } else finishUp(d.type === 'race' ? 2900 : 1900);
+            function nm0(u) { return dlName(u); }
+        }
+
+        // ===== Orang tua: atur permainan bersama =====
+        function renderDuelSettingsEditor() {
+            const el = document.getElementById('p-duel-settings');
+            if (!el) return;
+            const fam = getActiveFamily(); if (!fam) return;
+            if ((fam.children || []).length < 2) { el.innerHTML = ''; return; }
+            const c = duelCfg();
+            el.innerHTML = `<div data-collapsible="p-duel-settings" data-cc-default="collapsed" class="bg-white dark:bg-slate-800 rounded-3xl p-4 border-2 border-fuchsia-300 dark:border-fuchsia-800 space-y-3">
+                <div><h3 class="font-game font-bold text-sm text-fuchsia-700 dark:text-fuchsia-300">🤝 Atur Main Bersama Saudara</h3>
+                <p class="text-[11px] font-semibold text-slate-500 mt-0.5 leading-snug">Anak bisa berkunjung ke pet saudara dan bertanding (Duel Kilat, Adu Pet, Balapan Pet, Tebak Kata) dengan taruhan koin. Batasi taruhan agar tetap sehat.</p></div>
+                <div class="space-y-1.5">
+                    <label class="flex items-center justify-between gap-2 text-xs font-bold"><span>Fitur main bersama</span><select id="duel-cfg-enabled" class="px-2 py-1.5 rounded-lg border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-bold"><option value="1" ${c.enabled ? 'selected' : ''}>Aktif</option><option value="0" ${c.enabled ? '' : 'selected'}>Nonaktif</option></select></label>
+                    <label class="flex items-center justify-between gap-2 text-xs font-bold"><span>🪙 Taruhan maksimal (0 = tanpa taruhan)</span><input id="duel-cfg-max" type="number" min="0" max="1000" value="${c.maxWager}" class="w-20 px-2 py-1.5 rounded-lg border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-right font-bold text-xs"></label>
+                    <label class="flex items-center justify-between gap-2 text-xs font-bold"><span>📉 Batas kalah per hari (0 = tanpa batas)</span><input id="duel-cfg-cap" type="number" min="0" max="5000" value="${c.lossCap}" class="w-20 px-2 py-1.5 rounded-lg border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-right font-bold text-xs"></label>
+                </div>
+                <div class="grid grid-cols-2 gap-2"><button onclick="saveDuelSettings()" class="py-2.5 rounded-2xl font-game font-bold text-xs text-white btn-3d-purple">Simpan</button>
+                <button onclick="resetDuelSettings()" class="py-2.5 rounded-2xl font-game font-bold text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200">Kembalikan Bawaan</button></div>
+            </div>`;
+            enhanceCollapsibleCards();
+        }
+        function saveDuelSettings() {
+            const fam = getActiveFamily(); if (!fam) return;
+            const mx = parseInt(document.getElementById('duel-cfg-max').value, 10), cap = parseInt(document.getElementById('duel-cfg-cap').value, 10);
+            if (!Number.isSafeInteger(mx) || mx < 0 || mx > 1000 || !Number.isSafeInteger(cap) || cap < 0 || cap > 5000) { playSound('wrong'); showToast('⚠️ Isian tidak valid.'); return; }
+            fam.duelSettings = { enabled: document.getElementById('duel-cfg-enabled').value === '1', maxWager: mx, lossCap: cap };
+            logActivity(fam, 'mengubah pengaturan main bersama saudara');
+            saveDatabase(fam.parentUsername); playSound('correct'); renderDuelSettingsEditor();
+            showToast('✅ Pengaturan main bersama disimpan.');
+        }
+        async function resetDuelSettings() {
+            const fam = getActiveFamily(); if (!fam) return;
+            const ok = await appConfirm('Kembalikan pengaturan main bersama ke bawaan?', { title: 'Kembalikan Bawaan', okText: 'Ya, Kembalikan' });
+            if (!ok) return;
+            delete fam.duelSettings; saveDatabase(fam.parentUsername); renderDuelSettingsEditor();
+            showToast('↩️ Pengaturan dikembalikan.');
+        }
+
         // ===== Kartu Boss & Pet di beranda anak =====
         function renderHomeExtras() {
             const el = document.getElementById('home-extras');
@@ -8725,7 +9180,14 @@ T([9], S_BE, CLOZE, [
                 ${qbtn('startReviewQuiz()', '🔁', 'Ulangi yang Salah', wrongN ? `${wrongN} soal` : 'belum ada', 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300')}
                 ${qbtn('openCerts()', '📜', 'Sertifikat', `${certN} dimiliki`, 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900 text-amber-700 dark:text-amber-300')}
             </div>`;
-            el.innerHTML = bossCard + petCard + quick;
+            let togetherBtn = '';
+            const fam0 = getActiveFamily();
+            if (fam0 && dlSweep(fam0)) saveDatabase();
+            if (famSiblings(child).length && duelCfg().enabled) {
+                const nNew = dlInbox(child).count;
+                togetherBtn = `<button onclick="openTogether()" class="w-full rounded-2xl p-3 border-2 border-fuchsia-300 dark:border-fuchsia-800 bg-gradient-to-r from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/40 dark:to-pink-950/40 text-fuchsia-700 dark:text-fuchsia-300 font-extrabold text-xs flex items-center justify-center gap-2">🤝 Main Bersama Saudara${nNew ? `<span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px]">${nNew} baru</span>` : ''}</button>`;
+            }
+            el.innerHTML = bossCard + petCard + quick + togetherBtn;
         }
 
         // ===== LAPORAN MINGGUAN UNTUK ORANG TUA =====
@@ -9222,7 +9684,7 @@ T([9], S_BE, CLOZE, [
         Object.assign(window, {
             petRevive, petBury, petRename, closePetPlay, petPlayStart, petPlayAnswer, petPlayAgain, savePetPrices, resetPetPrices,
             petSetPanel, petToggleFeed, petSelect, petTap, petAdopt, petFeed, petPlay, petWarmOpen, petWarmAnswer, petBath, petMedicine, petBuy, petEquip,
-            roomBuy, roomEquip, startBossQuiz, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
+            roomBuy, roomEquip, startBossQuiz, openTogether, visitSibling, visitGift, dlWagerMenu, createChallenge, acceptDuel, declineDuel, resumeDuel, dlSeen, showDuelResult, wordGuess, saveDuelSettings, resetDuelSettings, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
             switchAuthRole,
             toggleParentRegisterMode,
             toggleParentJoinMode,
