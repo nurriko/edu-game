@@ -198,6 +198,22 @@
 .room-decor-drag{position:absolute;transform:translate(-50%,-50%);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;z-index:4;line-height:1;filter:drop-shadow(0 6px 5px rgba(15,23,42,.24));transition:transform .12s ease}
 .room-decor-drag:active,.room-decor-drag.dragging{cursor:grabbing;z-index:20;transform:translate(-50%,-50%) scale(1.24)!important;filter:drop-shadow(0 12px 14px rgba(99,102,241,.45))}
 .room-decor-drag .rd-inner{display:inline-block}
+/* ===== Animasi SVG Dekorasi, Aksesoris & Picker 5 Varian (v6) ===== */
+@keyframes svg-glow{0%,100%{opacity:.55;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes svg-tick{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes svg-swim{0%,100%{transform:translateX(-6px) scaleX(1)}48%{transform:translateX(8px) scaleX(1)}50%{transform:translateX(8px) scaleX(-1)}98%{transform:translateX(-6px) scaleX(-1)}}
+@keyframes svg-flame{0%,100%{transform:scaleY(.88) scaleX(.95)}50%{transform:scaleY(1.18) scaleX(1.06)}}
+@keyframes svg-water{0%,100%{transform:translateY(0) scaleY(.92);opacity:.75}50%{transform:translateY(-4px) scaleY(1.1);opacity:1}}
+@keyframes svg-shimmer{0%,100%{opacity:.25;transform:scale(.85)}50%{opacity:.95;transform:scale(1.2)}}
+.svg-glow{transform-box:fill-box;transform-origin:center;animation:svg-glow 2.4s ease-in-out infinite}
+.svg-tick{transform-box:fill-box;transform-origin:bottom center;animation:svg-tick 12s linear infinite}
+.svg-swim{transform-box:fill-box;transform-origin:center;animation:svg-swim 4.8s ease-in-out infinite}
+.svg-flame{transform-box:fill-box;transform-origin:top center;animation:svg-flame .55s ease-in-out infinite}
+.svg-water{transform-box:fill-box;transform-origin:bottom center;animation:svg-water 1.3s ease-in-out infinite}
+.svg-shimmer{transform-box:fill-box;transform-origin:center;animation:svg-shimmer 2.2s ease-in-out infinite}
+.vp-card{transition:transform .14s ease, box-shadow .14s ease}
+.vp-card:active{transform:scale(.97)}
+
 .room-pulse{animation:room-pulse 2.6s ease-in-out infinite}
 /* ===== Animasi Aktivitas Pet, Boss & Peta Petualangan v4 ===== */
 @keyframes pa-heal-ring{0%{transform:translate(-50%,-50%) scale(.4);opacity:.95}100%{transform:translate(-50%,-50%) scale(2.1);opacity:0}}
@@ -7546,6 +7562,785 @@ T([9], S_BE, CLOZE, [
         };
         const BOSS_HP = 7; // jumlah jawaban benar (dari 10 soal) untuk mengalahkan boss
 
+        // =========================================================================
+        // 12B-V6. SISTEM 5 VARIAN + GAMBAR SVG ANIMASI UNTUK SEMUA BARANG & DEKORASI
+        // =========================================================================
+        const WALL_VARIANTS = {
+            sky: [
+                { name: 'Pagi Cerah',      css: 'linear-gradient(180deg,#7dd3fc,#bae6fd 55%,#e0f2fe)' },
+                { name: 'Siang Biru',      css: 'linear-gradient(180deg,#38bdf8,#7dd3fc 55%,#f0f9ff)' },
+                { name: 'Senja Emas',      css: 'linear-gradient(180deg,#fb923c,#fde68a 58%,#fffbeb)' },
+                { name: 'Awan Pastel',     css: 'linear-gradient(180deg,#c4b5fd,#fbcfe8 55%,#e0f2fe)' },
+                { name: 'Pelangi Lembut',  css: 'linear-gradient(180deg,#93c5fd,#a7f3d0 48%,#fef08a)' }
+            ],
+            garden: [
+                { name: 'Padang Hijau',    css: 'linear-gradient(180deg,#86efac,#dcfce7 55%,#fef9c3)' },
+                { name: 'Taman Matahari',  css: 'linear-gradient(180deg,#fde047,#bbf7d0 55%,#ecfccb)' },
+                { name: 'Kebun Lavender',  css: 'linear-gradient(180deg,#d8b4fe,#bbf7d0 58%,#f0fdf4)' },
+                { name: 'Hutan Embun',     css: 'linear-gradient(180deg,#34d399,#a7f3d0 55%,#ecfdf5)' },
+                { name: 'Taman Sore',      css: 'linear-gradient(180deg,#fdba74,#bef264 58%,#fef9c3)' }
+            ],
+            sakura: [
+                { name: 'Sakura Pagi',     css: 'linear-gradient(180deg,#fbcfe8,#fce7f3 55%,#fff1f2)' },
+                { name: 'Kelopak Mawar',   css: 'linear-gradient(180deg,#f9a8d4,#fbcfe8 55%,#ffe4e6)' },
+                { name: 'Sakura Senja',    css: 'linear-gradient(180deg,#f472b6,#fed7aa 58%,#fff7ed)' },
+                { name: 'Sakura Langit',   css: 'linear-gradient(180deg,#bae6fd,#fbcfe8 55%,#fdf2f8)' },
+                { name: 'Sakura Malam',    css: 'linear-gradient(180deg,#4c1d95,#be185d 55%,#fbcfe8)' }
+            ],
+            beach: [
+                { name: 'Pantai Tropis',   css: 'linear-gradient(180deg,#38bdf8,#bae6fd 52%,#fef3c7)' },
+                { name: 'Pantai Senja',    css: 'linear-gradient(180deg,#f97316,#fdba74 52%,#fef3c7)' },
+                { name: 'Laguna Toska',    css: 'linear-gradient(180deg,#2dd4bf,#99f6e4 52%,#fef9c3)' },
+                { name: 'Pantai Pastel',   css: 'linear-gradient(180deg,#818cf8,#fbcfe8 52%,#fde68a)' },
+                { name: 'Pantai Malam',    css: 'linear-gradient(180deg,#0f172a,#1d4ed8 54%,#fcd34d)' }
+            ],
+            cozy: [
+                { name: 'Kabin Madu',      css: 'linear-gradient(180deg,#fde68a,#fed7aa 60%,#fdba74)' },
+                { name: 'Kayu Cokelat',    css: 'linear-gradient(180deg,#d97706,#f59e0b 55%,#fef3c7)' },
+                { name: 'Krem Hangat',     css: 'linear-gradient(180deg,#fef3c7,#fde68a 58%,#fed7aa)' },
+                { name: 'Kabin Berry',     css: 'linear-gradient(180deg,#fda4af,#fed7aa 58%,#fef3c7)' },
+                { name: 'Kabin Malam',     css: 'linear-gradient(180deg,#78350f,#b45309 55%,#fde68a)' }
+            ],
+            underwater: [
+                { name: 'Samudra Biru',    css: 'linear-gradient(180deg,#0284c7,#0369a1 55%,#0c4a6e)' },
+                { name: 'Terumbu Toska',   css: 'linear-gradient(180deg,#0d9488,#0891b2 55%,#164e63)' },
+                { name: 'Laut Dalam',      css: 'linear-gradient(180deg,#1e3a8a,#1d4ed8 55%,#0f172a)' },
+                { name: 'Karang Ungu',     css: 'linear-gradient(180deg,#6d28d9,#0284c7 55%,#0c4a6e)' },
+                { name: 'Laguna Cerah',    css: 'linear-gradient(180deg,#22d3ee,#0284c7 55%,#075985)' }
+            ],
+            space: [
+                { name: 'Nebula Ungu',     css: 'linear-gradient(180deg,#0f172a,#312e81 55%,#581c87)' },
+                { name: 'Galaksi Biru',    css: 'linear-gradient(180deg,#020617,#1e3a8a 55%,#0369a1)' },
+                { name: 'Planet Mars',     css: 'linear-gradient(180deg,#1c1917,#7c2d12 55%,#b91c1c)' },
+                { name: 'Kosmos Zamrud',   css: 'linear-gradient(180deg,#020617,#064e3b 55%,#1e1b4b)' },
+                { name: 'Bima Sakti',      css: 'linear-gradient(180deg,#090d16,#4c1d95 52%,#be185d)' }
+            ],
+            aurora: [
+                { name: 'Aurora Zamrud',   css: 'linear-gradient(180deg,#020617,#0f172a 50%,#1e1b4b)' },
+                { name: 'Aurora Ungu',     css: 'linear-gradient(180deg,#090d16,#3b0764 52%,#1e1b4b)' },
+                { name: 'Aurora Biru Es',  css: 'linear-gradient(180deg,#020617,#0c4a6e 52%,#172554)' },
+                { name: 'Aurora Pink',     css: 'linear-gradient(180deg,#0f172a,#831843 52%,#312e81)' },
+                { name: 'Aurora Emas',     css: 'linear-gradient(180deg,#0f172a,#1e293b 50%,#78350f)' }
+            ],
+            castle: [
+                { name: 'Istana Lavender', css: 'linear-gradient(180deg,#f5d0fe,#fae8ff 50%,#fef08a)' },
+                { name: 'Istana Mawar',    css: 'linear-gradient(180deg,#fbcfe8,#ffe4e6 50%,#fde68a)' },
+                { name: 'Istana Awan',     css: 'linear-gradient(180deg,#bae6fd,#e0e7ff 50%,#fef9c3)' },
+                { name: 'Istana Emas',     css: 'linear-gradient(180deg,#fde68a,#fef3c7 50%,#fbcfe8)' },
+                { name: 'Istana Malam',    css: 'linear-gradient(180deg,#4c1d95,#7e22ce 50%,#f5d0fe)' }
+            ]
+        };
+
+        const DECOR_VARIANTS = {
+            bed: [
+                { name: 'Awan Biru',       c1: '#38bdf8', c2: '#0284c7', c3: '#e0f2fe', frame: '#92400e', pat: 'stars' },
+                { name: 'Putri Pink',      c1: '#f472b6', c2: '#db2777', c3: '#fce7f3', frame: '#be185d', pat: 'hearts' },
+                { name: 'Kayu Hangat',     c1: '#f59e0b', c2: '#b45309', c3: '#fef3c7', frame: '#78350f', pat: 'stripes' },
+                { name: 'Galaksi Bintang', c1: '#6366f1', c2: '#312e81', c3: '#e0e7ff', frame: '#1e1b4b', pat: 'moon' },
+                { name: 'Hutan Mint',      c1: '#34d399', c2: '#059669', c3: '#d1fae5', frame: '#713f12', pat: 'dots' }
+            ],
+            frame: [
+                { name: 'Gunung Senja',    c1: '#fb923c', c2: '#7c2d12', c3: '#fde047', frame: '#92400e', scene: 'mountain' },
+                { name: 'Malam Berbintang',c1: '#1e1b4b', c2: '#4338ca', c3: '#fef08a', frame: '#ca8a04', scene: 'night' },
+                { name: 'Taman Sakura',    c1: '#fce7f3', c2: '#f472b6', c3: '#86efac', frame: '#9d174d', scene: 'sakura' },
+                { name: 'Mercusuar Laut',  c1: '#7dd3fc', c2: '#0284c7', c3: '#ef4444', frame: '#1e3a8a', scene: 'sea' },
+                { name: 'Pelangi Ceria',   c1: '#e0f2fe', c2: '#f43f5e', c3: '#facc15', frame: '#6d28d9', scene: 'rainbow' }
+            ],
+            clock: [
+                { name: 'Kayu Klasik',     c1: '#b45309', c2: '#fffbeb', c3: '#1e293b' },
+                { name: 'Biru Modern',     c1: '#0284c7', c2: '#f0f9ff', c3: '#0f172a' },
+                { name: 'Kucing Pink',     c1: '#ec4899', c2: '#fdf2f8', c3: '#831843' },
+                { name: 'Emas Kerajaan',   c1: '#d97706', c2: '#fefce8', c3: '#78350f' },
+                { name: 'Neon Galaksi',    c1: '#7c3aed', c2: '#1e1b4b', c3: '#38bdf8' }
+            ],
+            lamp: [
+                { name: 'Lentera Emas',    c1: '#fbbf24', c2: '#b45309', c3: '#fef08a' },
+                { name: 'Awan Pastel',     c1: '#7dd3fc', c2: '#0284c7', c3: '#e0f2fe' },
+                { name: 'Sakura Pink',     c1: '#f472b6', c2: '#be185d', c3: '#fbcfe8' },
+                { name: 'Kristal Ungu',    c1: '#a78bfa', c2: '#6d28d9', c3: '#ede9fe' },
+                { name: 'Daun Zamrud',     c1: '#34d399', c2: '#047857', c3: '#d1fae5' }
+            ],
+            mirror: [
+                { name: 'Emas Kerajaan',   c1: '#f59e0b', c2: '#b45309', c3: '#bae6fd' },
+                { name: 'Perak Awan',      c1: '#94a3b8', c2: '#475569', c3: '#e0f2fe' },
+                { name: 'Pink Putri',      c1: '#f472b6', c2: '#be185d', c3: '#fce7f3' },
+                { name: 'Kayu Klasik',     c1: '#a16207', c2: '#713f12', c3: '#cffafe' },
+                { name: 'Kristal Ungu',    c1: '#a855f7', c2: '#6b21a8', c3: '#ede9fe' }
+            ],
+            balloon: [
+                { name: 'Pelangi Pesta',   c1: '#f43f5e', c2: '#38bdf8', c3: '#facc15' },
+                { name: 'Pink & Emas',     c1: '#f472b6', c2: '#fbbf24', c3: '#fbcfe8' },
+                { name: 'Biru Langit',     c1: '#0284c7', c2: '#38bdf8', c3: '#a5f3fc' },
+                { name: 'Ungu Galaksi',    c1: '#8b5cf6', c2: '#ec4899', c3: '#c4b5fd' },
+                { name: 'Hijau Tropis',    c1: '#10b981', c2: '#facc15', c3: '#6ee7b7' }
+            ],
+            rainbow_art: [
+                { name: 'Pelangi Klasik',  c1: '#ef4444', c2: '#facc15', c3: '#3b82f6' },
+                { name: 'Pastel Macaron',  c1: '#f9a8d4', c2: '#fde68a', c3: '#93c5fd' },
+                { name: 'Senja Hangat',    c1: '#f97316', c2: '#fb7185', c3: '#a855f7' },
+                { name: 'Aurora Neon',     c1: '#34d399', c2: '#38bdf8', c3: '#818cf8' },
+                { name: 'Awan Emas',       c1: '#f59e0b', c2: '#fcd34d', c3: '#fb923c' }
+            ],
+            plant: [
+                { name: 'Monstera Hijau',  c1: '#22c55e', c2: '#15803d', c3: '#d97706' },
+                { name: 'Bunga Matahari',  c1: '#facc15', c2: '#16a34a', c3: '#b45309' },
+                { name: 'Sakura Pot',      c1: '#f472b6', c2: '#15803d', c3: '#f43f5e' },
+                { name: 'Bonsai Mini',     c1: '#10b981', c2: '#065f46', c3: '#0284c7' },
+                { name: 'Lavender Ungu',   c1: '#a855f7', c2: '#16a34a', c3: '#7c3aed' }
+            ],
+            cactus: [
+                { name: 'Bunga Pink',      c1: '#22c55e', c2: '#f472b6', c3: '#ea580c' },
+                { name: 'Gurun Emas',      c1: '#4ade80', c2: '#facc15', c3: '#b45309' },
+                { name: 'Pot Polkadot',    c1: '#10b981', c2: '#fb7185', c3: '#38bdf8' },
+                { name: 'Kaktus Kembar',   c1: '#16a34a', c2: '#f97316', c3: '#a855f7' },
+                { name: 'Pot Mint Lucu',   c1: '#34d399', c2: '#fde047', c3: '#ec4899' }
+            ],
+            teddy: [
+                { name: 'Beruang Cokelat', c1: '#b45309', c2: '#fde68a', c3: '#ef4444' },
+                { name: 'Beruang Pink',    c1: '#f472b6', c2: '#fce7f3', c3: '#facc15' },
+                { name: 'Beruang Panda',   c1: '#f8fafc', c2: '#1e293b', c3: '#38bdf8' },
+                { name: 'Beruang Kutub',   c1: '#e0f2fe', c2: '#ffffff', c3: '#6366f1' },
+                { name: 'Beruang Madu',    c1: '#f59e0b', c2: '#fef3c7', c3: '#10b981' }
+            ],
+            books: [
+                { name: 'Kayu Klasik',     c1: '#92400e', c2: '#ef4444', c3: '#3b82f6' },
+                { name: 'Pastel Ceria',    c1: '#f472b6', c2: '#fde047', c3: '#34d399' },
+                { name: 'Putih Minimalis', c1: '#cbd5e1', c2: '#6366f1', c3: '#f43f5e' },
+                { name: 'Rak Emas',        c1: '#b45309', c2: '#10b981', c3: '#a855f7' },
+                { name: 'Rak Galaksi',     c1: '#312e81', c2: '#38bdf8', c3: '#f472b6' }
+            ],
+            guitar: [
+                { name: 'Akustik Kayu',    c1: '#d97706', c2: '#78350f', c3: '#fef3c7' },
+                { name: 'Rock Merah',      c1: '#ef4444', c2: '#991b1b', c3: '#f8fafc' },
+                { name: 'Pastel Pink',     c1: '#f472b6', c2: '#be185d', c3: '#fce7f3' },
+                { name: 'Biru Laut',       c1: '#0284c7', c2: '#075985', c3: '#bae6fd' },
+                { name: 'Emas Bintang',    c1: '#facc15', c2: '#a16207', c3: '#fef9c3' }
+            ],
+            sofa: [
+                { name: 'Biru Awan',       c1: '#38bdf8', c2: '#0284c7', c3: '#fde047' },
+                { name: 'Pink Velvet',     c1: '#f472b6', c2: '#be185d', c3: '#fef3c7' },
+                { name: 'Kuning Mustard',  c1: '#f59e0b', c2: '#b45309', c3: '#38bdf8' },
+                { name: 'Hijau Mint',      c1: '#34d399', c2: '#047857', c3: '#fda4af' },
+                { name: 'Ungu Royal',      c1: '#8b5cf6', c2: '#5b21b6', c3: '#fcd34d' }
+            ],
+            tv: [
+                { name: 'Retro Kayu',      c1: '#b45309', c2: '#38bdf8', c3: '#fef08a' },
+                { name: 'Pastel Pink',     c1: '#f472b6', c2: '#a7f3d0', c3: '#f43f5e' },
+                { name: 'Cyber Neon',      c1: '#1e293b', c2: '#818cf8', c3: '#22d3ee' },
+                { name: 'Biru Klasik',     c1: '#0284c7', c2: '#bae6fd', c3: '#fb923c' },
+                { name: 'Kuning Ceria',    c1: '#eab308', c2: '#dcfce7', c3: '#ec4899' }
+            ],
+            globe: [
+                { name: 'Bumi Biru',       c1: '#38bdf8', c2: '#22c55e', c3: '#b45309' },
+                { name: 'Antik Emas',      c1: '#fde68a', c2: '#d97706', c3: '#78350f' },
+                { name: 'Pastel Pink',     c1: '#fbcfe8', c2: '#a78bfa', c3: '#db2777' },
+                { name: 'Malam Bintang',   c1: '#1e1b4b', c2: '#38bdf8', c3: '#f59e0b' },
+                { name: 'Alam Zamrud',     c1: '#2dd4bf', c2: '#15803d', c3: '#475569' }
+            ],
+            tent: [
+                { name: 'Teepee Merah',    c1: '#ef4444', c2: '#fef3c7', c3: '#b45309' },
+                { name: 'Kemah Hutan',     c1: '#10b981', c2: '#d1fae5', c3: '#78350f' },
+                { name: 'Tenda Galaksi',   c1: '#6366f1', c2: '#fde047', c3: '#312e81' },
+                { name: 'Tenda Pantai',    c1: '#0ea5e9', c2: '#fef9c3', c3: '#0369a1' },
+                { name: 'Tenda Putri',     c1: '#f472b6', c2: '#fce7f3', c3: '#be185d' }
+            ],
+            fish: [
+                { name: 'Ikan Badut',      c1: '#38bdf8', c2: '#f97316', c3: '#22c55e' },
+                { name: 'Ikan Emas',       c1: '#7dd3fc', c2: '#facc15', c3: '#10b981' },
+                { name: 'Karang Pink',     c1: '#67e8f9', c2: '#ec4899', c3: '#f472b6' },
+                { name: 'Laut Neon',       c1: '#1e3a8a', c2: '#22d3ee', c3: '#a855f7' },
+                { name: 'Taman Air',       c1: '#2dd4bf', c2: '#ef4444', c3: '#16a34a' }
+            ],
+            piano: [
+                { name: 'Grand Hitam',     c1: '#1e293b', c2: '#0f172a', c3: '#fbbf24' },
+                { name: 'Putih Elegan',    c1: '#f8fafc', c2: '#cbd5e1', c3: '#f59e0b' },
+                { name: 'Pink Pastel',     c1: '#f472b6', c2: '#db2777', c3: '#fde047' },
+                { name: 'Kayu Klasik',     c1: '#92400e', c2: '#78350f', c3: '#fcd34d' },
+                { name: 'Biru Langit',     c1: '#38bdf8', c2: '#0284c7', c3: '#ffffff' }
+            ],
+            rocket_toy: [
+                { name: 'Merah Putih',     c1: '#ef4444', c2: '#f8fafc', c3: '#38bdf8' },
+                { name: 'Biru Galaksi',    c1: '#3b82f6', c2: '#e0f2fe', c3: '#facc15' },
+                { name: 'Emas Bintang',    c1: '#f59e0b', c2: '#fef3c7', c3: '#ef4444' },
+                { name: 'Hijau Alien',     c1: '#10b981', c2: '#d1fae5', c3: '#a855f7' },
+                { name: 'Ungu Nebula',     c1: '#8b5cf6', c2: '#ede9fe', c3: '#f472b6' }
+            ],
+            cake_stand: [
+                { name: 'Stroberi Krim',   c1: '#f472b6', c2: '#fff1f2', c3: '#ef4444' },
+                { name: 'Cokelat Ceri',    c1: '#78350f', c2: '#fde68a', c3: '#dc2626' },
+                { name: 'Pelangi Pesta',   c1: '#38bdf8', c2: '#fde047', c3: '#ec4899' },
+                { name: 'Matcha Mint',     c1: '#34d399', c2: '#ecfdf5', c3: '#f59e0b' },
+                { name: 'Blueberry Star',  c1: '#818cf8', c2: '#e0e7ff', c3: '#facc15' }
+            ],
+            fountain: [
+                { name: 'Marmer Putih',    c1: '#e2e8f0', c2: '#94a3b8', c3: '#38bdf8' },
+                { name: 'Batu Taman',      c1: '#a8a29e', c2: '#57534e', c3: '#22d3ee' },
+                { name: 'Kristal Biru',    c1: '#7dd3fc', c2: '#0284c7', c3: '#bae6fd' },
+                { name: 'Emas Istana',     c1: '#fcd34d', c2: '#b45309', c3: '#38bdf8' },
+                { name: 'Sakura Pink',     c1: '#fbcfe8', c2: '#db2777', c3: '#67e8f9' }
+            ],
+            trophy: [
+                { name: 'Emas Juara',      c1: '#fbbf24', c2: '#b45309', c3: '#fef08a' },
+                { name: 'Berlian Biru',    c1: '#38bdf8', c2: '#0369a1', c3: '#e0f2fe' },
+                { name: 'Rubi Merah',      c1: '#f43f5e', c2: '#9f1239', c3: '#ffe4e6' },
+                { name: 'Zamrud Hijau',    c1: '#10b981', c2: '#065f46', c3: '#d1fae5' },
+                { name: 'Galaksi Ungu',    c1: '#a855f7', c2: '#581c87', c3: '#f3e8ff' }
+            ],
+            statue: [
+                { name: 'Batu Kuno',       c1: '#94a3b8', c2: '#475569', c3: '#cbd5e1' },
+                { name: 'Emas Firaun',     c1: '#fbbf24', c2: '#b45309', c3: '#fef08a' },
+                { name: 'Kristal Es',      c1: '#7dd3fc', c2: '#0284c7', c3: '#e0f2fe' },
+                { name: 'Giok Hijau',      c1: '#34d399', c2: '#065f46', c3: '#a7f3d0' },
+                { name: 'Obsidian Api',    c1: '#334155', c2: '#0f172a', c3: '#f97316' }
+            ]
+        };
+
+        const ACC_VARIANTS = {
+            ribbon:     [{ name:'Pink Lucu',c1:'#f472b6',c2:'#be185d'},{ name:'Biru Langit',c1:'#38bdf8',c2:'#0369a1'},{ name:'Ungu Manis',c1:'#a855f7',c2:'#6b21a8'},{ name:'Merah Ceri',c1:'#f43f5e',c2:'#9f1239'},{ name:'Emas Pesta',c1:'#fbbf24',c2:'#b45309'}],
+            flower:     [{ name:'Sakura Pink',c1:'#f9a8d4',c2:'#fde047'},{ name:'Matahari',c1:'#facc15',c2:'#b45309'},{ name:'Mawar Merah',c1:'#f43f5e',c2:'#fbbf24'},{ name:'Anggrek Ungu',c1:'#c084fc',c2:'#fef08a'},{ name:'Melati Biru',c1:'#7dd3fc',c2:'#f59e0b'}],
+            bowtie:     [{ name:'Merah Klasik',c1:'#ef4444',c2:'#991b1b'},{ name:'Biru Royal',c1:'#3b82f6',c2:'#1d4ed8'},{ name:'Pink Pesta',c1:'#ec4899',c2:'#9d174d'},{ name:'Emas Mewah',c1:'#f59e0b',c2:'#92400e'},{ name:'Hijau Mint',c1:'#10b981',c2:'#047857'}],
+            glasses:    [{ name:'Hitam Keren',c1:'#1e293b',c2:'#38bdf8'},{ name:'Pink Bintang',c1:'#ec4899',c2:'#fbcfe8'},{ name:'Neon Cyber',c1:'#06b6d4',c2:'#a855f7'},{ name:'Emas Retro',c1:'#d97706',c2:'#fef08a'},{ name:'Merah Sport',c1:'#ef4444',c2:'#1e293b'}],
+            partyhat:   [{ name:'Pelangi',c1:'#f43f5e',c2:'#facc15'},{ name:'Biru Bintang',c1:'#3b82f6',c2:'#fde047'},{ name:'Pink Polka',c1:'#ec4899',c2:'#ffffff'},{ name:'Hijau Ceria',c1:'#10b981',c2:'#fb923c'},{ name:'Ungu Ajaib',c1:'#8b5cf6',c2:'#38bdf8'}],
+            scarf:      [{ name:'Merah Hangat',c1:'#ef4444',c2:'#fef08a'},{ name:'Biru Salju',c1:'#38bdf8',c2:'#ffffff'},{ name:'Hijau Hutan',c1:'#10b981',c2:'#fde68a'},{ name:'Pink Pastel',c1:'#f472b6',c2:'#fce7f3'},{ name:'Ungu Galaksi',c1:'#7c3aed',c2:'#fbbf24'}],
+            hat:        [{ name:'Sulap Hitam',c1:'#1e293b',c2:'#ef4444'},{ name:'Biru Royal',c1:'#1d4ed8',c2:'#facc15'},{ name:'Ungu Misteri',c1:'#6d28d9',c2:'#f472b6'},{ name:'Cokelat Klasik',c1:'#78350f',c2:'#fbbf24'},{ name:'Putih Elegan',c1:'#f8fafc',c2:'#3b82f6'}],
+            headphones: [{ name:'Merah Bass',c1:'#ef4444',c2:'#1e293b'},{ name:'Biru Neon',c1:'#38bdf8',c2:'#1e1b4b'},{ name:'Pink Kawaii',c1:'#f472b6',c2:'#fdf2f8'},{ name:'Hijau Gamer',c1:'#22c55e',c2:'#0f172a'},{ name:'Emas Pro',c1:'#f59e0b',c2:'#451a03'}],
+            wizard:     [{ name:'Ungu Bintang',c1:'#6d28d9',c2:'#fde047'},{ name:'Biru Malam',c1:'#1e3a8a',c2:'#38bdf8'},{ name:'Merah Api',c1:'#b91c1c',c2:'#fbbf24'},{ name:'Hijau Hutan',c1:'#047857',c2:'#a7f3d0'},{ name:'Pink Peri',c1:'#db2777',c2:'#fef08a'}],
+            halo:       [{ name:'Cahaya Emas',c1:'#fde047',c2:'#f59e0b'},{ name:'Biru Malaikat',c1:'#7dd3fc',c2:'#0284c7'},{ name:'Pink Hati',c1:'#f9a8d4',c2:'#ec4899'},{ name:'Putih Suci',c1:'#ffffff',c2:'#cbd5e1'},{ name:'Pelangi Ajaib',c1:'#a78bfa',c2:'#34d399'}],
+            crown:      [{ name:'Emas Raja',c1:'#fbbf24',c2:'#ef4444'},{ name:'Berlian Es',c1:'#7dd3fc',c2:'#3b82f6'},{ name:'Rubi Merah',c1:'#f43f5e',c2:'#fde047'},{ name:'Zamrud Hutan',c1:'#34d399',c2:'#f59e0b'},{ name:'Galaksi Ungu',c1:'#a855f7',c2:'#ec4899'}],
+            medal:      [{ name:'Emas Juara',c1:'#fbbf24',c2:'#ef4444'},{ name:'Perak Kilau',c1:'#cbd5e1',c2:'#3b82f6'},{ name:'Rubi Boss',c1:'#f43f5e',c2:'#facc15'},{ name:'Zamrud Boss',c1:'#10b981',c2:'#fbbf24'},{ name:'Kosmik Boss',c1:'#8b5cf6',c2:'#38bdf8'}]
+        };
+
+        const SHOP_ITEM_VARIANTS = {
+            apple:      [{ name:'Apel Merah Fuji',c1:'#ef4444',c2:'#22c55e'},{ name:'Apel Hijau Malang',c1:'#4ade80',c2:'#15803d'},{ name:'Apel Emas Madu',c1:'#fbbf24',c2:'#16a34a'},{ name:'Apel Pink Manis',c1:'#fb7185',c2:'#22c55e'},{ name:'Apel Karamel',c1:'#b45309',c2:'#fde047'}],
+            banana:     [{ name:'Pisang Emas',c1:'#facc15',c2:'#ca8a04'},{ name:'Pisang Hijau',c1:'#a3e635',c2:'#4d7c0f'},{ name:'Pisang Cokelat',c1:'#fbbf24',c2:'#78350f'},{ name:'Pisang Stroberi',c1:'#fde047',c2:'#f472b6'},{ name:'Pisang Madu',c1:'#f59e0b',c2:'#b45309'}],
+            carrot:     [{ name:'Wortel Segar',c1:'#f97316',c2:'#22c55e'},{ name:'Wortel Ungu',c1:'#9333ea',c2:'#22c55e'},{ name:'Wortel Emas',c1:'#facc15',c2:'#16a34a'},{ name:'Wortel Mini',c1:'#fb923c',c2:'#4ade80'},{ name:'Wortel Merah',c1:'#ef4444',c2:'#15803d'}],
+            milk:       [{ name:'Susu Putih',c1:'#f8fafc',c2:'#38bdf8'},{ name:'Susu Stroberi',c1:'#fbcfe8',c2:'#ec4899'},{ name:'Susu Cokelat',c1:'#d6a87c',c2:'#78350f'},{ name:'Susu Matcha',c1:'#bbf7d0',c2:'#16a34a'},{ name:'Susu Pisang',c1:'#fef08a',c2:'#eab308'}],
+            fish_snack: [{ name:'Salmon Panggang',c1:'#fb923c',c2:'#ea580c'},{ name:'Tuna Biru',c1:'#38bdf8',c2:'#0369a1'},{ name:'Ikan Emas',c1:'#facc15',c2:'#b45309'},{ name:'Kakap Merah',c1:'#f43f5e',c2:'#9f1239'},{ name:'Ikan Tropis',c1:'#2dd4bf',c2:'#0f766e'}],
+            meat:       [{ name:'Steak Panggang',c1:'#b45309',c2:'#fef3c7'},{ name:'BBQ Pedas',c1:'#dc2626',c2:'#fef3c7'},{ name:'Daging Madu',c1:'#d97706',c2:'#fde68a'},{ name:'Lada Hitam',c1:'#78350f',c2:'#e2e8f0'},{ name:'Steak Spesial',c1:'#9a3412',c2:'#fed7aa'}],
+            salad:      [{ name:'Salad Taman',c1:'#22c55e',c2:'#ef4444'},{ name:'Salad Buah',c1:'#4ade80',c2:'#facc15'},{ name:'Salad Alpukat',c1:'#16a34a',c2:'#a3e635'},{ name:'Salad Berry',c1:'#34d399',c2:'#ec4899'},{ name:'Salad Jagung',c1:'#22c55e',c2:'#fb923c'}],
+            icecream:   [{ name:'Stroberi Krim',c1:'#f472b6',c2:'#d97706'},{ name:'Cokelat Mint',c1:'#34d399',c2:'#78350f'},{ name:'Vanila Berry',c1:'#93c5fd',c2:'#f59e0b'},{ name:'Mangga Tropis',c1:'#fbbf24',c2:'#ea580c'},{ name:'Pelangi Ajaib',c1:'#c084fc',c2:'#f472b6'}],
+            pizza:      [{ name:'Keju Mozzarella',c1:'#facc15',c2:'#ef4444'},{ name:'Pepperoni',c1:'#fbbf24',c2:'#dc2626'},{ name:'Jamur Sayur',c1:'#fde047',c2:'#22c55e'},{ name:'Sosis BBQ',c1:'#f59e0b',c2:'#991b1b'},{ name:'Nanas Tropis',c1:'#fde047',c2:'#f97316'}],
+            burger:     [{ name:'Burger Klasik',c1:'#f59e0b',c2:'#78350f'},{ name:'Keju Dobel',c1:'#fbbf24',c2:'#92400e'},{ name:'Ayam Krispi',c1:'#fb923c',c2:'#ca8a04'},{ name:'Burger Sayur',c1:'#f59e0b',c2:'#16a34a'},{ name:'Burger Jumbo',c1:'#d97706',c2:'#991b1b'}],
+            cake:       [{ name:'Kue Stroberi',c1:'#f472b6',c2:'#fff1f2'},{ name:'Kue Cokelat',c1:'#78350f',c2:'#fde68a'},{ name:'Kue Matcha',c1:'#34d399',c2:'#ecfdf5'},{ name:'Kue Blueberry',c1:'#818cf8',c2:'#e0e7ff'},{ name:'Kue Pelangi',c1:'#fb923c',c2:'#fef08a'}],
+            sushi:      [{ name:'Salmon Roll',c1:'#fb923c',c2:'#1e293b'},{ name:'Tuna Merah',c1:'#ef4444',c2:'#1e293b'},{ name:'Tamago Emas',c1:'#facc15',c2:'#1e293b'},{ name:'Alpukat Roll',c1:'#4ade80',c2:'#1e293b'},{ name:'Udang Ebi',c1:'#f472b6',c2:'#1e293b'}],
+            ramen:      [{ name:'Ramen Shoyu',c1:'#f59e0b',c2:'#ef4444'},{ name:'Ramen Pedas',c1:'#dc2626',c2:'#fb923c'},{ name:'Ramen Kari',c1:'#eab308',c2:'#16a34a'},{ name:'Ramen Miso',c1:'#d97706',c2:'#38bdf8'},{ name:'Ramen Spesial',c1:'#b45309',c2:'#ec4899'}],
+            gold_meat:  [{ name:'Daging Emas',c1:'#fbbf24',c2:'#fef08a'},{ name:'Daging Berlian',c1:'#38bdf8',c2:'#e0f2fe'},{ name:'Daging Rubi',c1:'#f43f5e',c2:'#ffe4e6'},{ name:'Daging Zamrud',c1:'#34d399',c2:'#d1fae5'},{ name:'Daging Kosmik',c1:'#a855f7',c2:'#f3e8ff'}],
+            soap:       [{ name:'Sabun Lavender',c1:'#c084fc',c2:'#e9d5ff'},{ name:'Sabun Stroberi',c1:'#f472b6',c2:'#fbcfe8'},{ name:'Sabun Mint',c1:'#34d399',c2:'#a7f3d0'},{ name:'Sabun Madu',c1:'#fbbf24',c2:'#fef3c7'},{ name:'Sabun Laut',c1:'#38bdf8',c2:'#bae6fd'}],
+            medicine:   [{ name:'Vitamin Ceri',c1:'#ef4444',c2:'#ffffff'},{ name:'Sirup Jeruk',c1:'#f97316',c2:'#fef3c7'},{ name:'Kapsul Mint',c1:'#10b981',c2:'#ecfdf5'},{ name:'Obat Berry',c1:'#8b5cf6',c2:'#f3e8ff'},{ name:'Eliksir Biru',c1:'#0ea5e9',c2:'#e0f2fe'}]
+        };
+
+        function wallStyleCSS(wallId, vIdx) {
+            const list = WALL_VARIANTS[wallId];
+            if (list && list[vIdx]) return list[vIdx].css;
+            return (ROOM_WALLS[wallId] || ROOM_WALLS.sky).css;
+        }
+
+        function decorSvgHTML(id, vIdx, px) {
+            const list = DECOR_VARIANTS[id];
+            const v = (list && list[vIdx]) || (list && list[0]) || { c1: '#6366f1', c2: '#4338ca', c3: '#e0e7ff', frame: '#78350f' };
+            const s = px || 52;
+            let body = '';
+
+            if (id === 'bed') {
+                const pat = v.pat === 'hearts'
+                    ? `<circle cx="38" cy="64" r="3" fill="${v.c3}"/><circle cx="54" cy="68" r="3" fill="${v.c3}"/><circle cx="70" cy="63" r="3" fill="${v.c3}"/>`
+                    : v.pat === 'stripes'
+                    ? `<line x1="22" y1="62" x2="88" y2="62" stroke="${v.c3}" stroke-width="3" opacity=".6"/><line x1="22" y1="70" x2="88" y2="70" stroke="${v.c3}" stroke-width="3" opacity=".6"/>`
+                    : v.pat === 'moon'
+                    ? `<circle cx="52" cy="66" r="5" fill="#fde047"/><circle cx="54.5" cy="64.5" r="4" fill="${v.c1}"/><circle cx="72" cy="62" r="2" fill="#fde047" class="svg-shimmer"/><circle cx="38" cy="68" r="1.8" fill="#fde047" class="svg-shimmer"/>`
+                    : `<circle cx="38" cy="63" r="2.3" fill="#fef08a" class="svg-shimmer"/><circle cx="56" cy="68" r="2.6" fill="#ffffff" opacity=".85"/><circle cx="74" cy="63" r="2.3" fill="#fef08a" class="svg-shimmer"/>`;
+                body = `
+                    <rect x="8" y="34" width="12" height="52" rx="5" fill="${v.frame}" stroke="#451a03" stroke-width="2.2"/>
+                    <rect x="84" y="48" width="10" height="38" rx="4" fill="${v.frame}" stroke="#451a03" stroke-width="2.2"/>
+                    <rect x="14" y="28" width="14" height="10" rx="5" fill="${v.c2}"/>
+                    <rect x="16" y="44" width="72" height="34" rx="10" fill="${v.c3}" stroke="${v.c2}" stroke-width="2.2"/>
+                    <rect x="18" y="38" width="24" height="14" rx="7" fill="#ffffff" stroke="${v.c2}" stroke-width="2"/>
+                    <ellipse cx="29" cy="44" rx="7" ry="3" fill="${v.c3}" opacity=".7"/>
+                    <path d="M32 50 Q60 44 88 52 L88 76 Q60 80 32 76 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.2"/>
+                    <path d="M32 50 Q42 56 38 64 L32 62 Z" fill="${v.c3}"/>
+                    ${pat}
+                    <rect x="10" y="74" width="84" height="9" rx="4" fill="${v.frame}" stroke="#451a03" stroke-width="2"/>
+                    <rect x="12" y="83" width="8" height="7" rx="2" fill="#451a03"/><rect x="82" y="83" width="8" height="7" rx="2" fill="#451a03"/>`;
+            } else if (id === 'frame') {
+                let art = '';
+                if (v.scene === 'mountain') {
+                    art = `<rect x="16" y="20" width="68" height="58" fill="${v.c1}"/>
+                           <circle cx="66" cy="36" r="9" fill="${v.c3}" class="svg-glow"/>
+                           <polygon points="16,78 40,42 62,78" fill="${v.c2}"/>
+                           <polygon points="44,78 66,48 84,78" fill="#9a3412"/>
+                           <polygon points="36,48 40,42 44,48" fill="#ffffff"/>`;
+                } else if (v.scene === 'night') {
+                    art = `<rect x="16" y="20" width="68" height="58" fill="${v.c1}"/>
+                           <circle cx="64" cy="36" r="10" fill="${v.c3}"/><circle cx="68" cy="33" r="8" fill="${v.c1}"/>
+                           <circle cx="30" cy="34" r="2.2" fill="#ffffff" class="svg-shimmer"/>
+                           <circle cx="44" cy="28" r="1.8" fill="#fde047" class="svg-shimmer"/>
+                           <circle cx="38" cy="48" r="2" fill="#ffffff" class="svg-shimmer"/>
+                           <path d="M16 66 Q50 56 84 68 L84 78 L16 78 Z" fill="${v.c2}"/>`;
+                } else if (v.scene === 'sakura') {
+                    art = `<rect x="16" y="20" width="68" height="58" fill="${v.c1}"/>
+                           <path d="M16 64 Q44 50 76 34" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+                           <circle cx="38" cy="50" r="7" fill="${v.c2}"/><circle cx="54" cy="40" r="8" fill="#ec4899"/><circle cx="68" cy="34" r="6" fill="${v.c2}"/>
+                           <circle cx="48" cy="54" r="5" fill="#fbcfe8"/><rect x="16" y="68" width="68" height="10" fill="${v.c3}"/>`;
+                } else if (v.scene === 'sea') {
+                    art = `<rect x="16" y="20" width="68" height="58" fill="${v.c1}"/>
+                           <rect x="16" y="56" width="68" height="22" fill="${v.c2}"/>
+                           <rect x="54" y="32" width="12" height="28" fill="#ffffff" stroke="#1e293b" stroke-width="1.5"/>
+                           <rect x="54" y="40" width="12" height="6" fill="${v.c3}"/><polygon points="52,32 68,32 60,24" fill="${v.c3}"/>
+                           <circle cx="60" cy="29" r="3" fill="#fde047" class="svg-glow"/>
+                           <path d="M22 66 Q32 62 42 66 T62 66 T80 66" fill="none" stroke="#e0f2fe" stroke-width="2.5"/>`;
+                } else {
+                    art = `<rect x="16" y="20" width="68" height="58" fill="${v.c1}"/>
+                           <path d="M24 68 A26 26 0 0 1 76 68" fill="none" stroke="#ef4444" stroke-width="5"/>
+                           <path d="M30 68 A20 20 0 0 1 70 68" fill="none" stroke="#facc15" stroke-width="5"/>
+                           <path d="M36 68 A14 14 0 0 1 64 68" fill="none" stroke="#3b82f6" stroke-width="5"/>
+                           <ellipse cx="28" cy="68" rx="9" ry="5" fill="#ffffff"/><ellipse cx="72" cy="68" rx="9" ry="5" fill="#ffffff"/>`;
+                }
+                body = `<line x1="50" y1="6" x2="34" y2="16" stroke="#64748b" stroke-width="2"/><line x1="50" y1="6" x2="66" y2="16" stroke="#64748b" stroke-width="2"/>
+                    <circle cx="50" cy="6" r="3" fill="#475569"/>
+                    <rect x="10" y="14" width="80" height="70" rx="6" fill="${v.frame}" stroke="#451a03" stroke-width="2.5"/>
+                    ${art}
+                    <rect x="16" y="20" width="68" height="58" fill="none" stroke="#fef3c7" stroke-width="2"/>`;
+            } else if (id === 'clock') {
+                body = `<circle cx="50" cy="52" r="38" fill="${v.c1}" stroke="#1e293b" stroke-width="3"/>
+                    <circle cx="50" cy="52" r="30" fill="${v.c2}"/>
+                    <circle cx="50" cy="27" r="2.2" fill="${v.c3}"/><circle cx="75" cy="52" r="2.2" fill="${v.c3}"/>
+                    <circle cx="50" cy="77" r="2.2" fill="${v.c3}"/><circle cx="25" cy="52" r="2.2" fill="${v.c3}"/>
+                    <line x1="50" y1="52" x2="50" y2="35" stroke="${v.c3}" stroke-width="3.5" stroke-linecap="round"/>
+                    <line class="svg-tick" x1="50" y1="52" x2="66" y2="52" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="50" cy="52" r="4" fill="${v.c1}"/>`;
+            } else if (id === 'lamp') {
+                body = `<line x1="50" y1="4" x2="50" y2="24" stroke="#475569" stroke-width="3"/>
+                    <circle cx="50" cy="62" r="26" fill="${v.c3}" opacity=".55" class="svg-glow"/>
+                    <path d="M28 54 L36 24 L64 24 L72 54 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5" stroke-linejoin="round"/>
+                    <ellipse cx="50" cy="54" rx="22" ry="5" fill="${v.c2}"/>
+                    <circle cx="50" cy="58" r="8" fill="#fef08a" class="svg-glow"/>`;
+            } else if (id === 'mirror') {
+                body = `<ellipse cx="50" cy="50" rx="30" ry="40" fill="${v.c1}" stroke="${v.c2}" stroke-width="3"/>
+                    <ellipse cx="50" cy="50" rx="22" ry="32" fill="${v.c3}"/>
+                    <path d="M36 32 L46 22 M34 46 L56 24" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+                    <circle cx="62" cy="34" r="3" fill="#ffffff" class="svg-shimmer"/>
+                    <circle cx="38" cy="66" r="2.5" fill="#ffffff" class="svg-shimmer"/>`;
+            } else if (id === 'balloon') {
+                body = `<path d="M34 52 Q36 74 48 92" fill="none" stroke="#64748b" stroke-width="2"/>
+                    <path d="M66 56 Q62 76 50 92" fill="none" stroke="#64748b" stroke-width="2"/>
+                    <path d="M50 48 L50 92" fill="none" stroke="#64748b" stroke-width="2"/>
+                    <ellipse cx="32" cy="34" rx="16" ry="20" fill="${v.c1}" stroke="#1e293b" stroke-width="2"/>
+                    <ellipse cx="68" cy="38" rx="15" ry="19" fill="${v.c2}" stroke="#1e293b" stroke-width="2"/>
+                    <ellipse cx="50" cy="28" rx="17" ry="21" fill="${v.c3}" stroke="#1e293b" stroke-width="2"/>
+                    <ellipse cx="44" cy="20" rx="4" ry="7" fill="#ffffff" opacity=".55"/>`;
+            } else if (id === 'rainbow_art') {
+                body = `<path d="M12 72 A38 38 0 0 1 88 72" fill="none" stroke="${v.c1}" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M22 72 A28 28 0 0 1 78 72" fill="none" stroke="${v.c2}" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M32 72 A18 18 0 0 1 68 72" fill="none" stroke="${v.c3}" stroke-width="9" stroke-linecap="round"/>
+                    <ellipse cx="18" cy="74" rx="12" ry="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <ellipse cx="82" cy="74" rx="12" ry="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle cx="50" cy="20" r="3" fill="#fde047" class="svg-shimmer"/>`;
+            } else if (id === 'plant') {
+                body = `<path d="M50 60 Q28 42 22 24 Q42 28 50 52 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>
+                    <path d="M50 60 Q72 42 78 24 Q58 28 50 52 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>
+                    <path d="M50 56 Q38 26 50 12 Q62 26 50 56 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>
+                    <polygon points="30,58 70,58 63,88 37,88" fill="${v.c3}" stroke="#78350f" stroke-width="2.2"/>
+                    <rect x="26" y="54" width="48" height="8" rx="3" fill="${v.c3}" stroke="#78350f" stroke-width="2"/>`;
+            } else if (id === 'cactus') {
+                body = `<rect x="40" y="20" width="20" height="44" rx="10" fill="${v.c1}" stroke="#14532d" stroke-width="2.2"/>
+                    <path d="M40 42 L28 42 Q24 42 24 34 L24 30" fill="none" stroke="${v.c1}" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M60 38 L72 38 Q76 38 76 30 L76 26" fill="none" stroke="${v.c1}" stroke-width="9" stroke-linecap="round"/>
+                    <circle cx="50" cy="18" r="6" fill="${v.c2}"/>
+                    <polygon points="32,60 68,60 62,88 38,88" fill="${v.c3}" stroke="#451a03" stroke-width="2.2"/>
+                    <rect x="28" y="56" width="44" height="7" rx="3" fill="${v.c3}" stroke="#451a03" stroke-width="2"/>`;
+            } else if (id === 'teddy') {
+                body = `<circle cx="30" cy="24" r="10" fill="${v.c1}" stroke="#451a03" stroke-width="2"/>
+                    <circle cx="70" cy="24" r="10" fill="${v.c1}" stroke="#451a03" stroke-width="2"/>
+                    <circle cx="30" cy="24" r="5" fill="${v.c2}"/><circle cx="70" cy="24" r="5" fill="${v.c2}"/>
+                    <ellipse cx="50" cy="68" rx="22" ry="20" fill="${v.c1}" stroke="#451a03" stroke-width="2.2"/>
+                    <ellipse cx="50" cy="69" rx="12" ry="12" fill="${v.c2}"/>
+                    <circle cx="50" cy="38" r="20" fill="${v.c1}" stroke="#451a03" stroke-width="2.2"/>
+                    <ellipse cx="50" cy="43" rx="9" ry="7" fill="${v.c2}"/>
+                    <circle cx="42" cy="34" r="2.8" fill="#1e293b"/><circle cx="58" cy="34" r="2.8" fill="#1e293b"/>
+                    <ellipse cx="50" cy="40" rx="3.5" ry="2.5" fill="#1e293b"/>
+                    <polygon points="42,56 50,60 42,64" fill="${v.c3}"/><polygon points="58,56 50,60 58,64" fill="${v.c3}"/>`;
+            } else if (id === 'books') {
+                body = `<rect x="14" y="14" width="72" height="74" rx="6" fill="${v.c1}" stroke="#451a03" stroke-width="2.5"/>
+                    <rect x="20" y="20" width="60" height="26" fill="#fef3c7" opacity=".25"/>
+                    <rect x="20" y="52" width="60" height="28" fill="#fef3c7" opacity=".25"/>
+                    <rect x="22" y="24" width="10" height="22" rx="2" fill="${v.c2}"/><rect x="34" y="22" width="11" height="24" rx="2" fill="${v.c3}"/>
+                    <rect x="47" y="26" width="10" height="20" rx="2" fill="#facc15"/><rect x="59" y="23" width="12" height="23" rx="2" fill="#10b981"/>
+                    <rect x="22" y="56" width="12" height="24" rx="2" fill="#ec4899"/><rect x="36" y="58" width="10" height="22" rx="2" fill="${v.c2}"/>
+                    <rect x="48" y="55" width="12" height="25" rx="2" fill="${v.c3}"/><rect x="62" y="60" width="12" height="20" rx="2" fill="#f59e0b"/>`;
+            } else if (id === 'guitar') {
+                body = `<g transform="rotate(-18 50 50)">
+                    <rect x="45" y="10" width="10" height="38" rx="3" fill="${v.c2}" stroke="#1e293b" stroke-width="2"/>
+                    <rect x="42" y="6" width="16" height="9" rx="3" fill="${v.c2}" stroke="#1e293b" stroke-width="2"/>
+                    <circle cx="50" cy="58" r="16" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <circle cx="50" cy="74" r="20" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <circle cx="50" cy="64" r="7" fill="#1e293b" stroke="${v.c3}" stroke-width="2"/>
+                    <rect x="42" y="78" width="16" height="4" rx="2" fill="${v.c2}"/>
+                    <line x1="48" y1="12" x2="48" y2="78" stroke="#f8fafc" stroke-width="1"/><line x1="52" y1="12" x2="52" y2="78" stroke="#f8fafc" stroke-width="1"/>
+                </g>`;
+            } else if (id === 'sofa') {
+                body = `<rect x="14" y="32" width="72" height="34" rx="12" fill="${v.c2}" stroke="#1e293b" stroke-width="2.2"/>
+                    <rect x="18" y="48" width="64" height="24" rx="8" fill="${v.c1}" stroke="#1e293b" stroke-width="2.2"/>
+                    <rect x="8" y="44" width="14" height="28" rx="7" fill="${v.c1}" stroke="#1e293b" stroke-width="2.2"/>
+                    <rect x="78" y="44" width="14" height="28" rx="7" fill="${v.c1}" stroke="#1e293b" stroke-width="2.2"/>
+                    <rect x="24" y="38" width="16" height="14" rx="5" fill="${v.c3}" stroke="#1e293b" stroke-width="1.5"/>
+                    <rect x="60" y="38" width="16" height="14" rx="5" fill="${v.c3}" stroke="#1e293b" stroke-width="1.5"/>
+                    <rect x="16" y="72" width="8" height="10" rx="2" fill="#78350f"/><rect x="76" y="72" width="8" height="10" rx="2" fill="#78350f"/>`;
+            } else if (id === 'tv') {
+                body = `<line x1="36" y1="12" x2="48" y2="26" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="64" y1="12" x2="52" y2="26" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                    <rect x="12" y="26" width="76" height="54" rx="10" fill="${v.c1}" stroke="#1e293b" stroke-width="2.5"/>
+                    <rect x="18" y="33" width="48" height="40" rx="6" fill="${v.c2}" stroke="#1e293b" stroke-width="2"/>
+                    <circle cx="42" cy="53" r="10" fill="${v.c3}" class="svg-glow"/>
+                    <circle cx="76" cy="42" r="4" fill="#f8fafc"/><circle cx="76" cy="54" r="4" fill="#fbbf24"/>
+                    <rect x="22" y="80" width="8" height="8" rx="2" fill="#1e293b"/><rect x="70" y="80" width="8" height="8" rx="2" fill="#1e293b"/>`;
+            } else if (id === 'globe') {
+                body = `<circle cx="50" cy="42" r="28" fill="${v.c1}" stroke="#1e293b" stroke-width="2.2"/>
+                    <path d="M34 30 Q46 24 54 34 Q46 44 36 42 Z" fill="${v.c2}"/>
+                    <path d="M54 44 Q68 42 70 54 Q58 60 50 52 Z" fill="${v.c2}"/>
+                    <path d="M22 42 A32 32 0 0 0 78 42" fill="none" stroke="${v.c3}" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="46" y="72" width="8" height="12" fill="${v.c3}"/>
+                    <rect x="30" y="82" width="40" height="7" rx="3.5" fill="${v.c3}" stroke="#1e293b" stroke-width="2"/>`;
+            } else if (id === 'tent') {
+                body = `<line x1="44" y1="10" x2="56" y2="24" stroke="${v.c3}" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="56" y1="10" x2="44" y2="24" stroke="${v.c3}" stroke-width="3.5" stroke-linecap="round"/>
+                    <polygon points="50,18 12,84 88,84" fill="${v.c1}" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polygon points="50,18 32,84 68,84" fill="${v.c2}" opacity=".85"/>
+                    <polygon points="50,48 38,84 62,84" fill="#1e293b"/>
+                    <circle cx="50" cy="36" r="4" fill="#fde047" class="svg-shimmer"/>`;
+            } else if (id === 'fish') {
+                body = `<rect x="12" y="20" width="76" height="58" rx="10" fill="${v.c1}" stroke="#0284c7" stroke-width="3" opacity=".92"/>
+                    <rect x="16" y="64" width="68" height="10" rx="4" fill="#fde68a"/>
+                    <path d="M24 66 Q20 50 26 42 M74 66 Q78 52 72 44" fill="none" stroke="${v.c3}" stroke-width="4" stroke-linecap="round"/>
+                    <g class="svg-swim">
+                        <ellipse cx="48" cy="46" rx="12" ry="7" fill="${v.c2}" stroke="#1e293b" stroke-width="1.5"/>
+                        <polygon points="36,46 28,40 28,52" fill="${v.c2}" stroke="#1e293b" stroke-width="1.5"/>
+                        <circle cx="54" cy="44" r="2" fill="#1e293b"/>
+                    </g>
+                    <circle cx="64" cy="32" r="2.5" fill="#ffffff" class="svg-shimmer"/>
+                    <circle cx="34" cy="30" r="2" fill="#ffffff" class="svg-shimmer"/>`;
+            } else if (id === 'piano') {
+                body = `<rect x="12" y="20" width="76" height="52" rx="6" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <rect x="18" y="48" width="64" height="18" rx="2" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+                    <rect x="26" y="48" width="6" height="11" fill="#0f172a"/><rect x="38" y="48" width="6" height="11" fill="#0f172a"/>
+                    <rect x="54" y="48" width="6" height="11" fill="#0f172a"/><rect x="66" y="48" width="6" height="11" fill="#0f172a"/>
+                    <rect x="34" y="26" width="32" height="16" rx="3" fill="${v.c3}" opacity=".9"/>
+                    <rect x="18" y="72" width="8" height="14" rx="2" fill="${v.c2}"/><rect x="74" y="72" width="8" height="14" rx="2" fill="${v.c2}"/>`;
+            } else if (id === 'rocket_toy') {
+                body = `<polygon class="svg-flame" points="42,76 58,76 50,94" fill="#f97316"/>
+                    <polygon class="svg-flame" points="45,76 55,76 50,88" fill="#fde047"/>
+                    <polygon points="34,58 20,76 36,72" fill="${v.c1}" stroke="#1e293b" stroke-width="2"/>
+                    <polygon points="66,58 80,76 64,72" fill="${v.c1}" stroke="#1e293b" stroke-width="2"/>
+                    <path d="M50 10 Q68 28 66 74 L34 74 Q32 28 50 10 Z" fill="${v.c2}" stroke="#1e293b" stroke-width="2.4"/>
+                    <path d="M50 10 Q60 20 62 30 L38 30 Q40 20 50 10 Z" fill="${v.c1}"/>
+                    <circle cx="50" cy="46" r="9" fill="${v.c3}" stroke="#1e293b" stroke-width="2"/>`;
+            } else if (id === 'cake_stand') {
+                body = `<rect x="47" y="18" width="6" height="14" fill="#facc15"/>
+                    <ellipse class="svg-flame" cx="50" cy="14" rx="4" ry="6" fill="#f97316"/>
+                    <rect x="26" y="32" width="48" height="20" rx="6" fill="${v.c1}" stroke="#1e293b" stroke-width="2"/>
+                    <path d="M26 40 Q34 46 42 40 T58 40 T74 40" fill="none" stroke="${v.c2}" stroke-width="4"/>
+                    <rect x="20" y="50" width="60" height="22" rx="6" fill="${v.c2}" stroke="${v.c1}" stroke-width="2"/>
+                    <circle cx="34" cy="32" r="4" fill="${v.c3}"/><circle cx="66" cy="32" r="4" fill="${v.c3}"/>
+                    <rect x="16" y="72" width="68" height="6" rx="3" fill="#cbd5e1"/><rect x="44" y="78" width="12" height="10" fill="#94a3b8"/>
+                    <rect x="32" y="86" width="36" height="5" rx="2.5" fill="#94a3b8"/>`;
+            } else if (id === 'fountain') {
+                body = `<path class="svg-water" d="M50 28 Q34 12 24 38 M50 28 Q66 12 76 38" fill="none" stroke="${v.c3}" stroke-width="4" stroke-linecap="round"/>
+                    <ellipse cx="50" cy="40" rx="22" ry="7" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>
+                    <rect x="43" y="46" width="14" height="22" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>
+                    <ellipse cx="50" cy="70" rx="36" ry="12" fill="${v.c3}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <path d="M16 70 Q50 92 84 70 L80 84 Q50 94 20 84 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2"/>`;
+            } else if (id === 'trophy') {
+                body = `<path d="M26 24 Q14 24 16 40 Q18 52 30 50" fill="none" stroke="${v.c2}" stroke-width="5"/>
+                    <path d="M74 24 Q86 24 84 40 Q82 52 70 50" fill="none" stroke="${v.c2}" stroke-width="5"/>
+                    <path d="M26 18 L74 18 L68 52 Q50 66 32 52 Z" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <polygon class="svg-shimmer" points="50,26 53,34 62,34 55,39 58,47 50,42 42,47 45,39 38,34 47,34" fill="${v.c3}"/>
+                    <rect x="44" y="58" width="12" height="18" fill="${v.c2}"/>
+                    <rect x="30" y="76" width="40" height="10" rx="4" fill="#78350f" stroke="#451a03" stroke-width="2"/>`;
+            } else if (id === 'statue') {
+                body = `<rect x="26" y="14" width="48" height="66" rx="14" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <rect x="34" y="30" width="32" height="7" rx="3" fill="${v.c2}"/>
+                    <circle cx="40" cy="42" r="4" fill="${v.c3}" class="svg-glow"/><circle cx="60" cy="42" r="4" fill="${v.c3}" class="svg-glow"/>
+                    <polygon points="46,44 54,44 52,60 48,60" fill="${v.c2}"/>
+                    <rect x="38" y="66" width="24" height="5" rx="2.5" fill="${v.c2}"/>
+                    <rect x="18" y="78" width="64" height="10" rx="4" fill="${v.c2}"/>`;
+            } else {
+                const em = (ROOM_DECOR[id] && ROOM_DECOR[id].emoji) || '✨';
+                return `<span style="font-size:${s}px;line-height:1">${em}</span>`;
+            }
+            return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="display:block;overflow:visible">${body}</svg>`;
+        }
+
+        function accSvgHTML(id, vIdx, px) {
+            const list = ACC_VARIANTS[id];
+            const v = (list && list[vIdx]) || (list && list[0]) || { c1: '#f472b6', c2: '#be185d' };
+            const s = px || 44;
+            let body = '';
+            if (id === 'ribbon') {
+                body = `<ellipse cx="32" cy="50" rx="20" ry="15" transform="rotate(-14 32 50)" fill="${v.c1}" stroke="${v.c2}" stroke-width="3"/>
+                    <ellipse cx="68" cy="50" rx="20" ry="15" transform="rotate(14 68 50)" fill="${v.c1}" stroke="${v.c2}" stroke-width="3"/>
+                    <circle cx="50" cy="50" r="10" fill="${v.c2}"/>`;
+            } else if (id === 'flower') {
+                body = `<circle cx="50" cy="28" r="14" fill="${v.c1}"/><circle cx="70" cy="44" r="14" fill="${v.c1}"/>
+                    <circle cx="62" cy="68" r="14" fill="${v.c1}"/><circle cx="38" cy="68" r="14" fill="${v.c1}"/>
+                    <circle cx="30" cy="44" r="14" fill="${v.c1}"/><circle cx="50" cy="50" r="12" fill="${v.c2}"/>`;
+            } else if (id === 'bowtie') {
+                body = `<polygon points="18,32 50,50 18,68" fill="${v.c1}" stroke="${v.c2}" stroke-width="3" stroke-linejoin="round"/>
+                    <polygon points="82,32 50,50 82,68" fill="${v.c1}" stroke="${v.c2}" stroke-width="3" stroke-linejoin="round"/>
+                    <rect x="44" y="42" width="12" height="16" rx="4" fill="${v.c2}"/>`;
+            } else if (id === 'glasses') {
+                body = `<rect x="10" y="34" width="34" height="24" rx="8" fill="${v.c1}" stroke="${v.c2}" stroke-width="3.5"/>
+                    <rect x="56" y="34" width="34" height="24" rx="8" fill="${v.c1}" stroke="${v.c2}" stroke-width="3.5"/>
+                    <line x1="44" y1="44" x2="56" y2="44" stroke="${v.c2}" stroke-width="4"/>
+                    <line x1="16" y1="40" x2="26" y2="40" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+                    <line x1="62" y1="40" x2="72" y2="40" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".6"/>`;
+            } else if (id === 'partyhat') {
+                body = `<polygon points="50,12 20,82 80,82" fill="${v.c1}" stroke="#1e293b" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="50" cy="12" r="9" fill="${v.c2}"/>
+                    <circle cx="44" cy="48" r="5" fill="${v.c2}"/><circle cx="58" cy="64" r="5" fill="${v.c2}"/>`;
+            } else if (id === 'scarf') {
+                body = `<rect x="14" y="34" width="72" height="22" rx="10" fill="${v.c1}" stroke="#1e293b" stroke-width="2.5"/>
+                    <rect x="58" y="48" width="18" height="34" rx="6" fill="${v.c1}" stroke="#1e293b" stroke-width="2.5"/>
+                    <line x1="22" y1="45" x2="78" y2="45" stroke="${v.c2}" stroke-width="4" stroke-dasharray="8 6"/>`;
+            } else if (id === 'hat') {
+                body = `<rect x="26" y="20" width="48" height="48" rx="6" fill="${v.c1}" stroke="#0f172a" stroke-width="2.5"/>
+                    <rect x="26" y="54" width="48" height="10" fill="${v.c2}"/>
+                    <rect x="12" y="64" width="76" height="12" rx="6" fill="${v.c1}" stroke="#0f172a" stroke-width="2.5"/>`;
+            } else if (id === 'headphones') {
+                body = `<path d="M20 56 A30 30 0 0 1 80 56" fill="none" stroke="${v.c2}" stroke-width="8" stroke-linecap="round"/>
+                    <rect x="10" y="46" width="16" height="30" rx="8" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>
+                    <rect x="74" y="46" width="16" height="30" rx="8" fill="${v.c1}" stroke="${v.c2}" stroke-width="2.5"/>`;
+            } else if (id === 'wizard') {
+                body = `<polygon points="56,10 22,68 78,68" fill="${v.c1}" stroke="#1e1b4b" stroke-width="2.5" stroke-linejoin="round"/>
+                    <ellipse cx="50" cy="70" rx="40" ry="11" fill="${v.c1}" stroke="#1e1b4b" stroke-width="2.5"/>
+                    <circle cx="48" cy="44" r="5" fill="${v.c2}" class="svg-shimmer"/><circle cx="60" cy="54" r="3" fill="${v.c2}"/>`;
+            } else if (id === 'halo') {
+                body = `<ellipse cx="50" cy="48" rx="34" ry="13" fill="none" stroke="${v.c1}" stroke-width="9" class="svg-glow"/>
+                    <ellipse cx="50" cy="48" rx="34" ry="13" fill="none" stroke="${v.c2}" stroke-width="3"/>`;
+            } else if (id === 'crown') {
+                body = `<polygon points="16,74 16,32 36,50 50,22 64,50 84,32 84,74" fill="${v.c1}" stroke="#92400e" stroke-width="2.5" stroke-linejoin="round"/>
+                    <circle cx="50" cy="54" r="6" fill="${v.c2}" class="svg-shimmer"/>
+                    <circle cx="30" cy="58" r="4" fill="${v.c2}"/><circle cx="70" cy="58" r="4" fill="${v.c2}"/>`;
+            } else if (id === 'medal') {
+                body = `<polygon points="34,14 48,46 38,46 24,14" fill="${v.c2}"/>
+                    <polygon points="66,14 52,46 62,46 76,14" fill="${v.c2}"/>
+                    <circle cx="50" cy="64" r="22" fill="${v.c1}" stroke="#92400e" stroke-width="3"/>
+                    <polygon class="svg-shimmer" points="50,48 54,58 65,58 56,64 59,74 50,68 41,74 44,64 35,58 46,58" fill="#ffffff"/>`;
+            } else {
+                return `<span style="font-size:${s}px">${(PET_ACCS[id] && PET_ACCS[id].emoji) || '✨'}</span>`;
+            }
+            return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="display:block;overflow:visible">${body}</svg>`;
+        }
+
+        function itemSvgHTML(kind, id, vIdx, px) {
+            const list = SHOP_ITEM_VARIANTS[id];
+            const v = (list && list[vIdx]) || (list && list[0]) || { c1: '#f59e0b', c2: '#ef4444' };
+            const s = px || 44;
+            const em = (kind === 'food' ? (PET_FOODS[id] && PET_FOODS[id].emoji) : (PET_SUPPLIES[id] && PET_SUPPLIES[id].emoji)) || '🎁';
+            return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="display:block;overflow:visible">
+                <defs><linearGradient id="ig_${id}_${vIdx}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${v.c1}"/><stop offset="100%" stop-color="${v.c2}"/></linearGradient></defs>
+                <rect x="8" y="8" width="84" height="84" rx="24" fill="url(#ig_${id}_${vIdx})" stroke="#ffffff" stroke-width="4"/>
+                <circle cx="26" cy="24" r="7" fill="#ffffff" opacity=".32"/>
+                <text x="50" y="64" text-anchor="middle" font-size="46">${em}</text>
+            </svg>`;
+        }
+
+        function getOwnedVariants(child, kind, id) {
+            ensurePetData(child);
+            if (kind === 'decor') {
+                const it = ROOM_DECOR[id];
+                if (it && it.bossOnly) return child.room.owned.includes(id) ? [0, 1, 2, 3, 4] : [];
+                const arr = child.room.variants[id];
+                if (Array.isArray(arr) && arr.length) return arr;
+                return child.room.owned.includes(id) ? [0] : [];
+            }
+            if (kind === 'wall') {
+                const wl = ROOM_WALLS[id];
+                const arr = child.room.wallVariants[id];
+                if (Array.isArray(arr) && arr.length) return arr;
+                return (child.room.owned.includes(id) || (wl && wl.price === 0)) ? [0] : [];
+            }
+            if (kind === 'acc') {
+                const a = PET_ACCS[id];
+                if (a && a.bossOnly) return child.petWardrobe.accs.includes(id) ? [0, 1, 2, 3, 4] : [];
+                const arr = child.petWardrobe.accVariants[id];
+                if (Array.isArray(arr) && arr.length) return arr;
+                return child.petWardrobe.accs.includes(id) ? [0] : [];
+            }
+            return [];
+        }
+
+        function openVariantPicker(kind, id) {
+            const child = getActiveChild();
+            if (!child) return;
+            ensurePetData(child);
+            const pet = getActivePet(child);
+            playSound('click');
+
+            let title = '', price = 0, variants = [], owned = [], activeV = -1, isBossOnly = false;
+            if (kind === 'decor') {
+                const d = ROOM_DECOR[id]; if (!d) return;
+                title = d.name; price = petPrice('decor', id, d.price); isBossOnly = !!d.bossOnly;
+                variants = DECOR_VARIANTS[id] || [];
+                owned = getOwnedVariants(child, 'decor', id);
+                activeV = child.room.placed[id] ? (Number(child.room.placed[id].v) || 0) : -1;
+            } else if (kind === 'wall') {
+                const w = ROOM_WALLS[id]; if (!w) return;
+                title = w.name; price = petPrice('wall', id, w.price);
+                variants = WALL_VARIANTS[id] || [];
+                owned = getOwnedVariants(child, 'wall', id);
+                activeV = child.room.wall === id ? (Number(child.room.wallVariant) || 0) : -1;
+            } else if (kind === 'acc') {
+                const a = PET_ACCS[id]; if (!a) return;
+                title = a.name; price = petPrice('acc', id, a.price); isBossOnly = !!a.bossOnly;
+                variants = ACC_VARIANTS[id] || [];
+                owned = getOwnedVariants(child, 'acc', id);
+                activeV = (pet && pet.acc === id) ? (Number(pet.accVariant) || 0) : -1;
+            } else if (kind === 'food' || kind === 'supply') {
+                const it = (kind === 'food' ? PET_FOODS : PET_SUPPLIES)[id]; if (!it) return;
+                title = it.name; price = petPrice(kind, id, it.price);
+                variants = SHOP_ITEM_VARIANTS[id] || [];
+            }
+
+            const cards = variants.map((v, idx) => {
+                let preview = '';
+                if (kind === 'decor') preview = `<div class="h-16 flex items-center justify-center">${decorSvgHTML(id, idx, 58)}</div>`;
+                else if (kind === 'wall') preview = `<div class="h-14 w-full rounded-xl border border-slate-200 dark:border-slate-700" style="background:${v.css}"></div>`;
+                else if (kind === 'acc') preview = `<div class="h-14 flex items-center justify-center">${accSvgHTML(id, idx, 50)}</div>`;
+                else preview = `<div class="h-14 flex items-center justify-center">${itemSvgHTML(kind, id, idx, 50)}</div>`;
+
+                let btn = '';
+                if (kind === 'food' || kind === 'supply') {
+                    btn = `<button onclick="pickVariantAction('${kind}','${id}',${idx})" class="w-full py-1.5 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-[11px]">Beli ${price} 🪙</button>`;
+                } else {
+                    const isOwned = owned.includes(idx);
+                    const isActive = activeV === idx;
+                    if (isActive) {
+                        btn = kind === 'wall'
+                            ? `<span class="block w-full py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-extrabold text-[11px] text-center">✓ Dipakai</span>`
+                            : `<button onclick="pickVariantAction('${kind}','${id}',${idx})" class="w-full py-1.5 rounded-xl bg-indigo-500 text-white font-extrabold text-[11px]">✓ Dipakai (Copot)</button>`;
+                    } else if (isOwned) {
+                        btn = `<button onclick="pickVariantAction('${kind}','${id}',${idx})" class="w-full py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px]">${kind === 'decor' ? 'Pasang' : 'Pakai'}</button>`;
+                    } else if (isBossOnly) {
+                        btn = `<span class="block w-full py-1.5 rounded-xl bg-slate-200 text-slate-500 font-extrabold text-[11px] text-center">🔒 Hadiah Boss</span>`;
+                    } else {
+                        btn = `<button onclick="pickVariantAction('${kind}','${id}',${idx})" class="w-full py-1.5 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-[11px]">Beli ${price} 🪙</button>`;
+                    }
+                }
+                const borderCls = (activeV === idx)
+                    ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400/40'
+                    : (owned.includes(idx) ? 'border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900');
+                return `<div class="vp-card rounded-2xl p-2.5 border-2 ${borderCls} flex flex-col justify-between gap-2 text-center">
+                    ${preview}
+                    <p class="font-game font-bold text-xs leading-tight">${idx + 1}. ${esc(v.name)}</p>
+                    ${btn}
+                </div>`;
+            }).join('');
+
+            const subNote = (kind === 'food' || kind === 'supply')
+                ? `Stok dimiliki: <b>${child.petInv[id] || 0}</b> • Pilih rasa/jenis favoritmu (5 pilihan):`
+                : `Pilih 1 dari 5 model ${esc(title)} • Koinmu: <b>${child.coins} 🪙</b>`;
+            sheetOpen(`🎨 Pilih Model ${title}`, `<p class="text-[11px] font-semibold text-slate-500 dark:text-slate-300 text-center">${subNote}</p>
+                <div class="grid grid-cols-2 gap-2.5">${cards}</div>`);
+        }
+
+        function pickVariantAction(kind, id, vIdx) {
+            const child = getActiveChild();
+            if (!child) return;
+            ensurePetData(child);
+            const pet = getActivePet(child);
+
+            if (kind === 'food' || kind === 'supply') {
+                const it = (kind === 'food' ? PET_FOODS : PET_SUPPLIES)[id];
+                if (!it || it.bossOnly || !spendCoins(child, petPrice(kind, id, it.price))) return;
+                child.petInv[id] = (child.petInv[id] || 0) + 1;
+                child.petInvStyle[id] = vIdx;
+                const vName = ((SHOP_ITEM_VARIANTS[id] || [])[vIdx] || {}).name || it.name;
+                playSound('correct');
+                showToast(`✅ Membeli ${vName}!`);
+                petPersist(true);
+                openVariantPicker(kind, id);
+                return;
+            }
+
+            const owned = getOwnedVariants(child, kind, id);
+            if (kind === 'decor') {
+                const d = ROOM_DECOR[id]; if (!d) return;
+                if (!owned.includes(vIdx)) {
+                    if (d.bossOnly || !spendCoins(child, petPrice('decor', id, d.price))) return;
+                    if (!child.room.owned.includes(id)) child.room.owned.push(id);
+                    if (!Array.isArray(child.room.variants[id])) child.room.variants[id] = owned.slice();
+                    if (!child.room.variants[id].includes(vIdx)) child.room.variants[id].push(vIdx);
+                    const cur = child.room.placed[id];
+                    child.room.placed[id] = { x: (cur && cur.x) || d.x || 50, y: (cur && cur.y) || d.y || 70, v: vIdx };
+                    const vName = ((DECOR_VARIANTS[id] || [])[vIdx] || {}).name || d.name;
+                    playSound('correct'); fireConfetti(28);
+                    showToast(`🏠 ${d.name} (${vName}) dibeli & dipasang! Geser untuk atur posisi.`);
+                    petPersist(true);
+                    openVariantPicker(kind, id);
+                } else {
+                    const cur = child.room.placed[id];
+                    if (cur && (Number(cur.v) || 0) === vIdx) {
+                        delete child.room.placed[id];
+                        playSound('click');
+                        showToast(`🧹 ${d.name} dicopot dari ruangan.`);
+                    } else {
+                        child.room.placed[id] = { x: (cur && cur.x) || d.x || 50, y: (cur && cur.y) || d.y || 70, v: vIdx };
+                        playSound('click');
+                        showToast(`✨ ${d.name} dipasang!`);
+                    }
+                    petPersist(false);
+                    openVariantPicker(kind, id);
+                }
+            } else if (kind === 'wall') {
+                const w = ROOM_WALLS[id]; if (!w) return;
+                if (!owned.includes(vIdx)) {
+                    if (!spendCoins(child, petPrice('wall', id, w.price))) return;
+                    if (!child.room.owned.includes(id)) child.room.owned.push(id);
+                    if (!Array.isArray(child.room.wallVariants[id])) child.room.wallVariants[id] = owned.slice();
+                    if (!child.room.wallVariants[id].includes(vIdx)) child.room.wallVariants[id].push(vIdx);
+                    child.room.wall = id;
+                    child.room.wallVariant = vIdx;
+                    const vName = ((WALL_VARIANTS[id] || [])[vIdx] || {}).name || w.name;
+                    playSound('correct'); fireConfetti(25);
+                    showToast(`🎨 Wallpaper ${w.name} (${vName}) dibeli & dipasang!`);
+                    petPersist(true);
+                    openVariantPicker(kind, id);
+                } else {
+                    child.room.wall = id;
+                    child.room.wallVariant = vIdx;
+                    playSound('click');
+                    petPersist(false);
+                    openVariantPicker(kind, id);
+                }
+            } else if (kind === 'acc') {
+                const a = PET_ACCS[id]; if (!a || !pet) return;
+                if (!owned.includes(vIdx)) {
+                    if (a.bossOnly || !spendCoins(child, petPrice('acc', id, a.price))) return;
+                    if (!child.petWardrobe.accs.includes(id)) child.petWardrobe.accs.push(id);
+                    if (!Array.isArray(child.petWardrobe.accVariants[id])) child.petWardrobe.accVariants[id] = owned.slice();
+                    if (!child.petWardrobe.accVariants[id].includes(vIdx)) child.petWardrobe.accVariants[id].push(vIdx);
+                    pet.acc = id;
+                    pet.accVariant = vIdx;
+                    const vName = ((ACC_VARIANTS[id] || [])[vIdx] || {}).name || a.name;
+                    playSound('correct'); fireConfetti(25);
+                    showToast(`🎀 ${a.name} (${vName}) dibeli & dipakai!`);
+                    petPersist(true);
+                    openVariantPicker(kind, id);
+                } else {
+                    if (pet.acc === id && (Number(pet.accVariant) || 0) === vIdx) {
+                        pet.acc = '';
+                        playSound('click');
+                    } else {
+                        pet.acc = id;
+                        pet.accVariant = vIdx;
+                        playSound('click');
+                    }
+                    petPersist(false);
+                    openVariantPicker(kind, id);
+                }
+            }
+        }
+
+
         // Harga pet bisa diubah orang tua (fam.petPrices[kind][id]); bila tidak diubah memakai harga bawaan
         function petPrice(kind, id, def) {
             const fam = getActiveFamily();
@@ -7564,10 +8359,15 @@ T([9], S_BE, CLOZE, [
             if (!child) return;
             if (!Array.isArray(child.pets)) child.pets = [];
             if (!child.petInv || typeof child.petInv !== 'object') child.petInv = {};
-            if (!child.petWardrobe) child.petWardrobe = { colors: ['normal'], accs: [] };
-            if (!child.room) child.room = { wall: 'sky', slots: { top: '', left: '', right: '' }, placed: {}, owned: ['sky'] };
+            if (!child.petWardrobe) child.petWardrobe = { colors: ['normal'], accs: [], accVariants: {} };
+            if (!child.petWardrobe.accVariants || typeof child.petWardrobe.accVariants !== 'object') child.petWardrobe.accVariants = {};
+            if (!child.petInvStyle || typeof child.petInvStyle !== 'object') child.petInvStyle = {};
+            if (!child.room) child.room = { wall: 'sky', wallVariant: 0, slots: { top: '', left: '', right: '' }, placed: {}, owned: ['sky'], variants: {}, wallVariants: { sky: [0] } };
             if (!child.room.slots) child.room.slots = { top: '', left: '', right: '' };
             if (!Array.isArray(child.room.owned)) child.room.owned = ['sky'];
+            if (!child.room.variants || typeof child.room.variants !== 'object') child.room.variants = {};
+            if (!child.room.wallVariants || typeof child.room.wallVariants !== 'object') child.room.wallVariants = {};
+            if (typeof child.room.wallVariant !== 'number') child.room.wallVariant = 0;
             if (!child.room.placed || typeof child.room.placed !== 'object') {
                 child.room.placed = {};
                 ['top', 'left', 'right'].forEach((s) => {
@@ -7835,7 +8635,7 @@ T([9], S_BE, CLOZE, [
                 <div data-pet="1" class="relative inline-block ${animCls}" style="width:${px}px;height:${px}px">
                     <span class="${pet.sick && st > 0 ? 'pa-sick' : (color.rainbow ? 'pet-rainbow-fx' : '')}" style="display:block;${color.rainbow ? '' : 'filter:' + color.css}">${petSvgHTML(pet, px)}</span>
                     ${sickFx}
-                    ${acc ? `<span style="position:absolute;left:50%;top:${acc.top};transform:translateX(-50%);font-size:${Math.round(px * .42)}px;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))">${acc.emoji}</span>` : ''}
+                    ${acc ? `<span style="position:absolute;left:50%;top:${acc.top};transform:translateX(-50%);filter:drop-shadow(0 2px 3px rgba(0,0,0,.22));pointer-events:none">${accSvgHTML(pet.acc, Number(pet.accVariant) || 0, Math.round(px * .48))}</span>` : ''}
                     ${overlay ? `<span style="position:absolute;right:-12%;top:-8%;font-size:${Math.round(px * .34)}px;line-height:1">${overlay}</span>` : ''}
                 </div>
             </div>`;
@@ -7921,7 +8721,7 @@ T([9], S_BE, CLOZE, [
 
         function petRoomHTML(child, pet, readOnly) {
             const room = child.room;
-            const wall = ROOM_WALLS[room.wall] || ROOM_WALLS.sky;
+            const wallCss = wallStyleCSS(room.wall, Number(room.wallVariant) || 0);
             const placed = room.placed || {};
             const decorItems = Object.keys(placed).map((id) => {
                 const d = ROOM_DECOR[id];
@@ -7929,9 +8729,10 @@ T([9], S_BE, CLOZE, [
                 if (!d || !pos) return '';
                 const x = Math.max(6, Math.min(94, Number(pos.x) || d.x || 50));
                 const y = Math.max(10, Math.min(88, Number(pos.y) || d.y || 50));
-                const sz = d.size || 40;
+                const sz = Math.round((d.size || 40) * 1.48);
+                const vIdx = Number(pos.v) || 0;
                 const dragAttr = readOnly ? '' : `onpointerdown="roomDragStart(event,'${id}')" title="Geser untuk memindah ${esc(d.name)}"`;
-                return `<div class="room-decor-drag" data-decor-id="${id}" ${dragAttr} style="left:${x}%;top:${y}%;font-size:${sz}px"><span class="rd-inner ${d.anim || ''}">${d.emoji}</span></div>`;
+                return `<div class="room-decor-drag" data-decor-id="${id}" ${dragAttr} style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px"><span class="rd-inner ${d.anim || ''}">${decorSvgHTML(id, vIdx, sz)}</span></div>`;
             }).join('');
 
             const floorBg = room.wall === 'beach'
@@ -7942,7 +8743,7 @@ T([9], S_BE, CLOZE, [
                 ? 'linear-gradient(180deg,#312e81,#1e1b4b)'
                 : 'repeating-linear-gradient(90deg,rgba(146,64,14,.26) 0 42px,rgba(120,53,15,.34) 42px 44px),linear-gradient(180deg,#d6a87c,#b47b4b)';
             const hasDecor = Object.keys(placed).length > 0;
-            return `<div id="pet-room" class="relative rounded-3xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-inner" style="height:260px;background:${wall.css}">
+            return `<div id="pet-room" class="relative rounded-3xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-inner" style="height:260px;background:${wallCss}">
                 ${petRoomAmbientHTML(room.wall)}
                 <div style="position:absolute;left:0;right:0;bottom:0;height:31%;background:${floorBg};border-top:3px solid rgba(255,255,255,.35)"></div>
                 <div style="position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:154px;height:36px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.65),rgba(251,191,36,.32) 70%,transparent);border:2px dashed rgba(255,255,255,.55);pointer-events:none"></div>
@@ -7982,7 +8783,7 @@ T([9], S_BE, CLOZE, [
                 roomDrag.el.classList.remove('dragging');
                 const child = getActiveChild();
                 if (child && child.room && child.room.placed && roomDrag.x != null) {
-                    child.room.placed[roomDrag.id] = { x: roomDrag.x, y: roomDrag.y };
+                    const prevP = child.room.placed[roomDrag.id] || {}; child.room.placed[roomDrag.id] = { x: roomDrag.x, y: roomDrag.y, v: Number(prevP.v) || 0 };
                     saveDatabase();
                 }
                 roomDrag = null;
@@ -8073,15 +8874,16 @@ T([9], S_BE, CLOZE, [
             } else if (petPanel === 'shop') {
                 const rows = (obj, kind) => Object.keys(obj).filter((k) => !obj[k].bossOnly).map((k) => {
                     const it = obj[k];
+                    const vIdx = Number(child.petInvStyle[k]) || 0;
                     const extra = kind === 'food' ? `Kenyang +${it.full}${it.happy ? `, Senang +${it.happy}` : ''}${it.health ? `, Sehat +${it.health}` : ''}` : it.desc;
-                    return `<div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                        <span class="text-2xl">${it.emoji}</span>
+                    return `<div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <span class="shrink-0">${itemSvgHTML(kind, k, vIdx, 38)}</span>
                         <div class="flex-1 min-w-0"><p class="font-bold text-xs">${it.name} <span class="text-slate-400">(punya ${child.petInv[k] || 0})</span></p><p class="text-[10px] font-semibold text-slate-500">${extra}</p></div>
-                        <button onclick="petBuy('${kind}','${k}')" class="${btnCls('buy')}">${petPrice(kind, k, it.price)} 🪙</button>
+                        <button onclick="openVariantPicker('${kind}','${k}')" class="${btnCls('buy')}">Pilih (5) • ${petPrice(kind, k, it.price)} 🪙</button>
                     </div>`;
                 }).join('');
-                panel = `<p class="text-[11px] font-extrabold text-slate-500">MAKANAN</p><div class="space-y-1.5">${rows(PET_FOODS, 'food')}</div>
-                    <p class="text-[11px] font-extrabold text-slate-500 pt-1">PERLENGKAPAN</p><div class="space-y-1.5">${rows(PET_SUPPLIES, 'supply')}</div>
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">MAKANAN (5 PILIHAN RASA)</p><div class="space-y-1.5">${rows(PET_FOODS, 'food')}</div>
+                    <p class="text-[11px] font-extrabold text-slate-500 pt-1">PERLENGKAPAN (5 PILIHAN)</p><div class="space-y-1.5">${rows(PET_SUPPLIES, 'supply')}</div>
                     ${(child.petInv.gold_meat || 0) > 0 ? `<p class="text-[11px] font-semibold text-amber-600">🍗 Daging Emas (hadiah boss) x${child.petInv.gold_meat} ada di tab Rawat.</p>` : ''}`;
             } else if (petPanel === 'look') {
                 const w = child.petWardrobe;
@@ -8093,31 +8895,41 @@ T([9], S_BE, CLOZE, [
                 }).join('');
                 const accRows = Object.keys(PET_ACCS).filter((k) => !PET_ACCS[k].bossOnly || w.accs.includes(k)).map((k) => {
                     const a = PET_ACCS[k];
-                    const owned = w.accs.includes(k);
+                    const ownedArr = getOwnedVariants(child, 'acc', k);
                     const on = pet.acc === k;
-                    const btn = on ? `<button onclick="petEquip('acc','')" class="${btnCls('off')}">Lepas</button>` : owned ? `<button onclick="petEquip('acc','${k}')" class="${btnCls('use')}">Pakai</button>` : `<button onclick="petBuy('acc','${k}')" class="${btnCls('buy')}">${petPrice('acc', k, a.price)} 🪙</button>`;
-                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">${a.emoji} ${a.name}</span>${btn}</div>`;
+                    const showV = on ? (Number(pet.accVariant) || 0) : (ownedArr[0] || 0);
+                    const btns = ownedArr.length > 0
+                        ? `<div class="flex items-center gap-1.5 shrink-0"><button onclick="openVariantPicker('acc','${k}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">🎨 ${ownedArr.length}/5</button>${on ? `<button onclick="petEquip('acc','')" class="${btnCls('off')}">Lepas</button>` : `<button onclick="petEquip('acc','${k}')" class="${btnCls('use')}">Pakai</button>`}</div>`
+                        : `<button onclick="openVariantPicker('acc','${k}')" class="${btnCls('buy')}">🎨 5 Model • ${petPrice('acc', k, a.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold flex items-center gap-2 min-w-0">${accSvgHTML(k, showV, 32)}<span class="truncate">${a.name}</span></span>${btns}</div>`;
                 }).join('');
-                panel = `<p class="text-[11px] font-extrabold text-slate-500">WARNA PET</p><div class="space-y-1.5">${colorRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">AKSESORIS</p><div class="space-y-1.5">${accRows}</div>`;
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">WARNA PET</p><div class="space-y-1.5">${colorRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">AKSESORIS (5 MODEL TIAP ITEM)</p><div class="space-y-1.5">${accRows}</div>`;
             } else if (petPanel === 'room') {
                 const r = child.room;
                 const wallRows = Object.keys(ROOM_WALLS).map((k) => {
                     const wl = ROOM_WALLS[k];
-                    const owned = r.owned.includes(k) || wl.price === 0;
-                    const btn = r.wall === k ? `<span class="${btnCls('on')}">Dipakai</span>` : owned ? `<button onclick="roomEquip('wall','${k}')" class="${btnCls('use')}">Pakai</button>` : `<button onclick="roomBuy('wall','${k}')" class="${btnCls('buy')}">${petPrice('wall', k, wl.price)} 🪙</button>`;
-                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold flex items-center gap-2"><span class="w-5 h-5 rounded-md inline-block" style="background:${wl.css}"></span>${wl.name}</span>${btn}</div>`;
+                    const ownedArr = getOwnedVariants(child, 'wall', k);
+                    const on = r.wall === k;
+                    const showV = on ? (Number(r.wallVariant) || 0) : (ownedArr[0] || 0);
+                    const btns = ownedArr.length > 0
+                        ? `<div class="flex items-center gap-1.5 shrink-0"><button onclick="openVariantPicker('wall','${k}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">🎨 ${ownedArr.length}/5</button>${on ? `<span class="${btnCls('on')}">Dipakai</span>` : `<button onclick="roomEquip('wall','${k}')" class="${btnCls('use')}">Pakai</button>`}</div>`
+                        : `<button onclick="openVariantPicker('wall','${k}')" class="${btnCls('buy')}">🎨 5 Tema • ${petPrice('wall', k, wl.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold flex items-center gap-2 min-w-0"><span class="w-7 h-7 rounded-lg inline-block shrink-0 border border-slate-200" style="background:${wallStyleCSS(k, showV)}"></span><span class="truncate">${wl.name}</span></span>${btns}</div>`;
                 }).join('');
                 const placed = r.placed || {};
                 const ownedDecors = Object.keys(ROOM_DECOR).filter((k) => r.owned.includes(k));
                 const decorRows = Object.keys(ROOM_DECOR).filter((k) => !ROOM_DECOR[k].bossOnly || r.owned.includes(k)).map((k) => {
                     const d = ROOM_DECOR[k];
-                    const owned = r.owned.includes(k);
+                    const ownedArr = getOwnedVariants(child, 'decor', k);
                     const on = !!placed[k];
-                    const btn = on ? `<button onclick="roomEquip('decor','${k}')" class="${btnCls('off')}">Copot</button>` : owned ? `<button onclick="roomEquip('decor','${k}')" class="${btnCls('use')}">Pasang</button>` : `<button onclick="roomBuy('decor','${k}')" class="${btnCls('buy')}">${petPrice('decor', k, d.price)} 🪙</button>`;
-                    return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold">${d.emoji} ${d.name} ${on ? '<span class="text-[10px] text-emerald-600">• Terpasang</span>' : ''}</span>${btn}</div>`;
+                    const showV = on ? (Number(placed[k].v) || 0) : (ownedArr[0] || 0);
+                    const btns = ownedArr.length > 0
+                        ? `<div class="flex items-center gap-1.5 shrink-0"><button onclick="openVariantPicker('decor','${k}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">🎨 ${ownedArr.length}/5</button>${on ? `<button onclick="roomEquip('decor','${k}')" class="${btnCls('off')}">Copot</button>` : `<button onclick="roomEquip('decor','${k}')" class="${btnCls('use')}">Pasang</button>`}</div>`
+                        : `<button onclick="openVariantPicker('decor','${k}')" class="${btnCls('buy')}">🎨 5 Model • ${petPrice('decor', k, d.price)} 🪙</button>`;
+                    return `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"><span class="font-bold flex items-center gap-2 min-w-0"><span class="shrink-0">${decorSvgHTML(k, showV, 36)}</span><span class="truncate">${d.name} ${on ? '<span class="text-[10px] text-emerald-600">• Terpasang</span>' : ''}</span></span>${btns}</div>`;
                 }).join('');
                 const bulkBtns = ownedDecors.length > 0 ? `<div class="grid grid-cols-2 gap-2"><button onclick="roomEquipAll(true)" class="py-2 rounded-xl bg-emerald-500 text-white font-extrabold text-[11px]">✨ Pasang Semua (${ownedDecors.length})</button><button onclick="roomEquipAll(false)" class="py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-[11px]">🧹 Lepas Semua</button></div><p class="text-[10px] font-semibold text-slate-400">✋ Sentuh & geser langsung barang di dalam ruangan untuk mengatur letaknya!</p>` : '';
-                panel = `<p class="text-[11px] font-extrabold text-slate-500">WALLPAPER HIDUP</p><div class="space-y-1.5">${wallRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">DEKORASI (BISA DIPASANG SEMUA)</p>${bulkBtns}<div class="space-y-1.5">${decorRows}</div>`;
+                panel = `<p class="text-[11px] font-extrabold text-slate-500">WALLPAPER HIDUP (5 TEMA TIAP JENIS)</p><div class="space-y-1.5">${wallRows}</div><p class="text-[11px] font-extrabold text-slate-500 pt-1">DEKORASI (5 MODEL TIAP BARANG)</p>${bulkBtns}<div class="space-y-1.5">${decorRows}</div>`;
             }
 
             el.innerHTML = `${coinsHTML}
@@ -8417,7 +9229,8 @@ T([9], S_BE, CLOZE, [
             showToast(`${f.emoji} ${pet.name} makan dengan lahap!`);
             saveDatabase();
             const statTag = `+${f.full} 🍽️${f.happy ? ' +' + f.happy + ' 😄' : ''}${f.health ? ' +' + f.health + ' ❤️' : ''}`;
-            petRoomAnim(`<span style="font-size:48px;z-index:3;animation:pa-food 1s cubic-bezier(.3,.8,.4,1) forwards">${f.emoji}</span>
+            const foodV = Number((child.petInvStyle || {})[foodId]) || 0;
+            petRoomAnim(`<span style="z-index:3;animation:pa-food 1s cubic-bezier(.3,.8,.4,1) forwards">${itemSvgHTML('food', foodId, foodV, 52)}</span>
                 <div class="pet-speech" style="animation-delay:.9s">${statTag}</div>
                 <span style="left:44%;top:32%;font-size:28px;opacity:0;animation:pa-pop 1.1s ease-out .95s forwards">😋</span>
                 ${petSpread('✨', 5, 'pa-pop', 1.1, 'animation-delay:.9s')}
@@ -8607,31 +9420,35 @@ T([9], S_BE, CLOZE, [
             const child = getActiveChild(); const pet = child && getActivePet(child); if (!pet) return;
             playSound('click');
             if (kind === 'color') pet.color = id;
-            if (kind === 'acc') pet.acc = id;
+            if (kind === 'acc') {
+                pet.acc = id;
+                if (id) {
+                    const ov = getOwnedVariants(child, 'acc', id);
+                    pet.accVariant = ov.length ? ov[0] : 0;
+                }
+            }
             petPersist(false);
         }
 
         function roomBuy(kind, id) {
-            const child = getActiveChild(); if (!child) return;
-            ensurePetData(child);
-            const it = kind === 'wall' ? ROOM_WALLS[id] : ROOM_DECOR[id];
-            if (!it || it.bossOnly || child.room.owned.includes(id) || !spendCoins(child, petPrice(kind, id, it.price))) return;
-            child.room.owned.push(id);
-            if (kind === 'wall') child.room.wall = id;
-            else child.room.placed[id] = { x: it.x || 50, y: it.y || 70 };
-            playSound('correct'); showToast(`🏠 ${it.name} dibeli & dipasang! Geser untuk atur posisi.`);
-            petPersist(true);
+            openVariantPicker(kind, id);
         }
 
         function roomEquip(kind, id) {
             const child = getActiveChild(); if (!child) return;
             ensurePetData(child);
             playSound('click');
-            if (kind === 'wall') child.room.wall = id;
-            else {
+            if (kind === 'wall') {
+                const ov = getOwnedVariants(child, 'wall', id);
+                child.room.wall = id;
+                child.room.wallVariant = ov.length ? ov[0] : 0;
+            } else {
                 const d = ROOM_DECOR[id]; if (!d) return;
                 if (child.room.placed[id]) delete child.room.placed[id];
-                else child.room.placed[id] = { x: d.x || 50, y: d.y || 70 };
+                else {
+                    const ov = getOwnedVariants(child, 'decor', id);
+                    child.room.placed[id] = { x: d.x || 50, y: d.y || 70, v: ov.length ? ov[0] : 0 };
+                }
             }
             petPersist(false);
         }
@@ -8644,7 +9461,8 @@ T([9], S_BE, CLOZE, [
                 Object.keys(ROOM_DECOR).forEach((k) => {
                     if (child.room.owned.includes(k) && !child.room.placed[k]) {
                         const d = ROOM_DECOR[k];
-                        child.room.placed[k] = { x: d.x || 50, y: d.y || 70 };
+                        const ov = getOwnedVariants(child, 'decor', k);
+                        child.room.placed[k] = { x: d.x || 50, y: d.y || 70, v: ov.length ? ov[0] : 0 };
                     }
                 });
                 showToast('✨ Semua dekorasi dipasang! Geser dengan jarimu untuk menatanya.');
@@ -11102,7 +11920,7 @@ T([9], S_BE, CLOZE, [
             openPvpChild, pvpAskConfirm, pvpSend, pvpAccept, pvpDecline, pvpIntro, pvpStart, pvpSeen, showPvpResult, savePvpSettings, resetPvpSettings,
             petRevive, petBury, petRename, closePetPlay, petPlayStart, petPlayAnswer, petPlayAgain, savePetPrices, resetPetPrices,
             petSetPanel, petToggleFeed, petSelect, petTap, petAdopt, petFeed, petPlay, petWarmOpen, petWarmAnswer, petBath, petMedicine, petBuy, petEquip,
-            roomBuy, roomEquip, roomEquipAll, roomDragStart, startBossQuiz, openTogether, visitSibling, visitGift, dlWagerMenu, createChallenge, acceptDuel, declineDuel, resumeDuel, dlSeen, showDuelResult, wordGuess, saveDuelSettings, resetDuelSettings, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, petStoryRead, petStoryNav, petStorySpeak, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
+            roomBuy, roomEquip, roomEquipAll, roomDragStart, openVariantPicker, pickVariantAction, startBossQuiz, openTogether, visitSibling, visitGift, dlWagerMenu, createChallenge, acceptDuel, declineDuel, resumeDuel, dlSeen, showDuelResult, wordGuess, saveDuelSettings, resetDuelSettings, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, petStoryRead, petStoryNav, petStorySpeak, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
             switchAuthRole,
             toggleParentRegisterMode,
             toggleParentJoinMode,
@@ -11116,7 +11934,7 @@ T([9], S_BE, CLOZE, [
             clearFamilyActivityLog,
             setRewardCost,
             resolveAppConfirm,
-            updateTargetQuestionHint,
+            updateTargetQuestionHint, onTargetSubjectChange,
             handleParentAuth,
             handleChildLogin,
             quickDemoLogin,
