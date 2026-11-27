@@ -4616,6 +4616,7 @@ T([9], S_BE, CLOZE, [
                             } else if (db.currentSession.role === 'child') {
                                 updateChildHeaderUI();
                                 renderChildHomeView();
+                                checkChildPvpNotify();
                             }
                         }
                     },
@@ -10930,8 +10931,28 @@ T([9], S_BE, CLOZE, [
         const PVP_TOTAL = 15;
         const PVP_QSEC = 10;
         let pvpTimer = null;
-        let pvpLastCount = -1;
-        let pvpParentLastCount = -1;
+        let pvpNotifiedIds = new Set();
+        let pvpParentNotifiedIds = new Set();
+        function checkChildPvpNotify() {
+            if (!db.currentSession || db.currentSession.role !== 'child') return;
+            const child = getActiveChild(); const fam = getActiveFamily();
+            if (!child || !fam || !pvpCfg(fam).enabled) return;
+            const ib = pvpInbox(fam, 'child', child.username);
+            const freshInvites = ib.invites.filter((d) => !pvpNotifiedIds.has(d.id));
+            if (freshInvites.length > 0) {
+                freshInvites.forEach((d) => pvpNotifiedIds.add(d.id));
+                const d0 = freshInvites[0];
+                const who = pvpDisplayParent(fam, d0.parentUn, d0.targetRole);
+                playSound('fanfare');
+                showToast(`⚔️ Tantangan baru dari ${who}! Buka Arena → Tantang Ayah/Ibu`);
+            }
+            const freshReady = ib.play.filter((d) => !(d.started && d.started.child) && !pvpNotifiedIds.has(d.id + '_play'));
+            if (freshReady.length > 0) {
+                freshReady.forEach((d) => pvpNotifiedIds.add(d.id + '_play'));
+                playSound('correct');
+                showToast('⚔️ Tantanganmu disetujui Ayah/Ibu! Ayo main sekarang!');
+            }
+        }
 
         function pvpCfg(fam) {
             fam = fam || getActiveFamily();
@@ -11060,8 +11081,8 @@ T([9], S_BE, CLOZE, [
                 const roleTag = side === 'parent' ? ` (${esc(pvpDisplayParent(fam, d.parentUn, d.targetRole))})` : '';
                 return card(`<p class="text-xs font-bold leading-snug">✅ Tantangan melawan <b>${esc(oppName(d))}</b>${roleTag} sudah disetujui.</p>
                     ${broke ? (pvpLoadProg(d.id, side)
-                        ? `<p class="text-[11px] font-semibold text-amber-700">Sesi sebelumnya terputus. Kamu bisa lanjut dari soal berikutnya (soal yang sedang tampil saat terputus dihitung salah).</p><button onclick="pvpStart('${d.id}')" class="w-full py-2 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-[11px]">▶️ Lanjutkan</button>`
-                        : '<p class="text-[11px] font-semibold text-rose-600">Sesi sebelumnya terputus dan tidak bisa dilanjutkan di perangkat ini. Dalam beberapa menit tantangan ini dianggap menyerah.</p>')
+                        ? `<p class="text-[11px] font-semibold text-amber-700">Sesi sebelumnya terputus. Kamu bisa lanjut dari soal berikutnya atau batalkan sesi ini.</p><div class="grid grid-cols-2 gap-2"><button onclick="pvpStart('${d.id}')" class="py-2 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-[11px]">▶️ Lanjutkan</button><button onclick="pvpCancelStuck('${d.id}')" class="py-2 rounded-xl bg-rose-500 text-white font-extrabold text-[11px]">🗑️ Batalkan Sesi</button></div>`
+                        : `<p class="text-[11px] font-semibold text-rose-600">Sesi sebelumnya terputus di perangkat lain atau browser ditutup.</p><button onclick="pvpCancelStuck('${d.id}')" class="w-full py-2 rounded-xl bg-rose-500 text-white font-extrabold text-[11px]">🗑️ Batalkan Sesi Nyangkut</button>`)
                         : `<button onclick="pvpIntro('${d.id}')" class="w-full py-2 rounded-xl bg-orange-500 text-white font-extrabold text-[11px]">▶️ Main Sekarang</button>`}`);
             }).join('');
 
@@ -11215,6 +11236,24 @@ T([9], S_BE, CLOZE, [
             pvpRefresh();
             if (side === 'child') openPvpChild(); else sheetClose();
         }
+
+        async function pvpCancelStuck(id) {
+            const fam = getActiveFamily();
+            const side = pvpSide();
+            if (!fam) return;
+            const d = (fam.pvp || []).find((x) => x.id === id);
+            if (!d) { sheetClose(); pvpRefresh(); return; }
+            const ok = await appConfirm('Batalkan sesi tantangan yang terputus/nyangkut ini? Kamu bisa langsung membuat atau menerima tantangan baru setelahnya.', { title: 'Batalkan Sesi Nyangkut', okText: 'Ya, Batalkan' });
+            if (!ok) return;
+            pvpClearProg(d.id, side);
+            fam.pvp = (fam.pvp || []).filter((x) => x.id !== id);
+            saveDatabase(fam.parentUsername);
+            playSound('click');
+            showToast('🗑️ Sesi nyangkut berhasil dibatalkan!');
+            pvpRefresh();
+            if (side === 'child') openPvpChild(); else sheetClose();
+        }
+
         function pvpIntro(id) {
             const fam = getActiveFamily(); const side = pvpSide();
             const d = (fam.pvp || []).find((x) => x.id === id); if (!d || d.status !== 'accepted') return;
@@ -11472,8 +11511,13 @@ T([9], S_BE, CLOZE, [
             const myRel = meAcc && (meAcc.relation === 'Ayah' || meAcc.relation === 'Ibu') ? meAcc.relation : '';
             const sections = pvpSectionsHTML(fam, 'parent', me);
             if (badge) badge.classList.toggle('hidden', !sections.count);
-            if (sections.count > 0 && sections.count !== pvpParentLastCount && !document.getElementById('quiz-modal').classList.contains('flex')) setTimeout(() => showToast('⚔️ Ada tantangan dari anak di menu Pantau!'), 700);
-            pvpParentLastCount = sections.count;
+            const pIb = pvpInbox(fam, 'parent', me);
+            const freshP = pIb.invites.filter((d) => !pvpParentNotifiedIds.has(d.id));
+            if (freshP.length > 0 && !document.getElementById('quiz-modal').classList.contains('flex')) {
+                freshP.forEach((d) => pvpParentNotifiedIds.add(d.id));
+                playSound('fanfare');
+                showToast('⚔️ Ada tantangan baru dari anak di menu Pantau!');
+            }
             const kids = (fam.children || []).map((c) => {
                 const busy = myRel
                     ? (fam.pvp || []).some((d) => d.childUn === c.username && d.parentUn === me && (d.targetRole || '') === myRel && ['pending', 'accepted'].includes(d.status))
@@ -11579,8 +11623,7 @@ T([9], S_BE, CLOZE, [
                 if (pvpSweep(famP)) saveDatabase();
                 const pc = pvpCfg(famP);
                 const pn = pvpInbox(famP, 'child', child.username).count;
-                if (pn > 0 && pn !== pvpLastCount) setTimeout(() => showToast('⚔️ Ada tantangan untukmu dari Ayah/Ibu!'), 700);
-                pvpLastCount = pn;
+                checkChildPvpNotify();
                 pvpBtn = `<button onclick="openPvpChild()" class="w-full rounded-2xl p-3 border-2 border-orange-300 dark:border-orange-800 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40 text-orange-700 dark:text-orange-300 font-extrabold text-xs flex items-center gap-2"><span class="text-2xl">👨‍👩‍👧</span><span class="flex-1 text-left">Tantang Ayah/Ibu<span class="block text-[10px] font-semibold opacity-80">${PVP_TOTAL} soal · ${pc.qSec} detik/soal · hadiah ${pc.prize} 🪙 jika menang</span></span>${pn ? `<span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">${pn}</span>` : ''}<i class="fa-solid fa-chevron-right text-xs"></i></button>`;
             }
             el.innerHTML = bossCard + petCard + quick + togetherBtn + pvpBtn;
@@ -12091,7 +12134,7 @@ T([9], S_BE, CLOZE, [
         window.addEventListener('unhandledrejection', (e) => softError(e.reason && e.reason.message));
 
         Object.assign(window, {
-            openPvpChild, pvpAskConfirm, pvpSend, pvpAccept, pvpDecline, pvpIntro, pvpStart, pvpSeen, showPvpResult, savePvpSettings, resetPvpSettings,
+            openPvpChild, pvpAskConfirm, pvpSend, pvpAccept, pvpDecline, pvpCancelStuck, pvpIntro, pvpStart, pvpSeen, showPvpResult, savePvpSettings, resetPvpSettings,
             petRevive, petBury, petRename, closePetPlay, petPlayStart, petPlayAnswer, petPlayAgain, savePetPrices, resetPetPrices,
             petSetPanel, petToggleFeed, petSelect, petTap, petAdopt, petFeed, petPlay, petWarmOpen, petWarmAnswer, petBath, petMedicine, petBuy, petEquip,
             roomBuy, roomEquip, roomEquipAll, roomDragStart, openVariantPicker, pickVariantAction, petSleepToggle, openBedtimePicker, saveBedtimePicker, startBossQuiz, openTogether, visitSibling, visitGift, dlWagerMenu, createChallenge, acceptDuel, declineDuel, resumeDuel, dlSeen, showDuelResult, wordGuess, saveDuelSettings, resetDuelSettings, sheetClose, openAdvMap, startAdvQuiz, startReviewQuiz, openCerts, viewCert, downloadCert, shareCert, openLiveView, closeLiveView, petStoriesOpen, petStoryRead, petStoryNav, petStorySpeak, saveBossSettings, resetBossSettings, bossFxContinue, bossFxOpenChest, copyWeeklyReport,
